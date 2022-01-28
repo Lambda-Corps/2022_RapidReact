@@ -4,7 +4,10 @@
 
 package frc.robot.commands.default_commands;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 
@@ -15,6 +18,8 @@ public class DriveTrainDefaultCommand extends CommandBase {
   // used to drive our robot
   private final DriveTrain m_driveTrain;
   private final XboxController m_driverController;
+  public final ShuffleboardTab m_driveTab;
+  private NetworkTableEntry m_leftVal, m_rightVal;
   /**
    * Creates a new DefaultDriveTrainCommand.
    */
@@ -22,6 +27,9 @@ public class DriveTrainDefaultCommand extends CommandBase {
     m_driveTrain = driveTrain;
     m_driverController = driverController;
 
+    m_driveTab = Shuffleboard.getTab("Default Drive Tab");
+    m_leftVal = m_driveTab.add("Left Drive Value", 0).getEntry();
+    m_rightVal = m_driveTab.add("Right Drive Value", 0).getEntry();
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_driveTrain);
   }
@@ -35,10 +43,13 @@ public class DriveTrainDefaultCommand extends CommandBase {
   @Override
   public void execute() {
     // Axises are inverted, negate them so positive is forward
-    double right = m_driverController.getRawAxis(DRIVER_RIGHT_AXIS); // Right X
-    double left  = -m_driverController.getRawAxis(DRIVER_LEFT_AXIS); // Left Y
+    double turn = m_driverController.getRawAxis(DRIVER_RIGHT_AXIS); // Right X
+    double forward  = -m_driverController.getRawAxis(DRIVER_LEFT_AXIS); // Left Y
 
-    m_driveTrain.teleop_drive(left, right);
+    m_leftVal.forceSetDouble(forward);
+    m_rightVal.forceSetDouble(turn);
+
+    m_driveTrain.teleop_drive(forward, turn);
     // m_driveTrain.curvature_drive_imp(0.5, 0.5, false);
   }
 

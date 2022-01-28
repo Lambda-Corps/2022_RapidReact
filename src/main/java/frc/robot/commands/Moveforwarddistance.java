@@ -25,7 +25,7 @@ public class Moveforwarddistance extends CommandBase {
   @Override
   public void initialize() {
     m_isdone = false;
-    double current_position = m_driveTrain.getEncoderValue();
+    double current_position = m_driveTrain.getLeftEncoderValue();
     m_target_position = 108;
     m_target_position_ticks = current_position + (m_target_position * 1086.49774484);
     SmartDashboard.putNumber("targetposition", m_target_position_ticks);
@@ -36,10 +36,10 @@ public class Moveforwarddistance extends CommandBase {
   @Override
   public void execute() {
     m_driveTrain.teleop_drive(.15, 0);
-    m_isdone = m_target_position_ticks <= m_driveTrain.getEncoderValue() ? true : false;
+    m_isdone = m_target_position_ticks <= m_driveTrain.getLeftEncoderValue() ? true : false;
     if (m_isdone) {
       m_driveTrain.teleop_drive(0, 0);
-      SmartDashboard.putNumber("positionafter", m_driveTrain.getEncoderValue());
+      SmartDashboard.putNumber("positionafter", m_driveTrain.getLeftEncoderValue());
     }
 
   }
