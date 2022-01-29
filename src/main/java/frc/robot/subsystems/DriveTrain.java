@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.default_commands.TurnToAngle;
+import frc.robot.commands.TurnToAngle;
 import edu.wpi.first.math.MathUtil;
 
 import static frc.robot.Constants.*;
@@ -128,7 +128,6 @@ public class DriveTrain extends SubsystemBase {
 		m_left_leader.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, kTimeoutMs);		//Used remotely by right Talon, speed up
 
 		zeroSensors();
-
   }
 
   @Override
@@ -176,28 +175,30 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void teleop_drive(double forward, double turn){
-    forward = deadband(forward);
-    turn = deadband(turn);
+    // forward = deadband(forward);
+    // turn = deadband(turn);
 
-    forward = clamp_drive(forward);
-    turn = clamp_drive(turn);
+    // forward = clamp_drive(forward);
+    // turn = clamp_drive(turn);
 
-    // If the yaw value is zero, we should be driving straight with encoder correction,
-    // otherwise, drive with the input values corrected for deadband
-    if( turn == 0 ){
-      /* Determine which slot affects which PID */
-      m_right_leader.selectProfileSlot(kSlot_Turning, PID_TURN);
-      double _targetAngle = m_right_leader.getSelectedSensorPosition(1);
+    // // If the yaw value is zero, we should be driving straight with encoder correction,
+    // // otherwise, drive with the input values corrected for deadband
+    // if( turn == 0 ){
+    //   /* Determine which slot affects which PID */
+    //   m_right_leader.selectProfileSlot(kSlot_Turning, PID_TURN);
+    //   double _targetAngle = m_right_leader.getSelectedSensorPosition(1);
 			
-			/* Configured for percentOutput with Auxiliary PID on Integrated Sensors' Difference */
-			m_right_leader.set(ControlMode.PercentOutput, forward, DemandType.AuxPID, _targetAngle);
-			m_left_leader.follow(m_right_leader, FollowerType.AuxOutput1);
-    }
-    else {
-      curvature_drive_imp(forward, turn, forward == 0 ? true : false);
-    }
+	// 		/* Configured for percentOutput with Auxiliary PID on Integrated Sensors' Difference */
+	// 		m_right_leader.set(ControlMode.PercentOutput, forward, DemandType.AuxPID, _targetAngle);
+	// 		m_left_leader.follow(m_right_leader, FollowerType.AuxOutput1);
+    // }
+    // else {
+    //   curvature_drive_imp(forward, turn, forward == 0 ? true : false);
+    // }
 
-    m_safety_drive.feed();
+    // m_safety_drive.feed();
+
+	m_safety_drive.curvatureDrive(forward, turn, true);
 
   }
 
