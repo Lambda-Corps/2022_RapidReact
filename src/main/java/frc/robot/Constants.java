@@ -56,7 +56,7 @@ public final class Constants {
      * Not all set of Gains are used in this project and may be removed as desired.
      * 
 	 * 	                                    			  kP   kI   kD   kF               Iz    PeakOut */
-	public final static Gains kGains_Turning = new Gains( 2.0, 0.0,  4.0, 0.0,            200,  1.00 );
+	public final static Gains kGains_Turning = new Gains( .2, 0.0,  0.0, 0.0,            200,  1.00 );
 	
 	/** ---- Flat constants, you should not need to change these ---- */
 	/* We allow either a 0 or 1 when selecting an ordinal for remote devices [You can have up to 2 devices assigned remotely to a talon/victor] */

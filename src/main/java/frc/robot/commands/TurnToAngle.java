@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveTrain;
 
 public class TurnToAngle extends CommandBase {
@@ -66,7 +65,7 @@ public class TurnToAngle extends CommandBase {
     m_start_time = Timer.getFPGATimestamp();
     count = 0;
     m_driveTrain.reset_turn_PID_values(m_turn_kP, m_kI, m_kD);
-    m_driveTrain.zeroSensors();
+    m_driveTrain.setEncodersToZero();
     m_driveTrain.motionMagicStartConfigsTurn();
     arclengthDegrees = SmartDashboard.getNumber("Arc Length in Degrees", 0);
     speed = SmartDashboard.getNumber("Speed", 0);
