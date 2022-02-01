@@ -20,6 +20,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.TurnToAngle;
@@ -122,7 +123,9 @@ public class DriveTrain extends SubsystemBase {
 		_rightConfig.slot1.closedLoopPeriod = closedLoopTimeMs;
 		_rightConfig.slot2.closedLoopPeriod = closedLoopTimeMs;
    		 _rightConfig.slot3.closedLoopPeriod = closedLoopTimeMs;
-    
+
+		_rightConfig.openloopRamp = kOpenLoopRamp;
+		_leftConfig.openloopRamp = kOpenLoopRamp;
    		 /* APPLY the config settings */
 		m_left_leader.configAllSettings(_leftConfig);
 		m_right_leader.configAllSettings(_rightConfig);
@@ -133,8 +136,11 @@ public class DriveTrain extends SubsystemBase {
 		m_left_leader.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, kTimeoutMs);		//Used remotely by right Talon, speed up
 
 		setEncodersToZero();
-
-		Shuffleboard.getTab("Default Drive Tab").addBoolean("Correcting", this::isCorrecting).withPosition(1, 0);
+		ShuffleboardTab tab = Shuffleboard.getTab("Default Drive Tab");
+		tab.addBoolean("Correcting", this::isCorrecting).withPosition(1, 0);
+		tab.addNumber("L. Encoder", this::getLeftEncoderValue).withPosition(0, 1);
+		tab.addNumber("R. Encdoer", this::getRightEncoderValue).withPosition(1, 1);
+		
   	}
 
   @Override
@@ -190,7 +196,7 @@ public class DriveTrain extends SubsystemBase {
 
     // If the yaw value is zero, we should be driving straight with encoder correction,
     // otherwise, drive with the input values corrected for deadband
-    if( turn == 0 ){
+    if( turn == 0 && forward != 0){
 		if(!m_was_correcting){
 			// First time we're correcting automatically, setup state
 			setEncodersToZero();
@@ -209,6 +215,9 @@ public class DriveTrain extends SubsystemBase {
 		m_was_correcting = true;
     }
     else {
+		// if(m_was_correcting){
+		// 	setEncodersToZero();
+		// }
 		m_is_correcting = false;
 		m_was_correcting = false;
 		m_safety_drive.curvatureDrive(forward, turn, true);

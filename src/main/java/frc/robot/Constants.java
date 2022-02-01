@@ -22,7 +22,7 @@ public final class Constants {
 
     ///////////// Drive Train Values /////////////
     public final static double kControllerDeadband = .05;
-    public final static int DRIVER_RIGHT_AXIS = 4;
+    public final static int DRIVER_RIGHT_AXIS = 2;
     public final static int DRIVER_LEFT_AXIS = 1;
 
     ///////////// Talon Specific Values ////////////////
@@ -37,8 +37,9 @@ public final class Constants {
 	 * Drive the robot in clockwise rotations and measure the units per rotation.
 	 * Drive the robot in counter clockwise rotations and measure the units per rotation.
 	 * Take the average of the two.
-	 */ // TODO -- Measure this and fix
-	public final static int kEncoderUnitsPerRotation = 51711;
+	 */
+	public final static int kEncoderUnitsPerRotation = 88554;
+	public final static int kEncoderTicksPerInch = 1074;
     /**
 	 * Set to zero to skip waiting for confirmation.
 	 * Set to nonzero to wait and report to DS if action fails.
@@ -49,6 +50,9 @@ public final class Constants {
 	 * Motor neutral dead-band, set to the minimum 0.1%.
 	 */
     public final static double kNeutralDeadband = 0.001;
+
+	// Open Loop Ramp-up times
+	public final static double kOpenLoopRamp = 0.2;
     
     /**
 	 * PID Gains may have to be adjusted based on the responsiveness of control loop.
@@ -56,7 +60,7 @@ public final class Constants {
      * Not all set of Gains are used in this project and may be removed as desired.
      * 
 	 * 	                                    			  kP   kI   kD   kF               Iz    PeakOut */
-	public final static Gains kGains_Turning = new Gains( .2, 0.0,  0.0, 0.0,            200,  1.00 );
+	public final static Gains kGains_Turning = new Gains( 0.1, 0.0,  0.0, 0.0,            200,  1.0 );
 	
 	/** ---- Flat constants, you should not need to change these ---- */
 	/* We allow either a 0 or 1 when selecting an ordinal for remote devices [You can have up to 2 devices assigned remotely to a talon/victor] */
