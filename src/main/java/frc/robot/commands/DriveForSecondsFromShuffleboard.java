@@ -29,6 +29,8 @@ public class DriveForSecondsFromShuffleboard extends CommandBase {
     m_speed_entry = m_dTab.add("Speed", 0).withPosition(5, 0).withSize(1, 1).getEntry();
     m_right_distance = m_dTab.add("R Distance in Inches", 0).withPosition(6, 0).withSize(1, 1).getEntry();
     m_inches_off = m_dTab.add("Inches_off", 0).withPosition(7, 0).withSize(1, 1).getEntry();
+
+    m_timer = new Timer();
   }
 
   // Called when the command is initially scheduled.
@@ -37,6 +39,7 @@ public class DriveForSecondsFromShuffleboard extends CommandBase {
     m_elapsed = m_elapsed_entry.getDouble(0);
     m_speed = m_speed_entry.getDouble(0);
 
+    m_timer.reset();
     m_timer.start();
   }
 
@@ -57,7 +60,7 @@ public class DriveForSecondsFromShuffleboard extends CommandBase {
     m_right_distance.forceSetDouble(rightenc / kEncoderTicksPerInch);
     double off = Math.abs(Math.abs(rightenc) - Math.abs(leftenc));
     m_inches_off.forceSetDouble(off/kEncoderTicksPerInch);
-  }
+    }
 
   // Returns true when the command should end.
   @Override
