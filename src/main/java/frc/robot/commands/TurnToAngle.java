@@ -57,7 +57,7 @@ public class TurnToAngle extends CommandBase {
     arclengthTicks = (int) (arclengthDegrees * 1074.67 * 0.2291); 
     // ^^^ arc length in ticks = degrees to turn * ticks per 1 inch * degrees per 1 inch
     m_arclengthticksEntry.forceSetDouble(arclengthTicks);
-    m_kF = m_kFEntry.getDouble(0.0129904762);
+    m_kF = m_kFEntry.getDouble(0.003699);
     m_turn_kP = m_turnkPEntry.getDouble(0.0);
     m_kI = m_kIEntry.getDouble(0.0);
     m_kD = m_kDEntry.getDouble(0.0);
@@ -68,7 +68,7 @@ public class TurnToAngle extends CommandBase {
     m_driveTrain.setEncodersToZero();
     m_driveTrain.motionMagicStartConfigsTurn();
     arclengthDegrees = SmartDashboard.getNumber("Arc Length in Degrees", 0);
-    speed = SmartDashboard.getNumber("Speed", 0);
+    //speed = SmartDashboard.getNumber("Speed", 0);
     currentAngle = m_driveTrain.m_gyro.getAngle();
     // arclengthDegrees = currentAngle + arclengthDegrees;
     m_driveTrain.disableMotorSafety();

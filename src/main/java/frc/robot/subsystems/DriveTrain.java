@@ -290,6 +290,7 @@ public class DriveTrain extends SubsystemBase {
   	}
 
   	public boolean motionMagicTurn(int arcTicks){
+<<<<<<< HEAD
 		double tolerance = 10; //TODO determine if this works or if we need it higher
 		m_left_leader.set(ControlMode.MotionMagic, arcTicks);
 		m_right_leader.set(ControlMode.MotionMagic, -arcTicks);
@@ -297,16 +298,24 @@ public class DriveTrain extends SubsystemBase {
 		int currentRightPos = (int) Math.abs(m_right_leader.getSelectedSensorPosition());
 		int targetTicks = Math.abs(arcTicks);
 
+=======
+		  double tolerance = 500; 
+		  m_left_leader.set(ControlMode.MotionMagic, arcTicks);
+		  m_right_leader.set(ControlMode.MotionMagic, -arcTicks);
+		  int currentLeftPos = (int) Math.abs(m_left_leader.getSelectedSensorPosition());
+		  int currentRightPos = (int) Math.abs(m_right_leader.getSelectedSensorPosition());
+		  int targetTicks = Math.abs(arcTicks);
+>>>>>>> 66aba3d383b104c87f1fbe1d4db2124836289eca
 		return (targetTicks - currentLeftPos) < tolerance && (targetTicks - currentRightPos) < tolerance;
 	}
 
 	public void motionMagicStartConfigsTurn(){
 		m_left_leader.selectProfileSlot(kSlot_Turning, PID_PRIMARY);
 		m_right_leader.selectProfileSlot(kSlot_Turning, PID_PRIMARY);
-		m_left_leader.configMotionCruiseVelocity(3000, kTimeoutMs);
-		m_left_leader.configMotionAcceleration(3000, kTimeoutMs);
-		m_right_leader.configMotionCruiseVelocity(3000, kTimeoutMs);
-		m_right_leader.configMotionAcceleration(3000, kTimeoutMs);
+		m_left_leader.configMotionCruiseVelocity(16636, kTimeoutMs);
+		m_left_leader.configMotionAcceleration(8318, kTimeoutMs);
+		m_right_leader.configMotionCruiseVelocity(16636, kTimeoutMs);
+		m_right_leader.configMotionAcceleration(8318, kTimeoutMs);
 	}
 
 	public void disableMotorSafety(){
@@ -319,6 +328,7 @@ public class DriveTrain extends SubsystemBase {
 
 	public void feedWatchdog(){
 		m_safety_drive.feed();
+<<<<<<< HEAD
 	}
 
 	public void motion_magic_end_config_turn(){
@@ -328,6 +338,15 @@ public class DriveTrain extends SubsystemBase {
 		m_right_leader.configMotionAcceleration(500, kTimeoutMs);
 	}
 
+=======
+	  }
+	  public void motion_magic_end_config_turn(){
+		m_left_leader.configMotionCruiseVelocity(16636, kTimeoutMs);
+		m_left_leader.configMotionAcceleration(8318, kTimeoutMs);
+		m_right_leader.configMotionCruiseVelocity(16636, kTimeoutMs);
+		m_right_leader.configMotionAcceleration(8318, kTimeoutMs);
+	  }
+>>>>>>> 66aba3d383b104c87f1fbe1d4db2124836289eca
 	public double getLeftEncoderValue(){
 		return m_left_leader.getSelectedSensorPosition();
 	}
