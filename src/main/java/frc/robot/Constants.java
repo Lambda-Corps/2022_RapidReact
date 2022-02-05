@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -16,8 +18,10 @@ public final class Constants {
     // Robot Electronics Map
 
     ///////////// CAN Bus IDs  ////////////////
-    public final static int RIGHT_TALON_LEADER = 1;
-    public final static int LEFT_TALON_LEADER = 2;
+    public final static int RIGHT_TALON_LEADER = 2;
+	public final static int RIGHT_TALON_FOLLOWER = 4;
+    public final static int LEFT_TALON_LEADER = 1;
+	public final static int LEFT_TALON_FOLLOWER = 3;
 
 
     ///////////// Drive Train Values /////////////
@@ -49,7 +53,7 @@ public final class Constants {
     /**
 	 * Motor neutral dead-band, set to the minimum 0.1%.
 	 */
-    public final static double kNeutralDeadband = 0.001;
+    public final static double kNeutralDeadband = 0.005;
 
 	// Open Loop Ramp-up times
 	public final static double kOpenLoopRamp = 0.2;
@@ -79,4 +83,29 @@ public final class Constants {
 	public final static int kSlot_Turning = SLOT_1;
 	public final static int kSlot_Velocit = SLOT_2;
 	public final static int kSlot_MotProf = SLOT_3;
+
+	public static final int kCountsPerRev = 2048;    // Encoder counts per revolution of the motor shaft.
+	public static final double kSensorGearRatio = 10.71; // Gear ratio is the ratio between the *encoder* and the wheels. On the AndyMark
+														// drivetrain, encoders mount 1:1 with the gearbox shaft.
+	public static final double kGearRatio = 10.71;   // Switch kSensorGearRatio to this gear ratio if encoder is on the motor instead
+														// of on the gearbox.
+	public static final double kWheelRadiusInches = 3.25;
+	public static final int k100msPerSecond = 10;
+
+	public static boolean kGyroReversed = true;
+
+	/* ---- Characterization Calculations ---- */
+	public static final double ksVolts = 0.65154;
+	public static final double kvVoltSecondsPerMeter = .000012616;
+	public static final double kaVoltSecondsSquaredPerMeter = 0.0000003799;
+	public static final double kPDriveVel = 8.5;
+	public static final double kTrackwidthMeters = 0.6731;
+	public static final DifferentialDriveKinematics kDriveKinematics = 
+			new DifferentialDriveKinematics(kTrackwidthMeters);
+	public static final double kMaxSpeedMetersPerSecond = 3;
+	public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+	// Reasonable baseline values for a RAMSETE follower in units of meters and seconds
+	public static final double kRamseteB = 2;
+	public static final double kRamseteZeta = 0.7;
+	
 }

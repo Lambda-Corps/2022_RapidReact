@@ -7,29 +7,37 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FollowerType;
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
+import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.hal.SimDouble;
+import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.TurnToAngle;
+import frc.robot.Robot;
 import static frc.robot.Constants.*;
 
 public class DriveTrain extends SubsystemBase {
 	// TalonFX's for the drivetrain
 	// Right side is inverted here to drive forward
-	WPI_TalonFX m_left_leader, m_right_leader;
+	WPI_TalonFX m_left_leader, m_right_leader, m_left_follower, m_right_follower;
 	
 	// Variables to hold the invert types for the talons
 	TalonFXInvertType m_left_invert, m_right_invert;
@@ -51,12 +59,24 @@ public class DriveTrain extends SubsystemBase {
 	private boolean m_is_correcting = false;
 	NetworkTableEntry m_driveCorrecting;
 
+	///////////// Odometry Trackers //////////////
+	// Odometry class for tracking robot pose
+	private final DifferentialDriveOdometry m_odometry;
+	private final Field2d m_2dField;
+	
+	///////////// Simulator Objects //////////////
+	// These classes help us simulate our drivetrain
+	public DifferentialDrivetrainSim m_drivetrainSimulator;
+	/* Object for simulated inputs into Talon. */
+	private TalonFXSimCollection m_leftDriveSim, m_rightDriveSim;
   
   	/** Creates a new DriveTrain. */
  	public DriveTrain() {
     	m_gyro = new AHRS(SPI.Port.kMXP);
     	m_left_leader = new WPI_TalonFX(LEFT_TALON_LEADER);
+		m_left_follower = new  WPI_TalonFX(LEFT_TALON_FOLLOWER);
     	m_right_leader = new WPI_TalonFX(RIGHT_TALON_LEADER);
+		m_right_follower = new WPI_TalonFX(RIGHT_TALON_FOLLOWER);
 
     	m_safety_drive = new DifferentialDrive(m_left_leader, m_right_leader);
 
@@ -68,6 +88,14 @@ public class DriveTrain extends SubsystemBase {
     	TalonFXConfiguration _leftConfig = new TalonFXConfiguration();
     	TalonFXConfiguration _rightConfig = new TalonFXConfiguration();
 
+		// Set follower talons to default configs, and then follow their leaders
+		m_left_follower.configAllSettings(_leftConfig);
+		m_right_follower.configAllSettings(_rightConfig);
+		m_left_follower.follow(m_left_leader);
+		m_left_follower.setInverted(InvertType.FollowMaster);
+		m_right_follower.follow(m_right_leader);
+		m_right_follower.setInverted(InvertType.FollowMaster);
+		
     		/* Set Neutral Mode */
 		m_left_leader.setNeutralMode(NeutralMode.Brake);
 		m_right_leader.setNeutralMode(NeutralMode.Brake);
@@ -136,20 +164,54 @@ public class DriveTrain extends SubsystemBase {
 		m_left_leader.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, kTimeoutMs);		//Used remotely by right Talon, speed up
 
 		setEncodersToZero();
-		ShuffleboardTab tab = Shuffleboard.getTab("Default Drive Tab");
-		tab.addBoolean("Correcting", this::isCorrecting).withPosition(1, 0);
-		tab.addNumber("L. Encoder", this::getLeftEncoderValue).withPosition(0, 1);
-		tab.addNumber("R. Encdoer", this::getRightEncoderValue).withPosition(1, 1);
+
+		/// Odometry Tracker objects
+		m_2dField = new Field2d();
 		
+		// TODO, see if we can put this on our driver's shuffleboard tab and see it update
+		SmartDashboard.putData(m_2dField);
+		m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
+
+		// Code for simulation within the DriveTrain Constructor
+		if (Robot.isSimulation()) { // If our robot is simulated
+			// This class simulates our drivetrain's motion around the field.
+			/* Simulation model of the drivetrain */
+			m_drivetrainSimulator = new DifferentialDrivetrainSim(
+			  DCMotor.getFalcon500(2), // 2 Falcon 500s on each side of the drivetrain.
+			  kGearRatio, // Standard AndyMark Gearing reduction.
+			  2.1, // MOI of 2.1 kg m^2 (from CAD model).
+			  26.5, // Mass of the robot is 26.5 kg.
+			  Units.inchesToMeters(kWheelRadiusInches), // Robot uses 3" radius (6" diameter) wheels.
+			  0.546, // Distance between wheels is _ meters.
+	  
+			  /*
+			  * The standard deviations for measurement noise:
+			  * x and y: 0.001 m
+			  * heading: 0.001 rad
+			  * l and r velocity: 0.1 m/s
+			  * l and r position: 0.005 m
+			  */
+			  null // VecBuilder.fill(0.001, 0.001, 0.001, 0.1, 0.1, 0.005, 0.005) //Uncomment this
+				  // line to add measurement noise.
+			);
+	  
+			// PhysicsSim.getInstance().addTalonSRX(m_rightDrive, 0.75, 4000);
+			// PhysicsSim.getInstance().addTalonSRX(m_leftDrive, 0.75, 4000);
+			// Setup the Simulation input classes
+			m_leftDriveSim = m_left_leader.getSimCollection();
+			m_rightDriveSim = m_right_leader.getSimCollection();
+		  } // end of constructor code for the simulation
   	}
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-	SmartDashboard.putNumber("Current Angle", TurnToAngle.currentAngle);
-  }
+	@Override
+	public void periodic() {
+		m_odometry.update(m_gyro.getRotation2d(),
+                      nativeUnitsToDistanceMeters(m_left_leader.getSelectedSensorPosition()),
+                      nativeUnitsToDistanceMeters(m_right_leader.getSelectedSensorPosition()));
+   		m_2dField.setRobotPose(m_odometry.getPoseMeters());
+	}
 
-  /* Zero all sensors used */
+  	/* Zero all sensors used */
 	public void setEncodersToZero() {
 		m_left_leader.getSensorCollection().setIntegratedSensorPosition(0.0, kTimeoutMs);
 		m_right_leader.getSensorCollection().setIntegratedSensorPosition(0.0, kTimeoutMs);
@@ -159,141 +221,85 @@ public class DriveTrain extends SubsystemBase {
 	private double deadband(double value) {
 		/* Upper deadband */
 		if (value >= kControllerDeadband) {
-      return value;
-    }
+      		return value;
+    	}
 		
 		/* Lower deadband */
 		if (value <= -kControllerDeadband) {
-      return value;
-    }
+      		return value;
+    	}
 
 		/* Outside deadband */
 		return 0;
-  }
+  	}
   
-  /** Make sure the input to the set command is 1.0 >= x >= -1.0 **/
+  	/** Make sure the input to the set command is 1.0 >= x >= -1.0 **/
 	private double clamp_drive(double value) {
 		/* Upper deadband */
 		if (value >= 1.0) {
-      return 1.0;
-    }
+     		return 1.0;
+   		}
 
 		/* Lower deadband */
 		if (value <= -1.0) {
-      return -1.0;
-    }
+      		return -1.0;
+    	}
 
 		/* Outside deadband */
 		return value;
-  }
+  	}
 
-  public void teleop_drive(double forward, double turn){
-    forward = deadband(forward);
-    turn = deadband(turn);
+	public void teleop_drive(double forward, double turn){
+		forward = deadband(forward);
+		turn = deadband(turn);
 
-    forward = clamp_drive(forward);
-    turn = clamp_drive(turn);
+		forward = clamp_drive(forward);
+		turn = clamp_drive(turn);
 
-    // If the yaw value is zero, we should be driving straight with encoder correction,
-    // otherwise, drive with the input values corrected for deadband
-    if( turn == 0 && forward != 0){
-		if(!m_was_correcting){
-			// First time we're correcting automatically, setup state
-			setEncodersToZero();
-			/* Determine which slot affects which PID */
-			m_right_leader.selectProfileSlot(kSlot_Turning, PID_TURN);
-			m_is_correcting = true;
+		if(Robot.isSimulation()){
+			// Just set the motors
+			m_safety_drive.curvatureDrive(forward, turn, true);
+			return;
 		}
-      	
-      	double _targetAngle = m_right_leader.getSelectedSensorPosition(1);
+
+		// If the yaw value is zero, we should be driving straight with encoder correction,
+		// otherwise, drive with the input values corrected for deadband
+		if( turn == 0 && forward != 0){
+			if(!m_was_correcting){
+				// First time we're correcting automatically, setup state
+				setEncodersToZero();
+				/* Determine which slot affects which PID */
+				m_right_leader.selectProfileSlot(kSlot_Turning, PID_TURN);
+				m_is_correcting = true;
+			}
 			
-		/* Configured for percentOutput with Auxiliary PID on Integrated Sensors' Difference */
-		m_right_leader.set(ControlMode.PercentOutput, forward, DemandType.AuxPID, _targetAngle);
-		m_left_leader.follow(m_right_leader, FollowerType.AuxOutput1);
+			double _targetAngle = m_right_leader.getSelectedSensorPosition(1);
+				
+			/* Configured for percentOutput with Auxiliary PID on Integrated Sensors' Difference */
+			m_right_leader.set(ControlMode.PercentOutput, forward, DemandType.AuxPID, _targetAngle);
+			m_left_leader.follow(m_right_leader, FollowerType.AuxOutput1);
 
-		m_safety_drive.feed();
-		m_was_correcting = true;
-    }
-    else {
-		// if(m_was_correcting){
-		// 	setEncodersToZero();
-		// }
-		m_is_correcting = false;
-		m_was_correcting = false;
-		m_safety_drive.curvatureDrive(forward, turn, true);
-		//curvature_drive_imp(forward, turn, forward == 0 ? true : false);
-    }
-
-    // 
-
-	//m_safety_drive.curvatureDrive(forward, turn, true);
-
-  }
-
-//   private void curvature_drive_imp(double xSpeed, double zRotation, boolean isQuickTurn) {
-//     double angularPower;
-//     boolean overPower;
-
-//     if (isQuickTurn) {
-//       if (Math.abs(xSpeed) < m_quickStopThreshold) {
-//         m_quickStopAccumulator = (1 - m_quickStopAlpha) * m_quickStopAccumulator
-//             + m_quickStopAlpha * MathUtil.clamp(zRotation, -1.0, 1.0) * 2;
-//       }
-//       overPower = true;
-//       angularPower = zRotation;
-//     } else {
-//       overPower = false;
-//       angularPower = Math.abs(xSpeed) * zRotation - m_quickStopAccumulator;
-
-//       if (m_quickStopAccumulator > 1) {
-//         m_quickStopAccumulator -= 1;
-//       } else if (m_quickStopAccumulator < -1) {
-//         m_quickStopAccumulator += 1;
-//       } else {
-//         m_quickStopAccumulator = 0.0;
-//       }
-//     }
-
-//     double leftMotorOutput = xSpeed + angularPower;
-//     double rightMotorOutput = xSpeed - angularPower;
-
-//     // If rotation is overpowered, reduce both outputs to within acceptable range
-//     if (overPower) {
-//       if (leftMotorOutput > 1.0) {
-//         rightMotorOutput -= leftMotorOutput - 1.0;
-//         leftMotorOutput = 1.0;
-//       } else if (rightMotorOutput > 1.0) {
-//         leftMotorOutput -= rightMotorOutput - 1.0;
-//         rightMotorOutput = 1.0;
-//       } else if (leftMotorOutput < -1.0) {
-//         rightMotorOutput -= leftMotorOutput + 1.0;
-//         leftMotorOutput = -1.0;
-//       } else if (rightMotorOutput < -1.0) {
-//         leftMotorOutput -= rightMotorOutput + 1.0;
-//         rightMotorOutput = -1.0;
-//       }
-//     }
-
-//     // Normalize the wheel speeds
-//     double maxMagnitude = Math.max(Math.abs(leftMotorOutput), Math.abs(rightMotorOutput));
-//     if (maxMagnitude > 1.0) {
-//       leftMotorOutput /= maxMagnitude;
-//       rightMotorOutput /= maxMagnitude;
-//     }
-
-//     m_left_leader.set(ControlMode.PercentOutput, leftMotorOutput);
-//     m_right_leader.set(ControlMode.PercentOutput, rightMotorOutput);
-//   }
+			m_safety_drive.feed();
+			m_was_correcting = true;
+		}
+		else {
+			m_is_correcting = false;
+			m_was_correcting = false;
+			m_safety_drive.curvatureDrive(forward, turn, true);
+		}
+  	}
 
   	public boolean motionMagicTurn(int arcTicks){
-		  double tolerance = 10; //TODO determine if this works or if we need it higher
-		  m_left_leader.set(ControlMode.MotionMagic, arcTicks);
-		  m_right_leader.set(ControlMode.MotionMagic, -arcTicks);
-		  int currentLeftPos = (int) Math.abs(m_left_leader.getSelectedSensorPosition());
-		  int currentRightPos = (int) Math.abs(m_right_leader.getSelectedSensorPosition());
-		  int targetTicks = Math.abs(arcTicks);
+		double tolerance = 10; //TODO determine if this works or if we need it higher
+		m_left_leader.set(ControlMode.MotionMagic, arcTicks);
+		m_right_leader.set(ControlMode.MotionMagic, -arcTicks);
+		int currentLeftPos = (int) Math.abs(m_left_leader.getSelectedSensorPosition());
+		int currentRightPos = (int) Math.abs(m_right_leader.getSelectedSensorPosition());
+		int targetTicks = Math.abs(arcTicks);
+
 		return (targetTicks - currentLeftPos) < tolerance && (targetTicks - currentRightPos) < tolerance;
-	  }
+	}
+
 	public void motionMagicStartConfigsTurn(){
 		m_left_leader.selectProfileSlot(kSlot_Turning, PID_PRIMARY);
 		m_right_leader.selectProfileSlot(kSlot_Turning, PID_PRIMARY);
@@ -302,30 +308,35 @@ public class DriveTrain extends SubsystemBase {
 		m_right_leader.configMotionCruiseVelocity(3000, kTimeoutMs);
 		m_right_leader.configMotionAcceleration(3000, kTimeoutMs);
 	}
+
 	public void disableMotorSafety(){
 		m_safety_drive.setSafetyEnabled(false);
-	  }
+	}
 	
 	public void enableMotorSafety(){
 		m_safety_drive.setSafetyEnabled(true);
-	  }
+	}
+
 	public void feedWatchdog(){
 		m_safety_drive.feed();
-	  }
-	  public void motion_magic_end_config_turn(){
+	}
+
+	public void motion_magic_end_config_turn(){
 		m_left_leader.configMotionCruiseVelocity(2100, kTimeoutMs);
 		m_left_leader.configMotionAcceleration(500, kTimeoutMs);
 		m_right_leader.configMotionCruiseVelocity(2100, kTimeoutMs);
 		m_right_leader.configMotionAcceleration(500, kTimeoutMs);
-	  }
+	}
+
 	public double getLeftEncoderValue(){
 		return m_left_leader.getSelectedSensorPosition();
-	  }
+	}
 	
 	public double getRightEncoderValue(){
 		return m_right_leader.getSelectedSensorPosition();
-	  }
-	  public void reset_turn_PID_values(double kP, double kI, double kD) {
+	}
+
+	public void reset_turn_PID_values(double kP, double kI, double kD) {
 		m_left_leader.config_kP(kSlot_Turning, kP);
 		m_left_leader.config_kI(kSlot_Turning, kI);
 		m_left_leader.config_kD(kSlot_Turning, kD);
@@ -333,13 +344,13 @@ public class DriveTrain extends SubsystemBase {
 		m_right_leader.config_kP(kSlot_Turning, kP);
 		m_right_leader.config_kI(kSlot_Turning, kI);
 		m_right_leader.config_kD(kSlot_Turning, kD);
-	  }
-  //////////////// NOTE ////////////////
-  // The setRobotTurnConfigs method is taken directly from CTRE's example code,
-  // and should be usable without modification.
-  // https://github.com/CrossTheRoadElec/Phoenix-Examples-Languages/blob/master/Java%20Talon%20FX%20(Falcon%20500)/DriveStraight_AuxIntegratedSensor
+	}
+	//////////////// NOTE ////////////////
+	// The setRobotTurnConfigs method is taken directly from CTRE's example code,
+	// and should be usable without modification.
+	// https://github.com/CrossTheRoadElec/Phoenix-Examples-Languages/blob/master/Java%20Talon%20FX%20(Falcon%20500)/DriveStraight_AuxIntegratedSensor
 
-  /** 
+	/** 
 	 * Determines if SensorSum or SensorDiff should be used 
 	 * for combining left/right sensors into Robot Distance.  
 	 * 
@@ -434,7 +445,85 @@ public class DriveTrain extends SubsystemBase {
 		masterConfig.auxiliaryPID.selectedFeedbackCoefficient = kTurnTravelUnitsPerRotation / kEncoderUnitsPerRotation;
 	}
 
-	private boolean isCorrecting(){
-		return m_is_correcting;
+	@Override
+	public void simulationPeriodic() {
+		/* Pass the robot battery voltage to the simulated Talon FXs */
+		m_leftDriveSim.setBusVoltage(RobotController.getBatteryVoltage());
+		m_rightDriveSim.setBusVoltage(RobotController.getBatteryVoltage());
+
+		/*
+			* CTRE simulation is low-level, so SimCollection inputs
+			* and outputs are not affected by SetInverted(). Only
+			* the regular user-level API calls are affected.
+			*
+			* WPILib expects +V to be forward.
+			* Positive motor output lead voltage is ccw. We observe
+			* on our physical robot that this is reverse for the
+			* right motor, so negate it.
+			*
+			* We are hard-coding the negation of the values instead of
+			* using getInverted() so we can catch a possible bug in the
+			* robot code where the wrong value is passed to setInverted().
+			*/
+		m_drivetrainSimulator.setInputs(m_leftDriveSim.getMotorOutputLeadVoltage(),
+								-m_rightDriveSim.getMotorOutputLeadVoltage());
+
+		/*
+			* Advance the model by 20 ms. Note that if you are running this
+			* subsystem in a separate thread or have changed the nominal
+			* timestep of TimedRobot, this value needs to match it.
+			*/
+		m_drivetrainSimulator.update(0.02);
+
+		/*
+			* Update all of our sensors.
+			*
+			* Since WPILib's simulation class is assuming +V is forward,
+			* but -V is forward for the right motor, we need to negate the
+			* position reported by the simulation class. Basically, we
+			* negated the input, so we need to negate the output.
+			*/
+		m_leftDriveSim.setIntegratedSensorRawPosition(
+						distanceToNativeUnits(
+							m_drivetrainSimulator.getLeftPositionMeters()
+						));
+		m_leftDriveSim.setIntegratedSensorVelocity(
+						velocityToNativeUnits(
+							m_drivetrainSimulator.getLeftVelocityMetersPerSecond()
+						));
+		m_rightDriveSim.setIntegratedSensorRawPosition(
+						distanceToNativeUnits(
+							-m_drivetrainSimulator.getRightPositionMeters()
+						));
+		m_rightDriveSim.setIntegratedSensorVelocity(
+						velocityToNativeUnits(
+							-m_drivetrainSimulator.getRightVelocityMetersPerSecond()
+						));
+
+		int dev = SimDeviceDataJNI.getSimDeviceHandle("navX-Sensor[0]");
+		SimDouble angle = new SimDouble(SimDeviceDataJNI.getSimValueHandle(dev, "Yaw"));
+		angle.set(-m_drivetrainSimulator.getHeading().getDegrees());
+	}
+
+	private int distanceToNativeUnits(double positionMeters){
+		double wheelRotations = positionMeters/(2 * Math.PI * Units.inchesToMeters(kWheelRadiusInches));
+		double motorRotations = wheelRotations * kSensorGearRatio;
+		int sensorCounts = (int)(motorRotations * kCountsPerRev);
+		return sensorCounts;
+	}
+
+	private int velocityToNativeUnits(double velocityMetersPerSecond){
+		double wheelRotationsPerSecond = velocityMetersPerSecond/(2 * Math.PI * Units.inchesToMeters(kWheelRadiusInches));
+		double motorRotationsPerSecond = wheelRotationsPerSecond * kSensorGearRatio;
+		double motorRotationsPer100ms = motorRotationsPerSecond / k100msPerSecond;
+		int sensorCountsPer100ms = (int)(motorRotationsPer100ms * kCountsPerRev);
+	return sensorCountsPer100ms;
+	}
+
+	private double nativeUnitsToDistanceMeters(double sensorCounts){
+		double motorRotations = (double)sensorCounts / kCountsPerRev;
+		double wheelRotations = motorRotations / kSensorGearRatio;
+		double positionMeters = wheelRotations * (2 * Math.PI * Units.inchesToMeters(kWheelRadiusInches));
+	return positionMeters;
 	}
 }
