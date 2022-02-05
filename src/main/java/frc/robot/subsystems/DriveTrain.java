@@ -167,7 +167,6 @@ public class DriveTrain extends SubsystemBase {
 
 		/// Odometry Tracker objects
 		m_2dField = new Field2d();
-		
 		// TODO, see if we can put this on our driver's shuffleboard tab and see it update
 		SmartDashboard.putData(m_2dField);
 		m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
