@@ -287,6 +287,17 @@ public class DriveTrain extends SubsystemBase {
 			m_safety_drive.curvatureDrive(forward, turn, true);
 		}
   	}
+	public boolean motionMagicDrive(double target_position) {
+		double tolerance = 500;
+		
+		m_left_leader.set(ControlMode.MotionMagic, target_position);
+			m_right_leader.set(ControlMode.MotionMagic, target_position);
+	
+			double currentPos_L = m_left_leader.getSelectedSensorPosition();
+			double currentPos_R = m_right_leader.getSelectedSensorPosition();
+	
+			return Math.abs(currentPos_L - target_position) < tolerance && (currentPos_R - target_position) < tolerance;
+	  }
 
   	public boolean motionMagicTurn(int arcTicks){
 		  double tolerance = 500; 
@@ -296,6 +307,27 @@ public class DriveTrain extends SubsystemBase {
 		  int currentRightPos = (int) Math.abs(m_right_leader.getSelectedSensorPosition());
 		  int targetTicks = Math.abs(arcTicks);
 		return (targetTicks - currentLeftPos) < tolerance && (targetTicks - currentRightPos) < tolerance;
+	  }
+
+	public void motion_magic_start_config_drive(boolean isForward){
+		setEncodersToZero();
+
+		m_left_leader.configMotionCruiseVelocity(16636,kTimeoutMs);
+		m_left_leader.configMotionAcceleration(8318, kTimeoutMs); //cruise velocity / 2, so will take 2 seconds
+		m_right_leader.configMotionCruiseVelocity(16636,kTimeoutMs);
+		m_right_leader.configMotionAcceleration(8318, kTimeoutMs);
+		
+		//set up talon to use DriveMM slots
+		m_left_leader.selectProfileSlot(kSlot_Distanc, PID_PRIMARY);
+		m_right_leader.selectProfileSlot(kSlot_Distanc, PID_PRIMARY);
+	
+		if(isForward){
+			m_left_leader.config_kF(kSlot_Distanc, kGains_Driving.kF);
+			m_right_leader.config_kF(kSlot_Distanc, kGains_Driving.kF);
+		} else{
+			m_left_leader.config_kF(kSlot_Distanc, kGains_Driving.kF * -1);
+			m_right_leader.config_kF(kSlot_Distanc, kGains_Driving.kF * -1);
+		}
 	}
 
 	public void motionMagicStartConfigsTurn(){
@@ -330,9 +362,18 @@ public class DriveTrain extends SubsystemBase {
 	
 	public double getRightEncoderValue(){
 		return m_right_leader.getSelectedSensorPosition();
-	}
+	  }
 
-	public void reset_turn_PID_values(double kP, double kI, double kD) {
+	public void reset_drive_PID_values(double kP, double kI, double kD) {
+		m_left_leader.config_kP(kSlot_Distanc, kP);
+		m_left_leader.config_kI(kSlot_Distanc, kI);
+		m_left_leader.config_kD(kSlot_Distanc, kD);
+		
+		m_right_leader.config_kP(kSlot_Distanc, kP);
+		m_right_leader.config_kI(kSlot_Distanc, kI);
+		m_right_leader.config_kD(kSlot_Distanc, kD); 
+	  }
+	  public void reset_turn_PID_values(double kP, double kI, double kD) {
 		m_left_leader.config_kP(kSlot_Turning, kP);
 		m_left_leader.config_kI(kSlot_Turning, kI);
 		m_left_leader.config_kD(kSlot_Turning, kD);

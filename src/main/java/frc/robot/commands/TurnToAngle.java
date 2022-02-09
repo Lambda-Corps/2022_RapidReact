@@ -27,10 +27,9 @@ public class TurnToAngle extends CommandBase {
   private double m_turn_kP, m_kI, m_kD, m_kF;
   private NetworkTableEntry m_turnkPEntry, m_kIEntry, m_kDEntry, m_arclengthEntry, m_iterationEntry, m_drivedurationEntry, m_countokEntry, m_arclengthticksEntry, m_kFEntry;
   /** Creates a new TurnToAngle. */
-  public TurnToAngle(DriveTrain driveTrain, double speed, double angle) {
+  public TurnToAngle(DriveTrain driveTrain, double angle) {
     m_driveTrain = driveTrain;
     arclengthDegrees = angle;
-    this.speed = speed;
     turnMMTab = Shuffleboard.getTab("Turn MM Testing");
     m_turnkPEntry = turnMMTab.add("kP_turn", 0 ).withPosition(1, 0).getEntry();
     m_kIEntry = turnMMTab.add("kI", 0 ).withPosition(2, 0).getEntry();
@@ -44,7 +43,6 @@ public class TurnToAngle extends CommandBase {
     m_drivedurationEntry = turnMMTab.add("drive duration", 0).withPosition(6, 0).getEntry();
     m_countokEntry = turnMMTab.add("count_ok", 0).getEntry();
     SmartDashboard.putNumber("Target Angle", arclengthDegrees);
-    SmartDashboard.putNumber("Speed", this.speed);
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_driveTrain);
   }
