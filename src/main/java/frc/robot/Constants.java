@@ -17,19 +17,34 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 public final class Constants {
     // Robot Electronics Map
 
-    ///////////// CAN Bus IDs  ////////////////
+    //////////////// CAN Bus IDs  /////////////////
     public final static int RIGHT_TALON_LEADER = 2;
 	public final static int RIGHT_TALON_FOLLOWER = 4;
     public final static int LEFT_TALON_LEADER = 1;
 	public final static int LEFT_TALON_FOLLOWER = 3;
+	public final static int INTAKE_INDEXER = 7;
+	public final static int MID_INDEXER = 8;
+	public final static int SHOOTER_INDEXER = 9;
 
+	//////////////////// DIO /////////////////////
+	public final static int BEAM_BREAKER_SEND = 0;
+	public final static int BEAM_BREAKER_RECEIVE_BOTTOM = 1;
+	public final static int BEAM_BREAKER_RECEIVE_TOP = 2;
 
     ///////////// Drive Train Values /////////////
     public final static double kControllerDeadband = .05;
-    public final static int DRIVER_RIGHT_AXIS = 2;
+    public final static int DRIVER_RIGHT_AXIS = 4;
     public final static int DRIVER_LEFT_AXIS = 1;
 
-    ///////////// Talon Specific Values ////////////////
+	/////////// Indexer Specific Values //////////
+	public final static double INDEXER_SPEED = 0.5;
+
+	/////////// Vision Specific Values ///////////
+	public final static double CAMERA_HEIGHT_METERS = 0;
+	public final static double CAMERA_PITCH_RADIANS = 0;
+	public final static double TARGET_HEIGHT_METERS = 0;
+
+    //////////// Talon Specific Values ///////////
     /**
 	 * Using the configSelectedFeedbackCoefficient() function, scale units to 3600 per rotation.
 	 * This is nice as it keeps 0.1 degrees of resolution, and is fairly intuitive.

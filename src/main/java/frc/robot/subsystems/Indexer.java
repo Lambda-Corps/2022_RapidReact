@@ -1,0 +1,84 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package frc.robot.subsystems;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+
+public class Indexer extends SubsystemBase {
+  /** Creates a new Indexer. */
+
+  public enum StorageState {
+    EMPTY, 
+    BOTTOMONLY,
+    TOPONLY, 
+    FULL,
+    PURGE // This is if the state machine cannot decide what state the indexer is in. If applied it will eject all cargo.
+  }
+
+  TalonSRX m_intakeIndex, m_midIndex, m_shooterIndex;
+//  private final NetworkTableEntry m_intakeIndexerEntry, m_midIndexerEntry, m_shooterIndexerEntry;
+//  public ShuffleboardTab m_IntakeTab;
+
+  private DigitalInput m_bottomBeam, m_topBeam;
+  private StorageState m_storageStatus;
+
+  private boolean m_bottomBeamSate, m_topBeamState;
+  
+  public Indexer() {
+    m_intakeIndex = new TalonSRX(Constants.INTAKE_INDEXER);
+    m_midIndex = new TalonSRX(Constants.MID_INDEXER);
+    m_shooterIndex = new TalonSRX(Constants.SHOOTER_INDEXER);
+
+    m_bottomBeam = new DigitalInput(Constants.BEAM_BREAKER_RECEIVE_BOTTOM);
+    m_topBeam = new DigitalInput(Constants.BEAM_BREAKER_RECEIVE_TOP);
+
+
+    m_storageStatus = StorageState.EMPTY;
+  }
+
+  @Override
+  public void periodic() {
+    checkIndexState();
+    resolveIndexer();
+  }
+
+  private void checkIndexState() {
+    m_bottomBeamSate = m_bottomBeam.get();
+    m_topBeamState = m_topBeam.get();
+
+    if (!m_bottomBeamSate && !m_topBeamState) {
+      m_storageStatus = StorageState.EMPTY;
+    }else {
+      if (m_bottomBeamSate && m_topBeamState) {
+        m_storageStatus = StorageState.FULL;
+      }else if (m_bottomBeamSate && !m_topBeamState) {
+        m_storageStatus = StorageState.BOTTOMONLY;
+      }else if (!m_bottomBeamSate && m_topBeamState) {
+        m_storageStatus = StorageState.TOPONLY;
+      }
+    }
+  }
+
+  private void resolveIndexer() {
+    if ((m_storageStatus == StorageState.BOTTOMONLY) || (m_storageStatus == StorageState.TOPONLY)) {
+      m_intakeIndex.set(ControlMode.PercentOutput, Constants.INDEXER_SPEED);
+      m_midIndex.set(ControlMode.PercentOutput, Constants.INDEXER_SPEED);
+      m_shooterIndex.set(ControlMode.PercentOutput, 0);
+    }else if (m_storageStatus == StorageState.FULL) {
+      m_intakeIndex.set(ControlMode.PercentOutput, 0);m_shooterIndex.set(ControlMode.PercentOutput, 0);
+      m_midIndex.set(ControlMode.PercentOutput, 0);m_shooterIndex.set(ControlMode.PercentOutput, 0);
+      m_shooterIndex.set(ControlMode.PercentOutput, 0);m_shooterIndex.set(ControlMode.PercentOutput, 0);
+    }else if (m_storageStatus == StorageState.PURGE) {
+      m_intakeIndex.set(ControlMode.PercentOutput, -Constants.INDEXER_SPEED);
+      m_midIndex.set(ControlMode.PercentOutput, -Constants.INDEXER_SPEED);
+      m_shooterIndex.set(ControlMode.PercentOutput, -Constants.INDEXER_SPEED);
+    }
+  }
+}
