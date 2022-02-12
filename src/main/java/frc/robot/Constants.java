@@ -18,6 +18,12 @@ public final class Constants {
     // Robot Electronics Map
 
     ///////////// CAN Bus IDs  ////////////////
+	// public final static int INTAKE_INDEXER = ;
+	// public final static int MIDDLE_INDEXER = ;
+	// public final static int SHOOTER_INDEXER = ;
+	// public final static int SHOOTER_FALCON =;
+	public final static int INTAKE_TALON = 7;
+	public final static int INTAKE_ARM_TALON = 8;
     public final static int RIGHT_TALON_LEADER = 2;
 	public final static int RIGHT_TALON_FOLLOWER = 4;
     public final static int LEFT_TALON_LEADER = 1;
@@ -63,10 +69,10 @@ public final class Constants {
      * kF: 1023 represents output value to Talon at 100%, 6800 represents Velocity units at 100% output
      * Not all set of Gains are used in this project and may be removed as desired.
      * 
-	 * 	                                    			  kP   kI   kD   kF               Iz    PeakOut */
-	public final static Gains kGains_Turning = new Gains( 0.1, 0.0,  0.0, 0.0,            200,  1.0 );
-	public final static Gains kGains_Driving = new Gains( 0.1, 0.0,  0.0, 0.003699,         0,  1.0 );
-	
+	 * 	                                    			    kP   kI   kD   kF               Iz    PeakOut */
+	public final static Gains kGains_Turning = new Gains(   0.1, 0.0,  0.0, 0.003699,            200,  1.0 );
+	public final static Gains kGains_Driving = new Gains(   0.1, 0.0,  0.0, 0.003699,         0,  1.0 );
+	public final static Gains kGains_IntakeArms = new Gains(0.1, 0.0, 0.0, 0.0,               0,  1.0 );
 	/** ---- Flat constants, you should not need to change these ---- */
 	/* We allow either a 0 or 1 when selecting an ordinal for remote devices [You can have up to 2 devices assigned remotely to a talon/victor] */
 	public final static int REMOTE_0 = 0;
