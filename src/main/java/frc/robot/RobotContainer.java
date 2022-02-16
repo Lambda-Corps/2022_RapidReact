@@ -14,6 +14,7 @@ import frc.robot.commands.DriveMM;
 import frc.robot.commands.TurnToAngle;
 import frc.robot.commands.default_commands.DriveTrainDefaultCommand;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Indexer;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -24,6 +25,7 @@ import frc.robot.subsystems.DriveTrain;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   DriveTrain m_driveTrain;
+  Indexer m_indexer;
 
   // OI
   XboxController m_driver_controller;
@@ -32,6 +34,7 @@ public class RobotContainer {
   public RobotContainer() {
     m_driver_controller = new XboxController(0);
     m_driveTrain = new DriveTrain();
+    m_indexer = new Indexer();
 
     m_driveTrain.setDefaultCommand(new DriveTrainDefaultCommand(m_driveTrain, m_driver_controller));
     Shuffleboard.getTab("Default Drive Tab").add("DriveForSeconds", new DriveForSecondsFromShuffleboard(m_driveTrain))
@@ -40,6 +43,8 @@ public class RobotContainer {
     // SmartDashboard.putData("Turn To Angle", new TurnToAngle(m_driveTrain, 0.2, 90));
     Shuffleboard.getTab("Turn MM Testing").add(new TurnToAngle(m_driveTrain, 90));
     Shuffleboard.getTab("Drive MM Testing").add(new DriveMM(m_driveTrain, 0));
+
+
     // SmartDashboard.getNumber("Target Angle", 0);
     // Configure the button bindings
     configureButtonBindings();
