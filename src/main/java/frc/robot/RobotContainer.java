@@ -11,9 +11,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.commands.DriveForSecondsFromShuffleboard;
 import frc.robot.commands.DriveMM;
-import frc.robot.commands.TurnToAngle;
+import frc.robot.commands.TurnMM;
+import frc.robot.commands.Intake.ArmMM;
 import frc.robot.commands.default_commands.DriveTrainDefaultCommand;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.commands.Shooter.Shoot;
+import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Intake;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -24,6 +28,8 @@ import frc.robot.subsystems.DriveTrain;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   DriveTrain m_driveTrain;
+  Shooter m_shooter;
+  Intake m_intake;
 
   // OI
   XboxController m_driver_controller;
@@ -38,11 +44,16 @@ public class RobotContainer {
                                             .withPosition(4, 1)
                                             .withSize(2, 1);         
     // SmartDashboard.putData("Turn To Angle", new TurnToAngle(m_driveTrain, 0.2, 90));
-    Shuffleboard.getTab("Turn MM Testing").add(new TurnToAngle(m_driveTrain, 90));
+    Shuffleboard.getTab("Turn MM Testing").add(new TurnMM(m_driveTrain, 90));
     Shuffleboard.getTab("Drive MM Testing").add(new DriveMM(m_driveTrain, 0));
     // SmartDashboard.getNumber("Target Angle", 0);
     // Configure the button bindings
     configureButtonBindings();
+    m_shooter = new Shooter();
+    m_intake = new Intake();
+
+    Shuffleboard.getTab("Shooter Testing").add("Shoot", new Shoot(m_shooter));
+    Shuffleboard.getTab("Arm MM Testing").add("Arm MM", new ArmMM(m_intake, 0)).withPosition(0, 1);
   }
 
   /**

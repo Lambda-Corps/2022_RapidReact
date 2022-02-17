@@ -22,8 +22,8 @@ public final class Constants {
 	// public final static int MIDDLE_INDEXER = ;
 	// public final static int SHOOTER_INDEXER = ;
 	// public final static int SHOOTER_FALCON =;
-	public final static int INTAKE_TALON = 7;
-	public final static int INTAKE_ARM_TALON = 8;
+	public final static int INTAKE_TALON = 5;
+	public final static int INTAKE_ARM_TALON = 6;
     public final static int RIGHT_TALON_LEADER = 2;
 	public final static int RIGHT_TALON_FOLLOWER = 4;
     public final static int LEFT_TALON_LEADER = 1;
