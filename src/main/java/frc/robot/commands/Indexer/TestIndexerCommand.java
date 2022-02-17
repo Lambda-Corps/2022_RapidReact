@@ -47,13 +47,13 @@ public class TestIndexerCommand extends CommandBase {
                                 .withSize(1, 1)
                                 .getEntry();
 
-    m_beamIndex_entry = intab.add("Intake Beam", 0).withPosition(0, 3)
-                                .withSize(1, 1)
-                                .getEntry();
+    // m_beamIndex_entry = intab.add("Intake Beam", 0).withPosition(0, 3)
+    //                             .withSize(1, 1)
+    //                             .getEntry();
 
-    m_beamShoot_entry =  intab.add("Shooter Beam", 0).withPosition(1, 3)
-                                .withSize(1, 1)
-                                .getEntry();
+    // m_beamShoot_entry =  intab.add("Shooter Beam", 0).withPosition(1, 3)
+    //                             .withSize(1, 1)
+    //                             .getEntry();
 
     m_timer = new Timer();
     m_timer.start();

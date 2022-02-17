@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -32,7 +33,9 @@ public class Indexer extends SubsystemBase {
   private DigitalInput m_bottomBeam, m_topBeam;
   private StorageState m_storageStatus;
 
-  private boolean m_bottomBeamSate, m_topBeamState;
+  private boolean m_bottomBeamState, m_topBeamState;
+
+  private NetworkTableEntry m_intake_entry, m_shooter_entry;
   
   public Indexer() {
     m_intakeIndex = new TalonSRX(Constants.INTAKE_INDEXER);
@@ -46,47 +49,58 @@ public class Indexer extends SubsystemBase {
 
     // Add a shuffleboard tab for any testing, tuning, or debugging, etc
     ShuffleboardTab tab = Shuffleboard.getTab("Indexer");
-    tab.add("Test Duration", new TestIndexerCommand(this)).withPosition(0, 1).withSize(2, 1);
+    tab.add("Test Indexer Command", new TestIndexerCommand(this)).withPosition(0, 1).withSize(2, 1);
+    // TODO -- Remove these after tuning and beam break sensors are really in
+    m_intake_entry = tab.add("Intake Beam", 0).withPosition(0, 3).getEntry();
+    m_shooter_entry = tab.add("Shooter Beam", 0).withPosition(1,3).getEntry();
   }
 
   @Override
   public void periodic() {
-    // checkIndexState();
-    // resolveIndexer();
+    // TODO -- Fix this to use the 
+    m_bottomBeamState = m_intake_entry.getDouble(0) == 1 ? true : false;
+    m_topBeamState = m_shooter_entry.getDouble(0) == 1 ? true : false;
   }
 
-  // private void checkIndexState() {
-  //   m_bottomBeamSate = m_bottomBeam.get();
-  //   m_topBeamState = m_topBeam.get();
+  // Command to be called from the indexer default command that will automate the state of the balls in
+  // the indexer.
+  public void check_and_resolve_indexer(){
+    checkIndexState();
+    resolveIndexer();
+  }
 
-  //   if (!m_bottomBeamSate && !m_topBeamState) {
-  //     m_storageStatus = StorageState.EMPTY;
-  //   }else {
-  //     if (m_bottomBeamSate && m_topBeamState) {
-  //       m_storageStatus = StorageState.FULL;
-  //     }else if (m_bottomBeamSate && !m_topBeamState) {
-  //       m_storageStatus = StorageState.BOTTOMONLY;
-  //     }else if (!m_bottomBeamSate && m_topBeamState) {
-  //       m_storageStatus = StorageState.TOPONLY;
-  //     }
-  //   }
-  // }
+  private void checkIndexState() {
+    // m_bottomBeamSate = m_bottomBeam.get();
+    // m_topBeamState = m_topBeam.get();
 
-  // private void resolveIndexer() {
-  //   if ((m_storageStatus == StorageState.BOTTOMONLY) || (m_storageStatus == StorageState.TOPONLY)) {
-  //     m_intakeIndex.set(ControlMode.PercentOutput, Constants.INDEXER_SPEED);
-  //     m_midIndex.set(ControlMode.PercentOutput, Constants.INDEXER_SPEED);
-  //     m_shooterIndex.set(ControlMode.PercentOutput, 0);
-  //   }else if (m_storageStatus == StorageState.FULL) {
-  //     m_intakeIndex.set(ControlMode.PercentOutput, 0);m_shooterIndex.set(ControlMode.PercentOutput, 0);
-  //     m_midIndex.set(ControlMode.PercentOutput, 0);m_shooterIndex.set(ControlMode.PercentOutput, 0);
-  //     m_shooterIndex.set(ControlMode.PercentOutput, 0);m_shooterIndex.set(ControlMode.PercentOutput, 0);
-  //   }else if (m_storageStatus == StorageState.PURGE) {
-  //     m_intakeIndex.set(ControlMode.PercentOutput, -Constants.INDEXER_SPEED);
-  //     m_midIndex.set(ControlMode.PercentOutput, -Constants.INDEXER_SPEED);
-  //     m_shooterIndex.set(ControlMode.PercentOutput, -Constants.INDEXER_SPEED);
-  //   }
-  // }
+    if (!m_bottomBeamState && !m_topBeamState) {
+      m_storageStatus = StorageState.EMPTY;
+    }else {
+      if (m_bottomBeamState && m_topBeamState) {
+        m_storageStatus = StorageState.FULL;
+      }else if (m_bottomBeamState && !m_topBeamState) {
+        m_storageStatus = StorageState.BOTTOMONLY;
+      }else if (!m_bottomBeamState && m_topBeamState) {
+        m_storageStatus = StorageState.TOPONLY;
+      }
+    }
+  }
+
+  private void resolveIndexer() {
+    if ((m_storageStatus == StorageState.BOTTOMONLY) || (m_storageStatus == StorageState.TOPONLY)) {
+      m_intakeIndex.set(ControlMode.PercentOutput, Constants.INDEXER_SPEED);
+      m_midIndex.set(ControlMode.PercentOutput, Constants.INDEXER_SPEED);
+      m_shooterIndex.set(ControlMode.PercentOutput, 0);
+    }else if (m_storageStatus == StorageState.FULL) {
+      m_intakeIndex.set(ControlMode.PercentOutput, 0);m_shooterIndex.set(ControlMode.PercentOutput, 0);
+      m_midIndex.set(ControlMode.PercentOutput, 0);m_shooterIndex.set(ControlMode.PercentOutput, 0);
+      m_shooterIndex.set(ControlMode.PercentOutput, 0);m_shooterIndex.set(ControlMode.PercentOutput, 0);
+    }else if (m_storageStatus == StorageState.PURGE) {
+      m_intakeIndex.set(ControlMode.PercentOutput, -Constants.INDEXER_SPEED);
+      m_midIndex.set(ControlMode.PercentOutput, -Constants.INDEXER_SPEED);
+      m_shooterIndex.set(ControlMode.PercentOutput, -Constants.INDEXER_SPEED);
+    }
+  }
 
   /*
    * Drive the index motors at independent speeds.  Designed to be called from a specific 
@@ -96,5 +110,9 @@ public class Indexer extends SubsystemBase {
     m_intakeIndex.set(ControlMode.PercentOutput, intake);
     m_midIndex.set(ControlMode.PercentOutput, mid);
     m_shooterIndex.set(ControlMode.PercentOutput, shooter);
+  }
+
+  public NetworkTableEntry getEntry(){
+    return m_shooter_entry;
   }
 }
