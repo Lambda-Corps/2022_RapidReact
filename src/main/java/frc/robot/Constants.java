@@ -15,17 +15,22 @@ package frc.robot;
 public final class Constants {
     // Robot Electronics Map
 
-    ///////////// CAN Bus IDs  ////////////////
+    /////////////// CAN Bus IDs  ////////////////
     public final static int RIGHT_TALON_LEADER = 1;
     public final static int LEFT_TALON_LEADER = 2;
 
 
-    ///////////// Drive Train Values /////////////
+    ///////////// Drive Train Values ////////////
     public final static double kControllerDeadband = .05;
     public final static int DRIVER_RIGHT_AXIS = 2;
     public final static int DRIVER_LEFT_AXIS = 1;
 
-    ///////////// Talon Specific Values ////////////////
+	/////////////// Vision Values ///////////////
+	public final static double CAMERA_HEIGHT_METERS = 1.016;
+	public final static double CAMERA_PITCH_RADIANS = 0.0;
+	public final static double TARGET_HEIGHT_METERS = 2.64;
+
+	////////// Talon Specific Values ////////////
     /**
 	 * Using the configSelectedFeedbackCoefficient() function, scale units to 3600 per rotation.
 	 * This is nice as it keeps 0.1 degrees of resolution, and is fairly intuitive.
