@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import static frc.robot.Constants.*;
 import frc.robot.commands.Indexer.TestIndexerCommand;
 
 public class Indexer extends SubsystemBase {
@@ -38,9 +38,9 @@ public class Indexer extends SubsystemBase {
   private NetworkTableEntry m_intake_entry, m_shooter_entry;
   
   public Indexer() {
-    m_intakeIndex = new TalonSRX(Constants.INTAKE_INDEXER);
-    m_midIndex = new TalonSRX(Constants.MID_INDEXER);
-    m_shooterIndex = new TalonSRX(Constants.SHOOTER_INDEXER);
+    m_intakeIndex = new TalonSRX(INTAKE_INDEXER);
+    m_midIndex = new TalonSRX(MID_INDEXER);
+    m_shooterIndex = new TalonSRX(SHOOTER_INDEXER);
 
     // m_bottomBeam = new DigitalInput(Constants.BEAM_BREAKER_RECEIVE_BOTTOM);
     // m_topBeam = new DigitalInput(Constants.BEAM_BREAKER_RECEIVE_TOP);
@@ -70,8 +70,10 @@ public class Indexer extends SubsystemBase {
   }
 
   private void checkIndexState() {
-    // m_bottomBeamSate = m_bottomBeam.get();
-    // m_topBeamState = m_topBeam.get();
+     m_bottomBeamSate = m_intake_entry;
+     m_topBeamState = m_topBeam.get();
+
+    // Temporary substitute for the beam breakers
 
     if (!m_bottomBeamState && !m_topBeamState) {
       m_storageStatus = StorageState.EMPTY;
@@ -88,17 +90,17 @@ public class Indexer extends SubsystemBase {
 
   private void resolveIndexer() {
     if ((m_storageStatus == StorageState.BOTTOMONLY) || (m_storageStatus == StorageState.TOPONLY)) {
-      m_intakeIndex.set(ControlMode.PercentOutput, Constants.INDEXER_SPEED);
-      m_midIndex.set(ControlMode.PercentOutput, Constants.INDEXER_SPEED);
+      m_intakeIndex.set(ControlMode.PercentOutput, INDEXER_SPEED);
+      m_midIndex.set(ControlMode.PercentOutput, INDEXER_SPEED);
       m_shooterIndex.set(ControlMode.PercentOutput, 0);
     }else if (m_storageStatus == StorageState.FULL) {
       m_intakeIndex.set(ControlMode.PercentOutput, 0);m_shooterIndex.set(ControlMode.PercentOutput, 0);
       m_midIndex.set(ControlMode.PercentOutput, 0);m_shooterIndex.set(ControlMode.PercentOutput, 0);
       m_shooterIndex.set(ControlMode.PercentOutput, 0);m_shooterIndex.set(ControlMode.PercentOutput, 0);
     }else if (m_storageStatus == StorageState.PURGE) {
-      m_intakeIndex.set(ControlMode.PercentOutput, -Constants.INDEXER_SPEED);
-      m_midIndex.set(ControlMode.PercentOutput, -Constants.INDEXER_SPEED);
-      m_shooterIndex.set(ControlMode.PercentOutput, -Constants.INDEXER_SPEED);
+      m_intakeIndex.set(ControlMode.PercentOutput, -INDEXER_SPEED);
+      m_midIndex.set(ControlMode.PercentOutput, -INDEXER_SPEED);
+      m_shooterIndex.set(ControlMode.PercentOutput, -INDEXER_SPEED);
     }
   }
 
