@@ -24,7 +24,7 @@ public class ArmMM extends CommandBase {
     m_intake = intake;
     addRequirements(m_intake);
     m_targetPosition = target;
-    armMMTab = Shuffleboard.getTab("Arm MM Testing");
+    armMMTab = Shuffleboard.getTab("Intake Testing");
     m_armkPEntry = armMMTab.add("kP_turn", 0 ).withPosition(1, 0).getEntry();
     m_kIEntry = armMMTab.add("kI", 0 ).withPosition(2, 0).getEntry();
     m_kDEntry = armMMTab.add("kD", 0 ).withPosition(3, 0).getEntry();

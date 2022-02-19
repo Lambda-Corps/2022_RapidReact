@@ -186,8 +186,8 @@ public class Intake extends SubsystemBase {
     return absoluteEncoder.getAverageVoltage();
   }
 
-  public void intakeMotorOn(){
-    m_intakeMotor.set(ControlMode.PercentOutput, STANDARD_INTAKE_SPEED);
+  public void intakeMotorOn(double speed){
+    m_intakeMotor.set(ControlMode.PercentOutput, speed);
   }
 
   public void stopIntakeMotor(){

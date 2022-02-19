@@ -13,6 +13,7 @@ import frc.robot.commands.DriveForSecondsFromShuffleboard;
 import frc.robot.commands.DriveMM;
 import frc.robot.commands.TurnMM;
 import frc.robot.commands.Intake.ArmMM;
+import frc.robot.commands.Intake.RunIntake;
 import frc.robot.commands.default_commands.DriveTrainDefaultCommand;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.commands.Shooter.Shoot;
@@ -53,7 +54,8 @@ public class RobotContainer {
     m_intake = new Intake();
 
     Shuffleboard.getTab("Shooter Testing").add("Shoot", new Shoot(m_shooter));
-    Shuffleboard.getTab("Arm MM Testing").add("Arm MM", new ArmMM(m_intake, 0)).withPosition(0, 1);
+    Shuffleboard.getTab("Intake Testing").add("Arm MM", new ArmMM(m_intake, 0)).withPosition(0, 1);
+    Shuffleboard.getTab("Intake Testing").add("Run Intake", new RunIntake(m_intake)).withPosition(0,2);
   }
 
   /**
