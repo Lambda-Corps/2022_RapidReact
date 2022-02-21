@@ -20,7 +20,7 @@ public class Vision extends SubsystemBase {
   PhotonCamera m_camera;
 
   ShuffleboardTab m_visionTab;
-  NetworkTableEntry m_tx, m_ty, m_ta, m_bestTarget, targetPitch, targetYaw, targetRange, targetCount;
+  NetworkTableEntry m_tx, m_ty, m_ta, m_bestTarget, targetPitch, targetYaw, targetRange, targetCount, targetType;
   PhotonTrackedTarget m_target;
 
   double pitch, yaw, area;
@@ -32,6 +32,8 @@ public class Vision extends SubsystemBase {
     
     m_visionTab = Shuffleboard.getTab("Vision");
     m_visionTab.addBoolean("Target Found", this::getTargetStatus);
+
+    targetType = m_visionTab.add("Target Type", " ").getEntry();
   }
 
   @Override
@@ -68,15 +70,24 @@ public class Vision extends SubsystemBase {
     }
   }
   
-  public void getTeamColor(String allianceColor, int pipelineIndex) {
+  public void setTeamPipeline() {
+    int pipelineIndex;
+    String allianceColor;
     if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
       pipelineIndex = 0;
-      allianceColor = "Blue";
-      m_visionTab.add("Alliance Color", allianceColor);
+      allianceColor = "Blue Ball";
+      targetType.setString(allianceColor);
+      m_camera.setPipelineIndex(pipelineIndex);
     }else if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
-      pipelineIndex = 0;
-      allianceColor = "Red";
-      m_visionTab.add("Alliance Color", allianceColor);
+      pipelineIndex = 1;
+      allianceColor = "Red Ball";
+      targetType.setString(allianceColor);
+      m_camera.setPipelineIndex(pipelineIndex);
     }
+  }
+
+  public void targetMode(int targetIndex) {
+    m_camera.setPipelineIndex(targetIndex);
+    targetType.setString("Hub");
   }
 }
