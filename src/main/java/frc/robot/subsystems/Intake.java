@@ -14,8 +14,11 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.RemoteLimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Gains;
@@ -42,7 +45,7 @@ public class Intake extends SubsystemBase {
   public static final int INTAKE_ARM_DOWN = 1000; //intake down to grab ball (currently has temporary value) TODO get this value
   //TODO Do we want a position somewhere in the middle?
   
-  public static int MM_FEEDFORWARD; //PID (would this one also be motion magic?) TODO get this value
+  public static int MM_FEEDFORWARD = 0; //PID (would this one also be motion magic?) TODO get this value
   
   //gains for intake arm
   private Gains m_intakeArmGains = Constants.kGains_IntakeArms;
@@ -59,10 +62,6 @@ public class Intake extends SubsystemBase {
     // *
     // */
   
-  private static int kTimeoutMs = 5; //TODO determine value (current is from 2019)
-  
-  AnalogInput absoluteEncoder;
-
   //soft limits
   private final int ARM_REVERSE_SOFT_LIMIT = 0;
   private final int ARM_FORWARD_SOFT_LIMIT = INTAKE_ARM_DOWN;
@@ -71,6 +70,8 @@ public class Intake extends SubsystemBase {
   private final double MAX_ARM_SPEED = 0; //TODO set this
   private final double STANDARD_INTAKE_SPEED = 0; //^^^
 
+  ShuffleboardTab m_intakeTab;
+  NetworkTableEntry m_armMaxSpeed, m_armStandardSpeed, m_maxFF, m_minFF;
 
   public Intake() {
     m_armMotor = new TalonSRX(Constants.INTAKE_ARM_TALON);
@@ -88,16 +89,16 @@ public class Intake extends SubsystemBase {
     m_armMotor.configForwardSoftLimitEnable(true);
     m_armMotor.configReverseSoftLimitEnable(true);
     //mm
-    m_armMotor.configMotionCruiseVelocity(0, kTimeoutMs);
-    m_armMotor.configMotionAcceleration(0, kTimeoutMs);
+    m_armMotor.configMotionCruiseVelocity(0, 0);
+    m_armMotor.configMotionAcceleration(0, 0);
 
     //current limits?
     m_armMotor.configPeakCurrentLimit(0);
     //m_armMotor.configContinuousCurrentLimit(amps);
     
     //limit switches
-   //m_armMotor.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled, kTimeoutMs);
-    m_armMotor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled, kTimeoutMs); //hopefully this is correct?
+   //m_armMotor.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled, 0);
+    m_armMotor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled, 0); //hopefully this is correct?
 
     //config PIDF values
     m_armMotor.config_kP(0, m_intakeArmGains.kP, 0);
@@ -106,7 +107,8 @@ public class Intake extends SubsystemBase {
     m_armMotor.config_kF(0, m_intakeArmGains.kF, 0);
 
     //config closed loop error
-    m_armMotor.configAllowableClosedloopError(0, 10, kTimeoutMs); //TODO determine what tolerance needs to be
+    m_armMotor.configAllowableClosedloopError(0, 10, 0); //TODO determine what tolerance needs to be
+
   }
 
   @Override
@@ -182,10 +184,6 @@ public class Intake extends SubsystemBase {
     return m_armMotor.getSelectedSensorPosition(0);
     }
   
-  public double getAbsoluteEncoder(){
-    return absoluteEncoder.getAverageVoltage();
-  }
-
   public void intakeMotorOn(){
     m_intakeMotor.set(ControlMode.PercentOutput, STANDARD_INTAKE_SPEED);
   }
@@ -199,9 +197,9 @@ public class Intake extends SubsystemBase {
   }
 
   public void reset_arm_PIDF_values(double arm_kP, double kI, double kD, double kF) {
-    m_armMotor.config_kP(0, arm_kP, kTimeoutMs);
-    m_armMotor.config_kI(0, kI, kTimeoutMs);
-    m_armMotor.config_kD(0, kD, kTimeoutMs);
-    m_armMotor.config_kF(0, kF, kTimeoutMs);
+    m_armMotor.config_kP(0, arm_kP, 0);
+    m_armMotor.config_kI(0, kI, 0);
+    m_armMotor.config_kD(0, kD, 0);
+    m_armMotor.config_kF(0, kF, 0);
   }
 }
