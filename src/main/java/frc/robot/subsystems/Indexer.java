@@ -70,10 +70,9 @@ public class Indexer extends SubsystemBase {
   }
 
   private void checkIndexState() {
-     m_bottomBeamSate = m_intake_entry;
-     m_topBeamState = m_topBeam.get();
-
-    // Temporary substitute for the beam breakers
+    // Real State Machine
+    // m_bottomBeamState = m_bottomBeam.get();
+    // m_topBeamState = m_topBeam.get();
 
     if (!m_bottomBeamState && !m_topBeamState) {
       m_storageStatus = StorageState.EMPTY;
