@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.*;
-import frc.robot.commands.Indexer.TestIndexerCommand;
+import frc.robot.commands.Indexer.TestIntakeAndIndexer;
 
 public class Indexer extends SubsystemBase {
   /** Creates a new Indexer. */
@@ -49,7 +49,7 @@ public class Indexer extends SubsystemBase {
 
     // Add a shuffleboard tab for any testing, tuning, or debugging, etc
     ShuffleboardTab tab = Shuffleboard.getTab("Indexer");
-    tab.add("Test Indexer Command", new TestIndexerCommand(this)).withPosition(0, 1).withSize(2, 1);
+
     // TODO -- Remove these after tuning and beam break sensors are really in
     m_intake_entry = tab.add("Intake Beam", 0).withPosition(0, 3).getEntry();
     m_shooter_entry = tab.add("Shooter Beam", 0).withPosition(1,3).getEntry();
