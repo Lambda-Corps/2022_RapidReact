@@ -26,8 +26,8 @@ public final class Constants {
     public final static int DRIVER_LEFT_AXIS = 1;
 
 	/////////////// Vision Values ///////////////
-	public final static double CAMERA_HEIGHT_METERS = 1.016;
-	public final static double CAMERA_PITCH_RADIANS = 0.0;
+	public final static double CAMERA_HEIGHT_METERS = 0.9144;
+	public final static double CAMERA_PITCH_RADIANS = 0.785398;
 	public final static double TARGET_HEIGHT_METERS = 2.64;
 
 	////////// Talon Specific Values ////////////
