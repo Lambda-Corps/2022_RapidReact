@@ -20,6 +20,7 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -27,11 +28,15 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.commands.UpdateDriveLimiters;
+
 import static frc.robot.Constants.*;
 
 public class DriveTrain extends SubsystemBase {
@@ -45,19 +50,9 @@ public class DriveTrain extends SubsystemBase {
 	// Gyro 
 	public AHRS m_gyro;
 	
-	// Safety Drive to have motor watchdog turn robot off if we lose comms
-	DifferentialDrive m_safety_drive;
-	
-	// Curvature Drive member variables
-	//   private double m_quickStopThreshold = .2;
-	//   private double m_quickStopAlpha = .1;
-	//   private double m_quickStopAccumulator;
-	//   private double m_deadband = .1;
-	
 	// Auxilliary PID tracker
 	private boolean m_was_correcting = false;
 	private boolean m_is_correcting = false;
-	NetworkTableEntry m_driveCorrecting;
 
 	///////////// Odometry Trackers //////////////
 	// Odometry class for tracking robot pose
@@ -69,7 +64,12 @@ public class DriveTrain extends SubsystemBase {
 	public DifferentialDrivetrainSim m_drivetrainSimulator;
 	/* Object for simulated inputs into Talon. */
 	private TalonFXSimCollection m_leftDriveSim, m_rightDriveSim;
-  
+
+	// RateLimiters to try to keep from tipping over
+	SlewRateLimiter m_forward_limiter, m_rotation_limiter;
+	private double m_drive_absMax;
+	NetworkTableEntry m_left_output, m_right_output, m_forward_rate, m_rotation_rate, m_drive_max;
+
   	/** Creates a new DriveTrain. */
  	public DriveTrain() {
     	m_gyro = new AHRS(SPI.Port.kMXP);
@@ -77,8 +77,6 @@ public class DriveTrain extends SubsystemBase {
 		m_left_follower = new  WPI_TalonFX(LEFT_TALON_FOLLOWER);
     	m_right_leader = new WPI_TalonFX(RIGHT_TALON_LEADER);
 		m_right_follower = new WPI_TalonFX(RIGHT_TALON_FOLLOWER);
-
-    	m_safety_drive = new DifferentialDrive(m_left_leader, m_right_leader);
 
     	/** Invert Directions for Left and Right */
     	m_left_invert = TalonFXInvertType.CounterClockwise; //Same as invert = "false"
@@ -152,8 +150,8 @@ public class DriveTrain extends SubsystemBase {
 		_rightConfig.slot2.closedLoopPeriod = closedLoopTimeMs;
    		 _rightConfig.slot3.closedLoopPeriod = closedLoopTimeMs;
 
-		_rightConfig.openloopRamp = kOpenLoopRamp;
-		_leftConfig.openloopRamp = kOpenLoopRamp;
+		// _rightConfig.openloopRamp = kOpenLoopRamp;
+		// _leftConfig.openloopRamp = kOpenLoopRamp;
    		 /* APPLY the config settings */
 		m_left_leader.configAllSettings(_leftConfig);
 		m_right_leader.configAllSettings(_rightConfig);
@@ -200,6 +198,20 @@ public class DriveTrain extends SubsystemBase {
 			m_leftDriveSim = m_left_leader.getSimCollection();
 			m_rightDriveSim = m_right_leader.getSimCollection();
 		  } // end of constructor code for the simulation
+
+		  // Setup the drive train limiting test variables
+		  // Default the slew rate limiters to 1/3 of a second from 0 -> full
+		  m_forward_limiter = new SlewRateLimiter(3);
+		  m_rotation_limiter = new SlewRateLimiter(3);
+		  m_drive_absMax = 1.0;
+		  // Setup Shuffleboard tuning
+		  ShuffleboardTab tab = Shuffleboard.getTab("Default Drive");
+		  m_forward_rate = tab.add("ForwardLimiter", 3).withSize(1, 1).withPosition(0, 0).getEntry();
+		  m_rotation_rate = tab.add("RotationLimiter", 3).withSize(1, 1).withPosition(1, 0).getEntry();
+		  m_drive_max = tab.add("Drive Max (abs)", m_drive_absMax).withSize(1, 1).withPosition(2, 0).getEntry();
+		  m_left_output = tab.add("Left Output", 0).withSize(1, 1).withPosition(3, 0).getEntry();
+		  m_right_output = tab.add("Right Output",0).withSize(1, 1).withPosition(4, 0).getEntry();
+		  tab.add("Reset Limits", new UpdateDriveLimiters(this)).withSize(3, 1).withPosition(2, 1);
   	}
 
 	@Override
@@ -235,13 +247,13 @@ public class DriveTrain extends SubsystemBase {
   	/** Make sure the input to the set command is 1.0 >= x >= -1.0 **/
 	private double clamp_drive(double value) {
 		/* Upper deadband */
-		if (value >= 1.0) {
-     		return 1.0;
+		if (value >= m_drive_absMax) {
+     		return m_drive_absMax;
    		}
 
 		/* Lower deadband */
-		if (value <= -1.0) {
-      		return -1.0;
+		if (value <= -m_drive_absMax) {
+      		return -m_drive_absMax;
     	}
 
 		/* Outside deadband */
@@ -255,38 +267,52 @@ public class DriveTrain extends SubsystemBase {
 		forward = clamp_drive(forward);
 		turn = clamp_drive(turn);
 
+		//forward = -m_forward_limiter.calculate(forward) * m_drive_absMax;
+		forward = m_forward_limiter.calculate(forward) * m_drive_absMax;
+		turn = m_rotation_limiter.calculate(turn) * m_drive_absMax;
+
+		var speeds = DifferentialDrive.curvatureDriveIK(forward, turn, true);
+
 		if(Robot.isSimulation()){
 			// Just set the motors
-			m_safety_drive.curvatureDrive(forward, turn, true);
+			m_right_leader.set(ControlMode.PercentOutput, speeds.right);
+			m_left_leader.set(ControlMode.PercentOutput, speeds.left);
+			m_right_output.forceSetDouble(speeds.right);
+			m_left_output.forceSetDouble(speeds.left);
 			return;
 		}
 
 		// If the yaw value is zero, we should be driving straight with encoder correction,
 		// otherwise, drive with the input values corrected for deadband
-		if( turn == 0 && forward != 0){
-			if(!m_was_correcting){
-				// First time we're correcting automatically, setup state
-				setEncodersToZero();
-				/* Determine which slot affects which PID */
-				m_right_leader.selectProfileSlot(kSlot_Turning, PID_TURN);
-				m_is_correcting = true;
-			}
+		// if( turn == 0 && forward != 0){
+		// 	if(!m_was_correcting){
+		// 		// First time we're correcting automatically, setup state
+		// 		setEncodersToZero();
+		// 		/* Determine which slot affects which PID */
+		// 		m_right_leader.selectProfileSlot(kSlot_Turning, PID_TURN);
+		// 		m_is_correcting = true;
+		// 	}
 			
-			double _targetAngle = m_right_leader.getSelectedSensorPosition(1);
+		// 	double _targetAngle = m_right_leader.getSelectedSensorPosition(1);
 				
-			/* Configured for percentOutput with Auxiliary PID on Integrated Sensors' Difference */
-			m_right_leader.set(ControlMode.PercentOutput, forward, DemandType.AuxPID, _targetAngle);
-			m_left_leader.follow(m_right_leader, FollowerType.AuxOutput1);
+		// 	/* Configured for percentOutput with Auxiliary PID on Integrated Sensors' Difference */
+		// 	m_right_leader.set(ControlMode.PercentOutput, forward, DemandType.AuxPID, _targetAngle);
+		// 	m_left_leader.follow(m_right_leader, FollowerType.AuxOutput1);
 
-			m_safety_drive.feed();
-			m_was_correcting = true;
-		}
-		else {
+		// 	m_was_correcting = true;
+		// }
+		// else {
 			m_is_correcting = false;
 			m_was_correcting = false;
-			m_safety_drive.curvatureDrive(forward, turn, true);
-		}
+			
+			// Just set the motors
+			m_right_leader.set(ControlMode.PercentOutput, speeds.right);
+			m_left_leader.set(ControlMode.PercentOutput, speeds.left);
+			m_right_output.forceSetDouble(speeds.right);
+			m_left_output.forceSetDouble(speeds.left);
+		// }
   	}
+
 	public boolean motionMagicDrive(double target_position) {
 		double tolerance = 500;
 		
@@ -340,29 +366,31 @@ public class DriveTrain extends SubsystemBase {
 	}
 
 	public void disableMotorSafety(){
-		m_safety_drive.setSafetyEnabled(false);
+		// m_safety_drive.setSafetyEnabled(false);
 	}
 	
 	public void enableMotorSafety(){
-		m_safety_drive.setSafetyEnabled(true);
+		// m_safety_drive.setSafetyEnabled(true);
 	}
 
 	public void feedWatchdog(){
-		m_safety_drive.feed();
-	  }
-	  public void motion_magic_end_config_turn(){
+		// m_safety_drive.feed();
+	}
+
+	public void motion_magic_end_config_turn(){
 		m_left_leader.configMotionCruiseVelocity(16636, kTimeoutMs);
 		m_left_leader.configMotionAcceleration(8318, kTimeoutMs);
 		m_right_leader.configMotionCruiseVelocity(16636, kTimeoutMs);
 		m_right_leader.configMotionAcceleration(8318, kTimeoutMs);
-	  }
+	}
+	
 	public double getLeftEncoderValue(){
 		return m_left_leader.getSelectedSensorPosition();
 	}
 	
 	public double getRightEncoderValue(){
 		return m_right_leader.getSelectedSensorPosition();
-	  }
+	}
 
 	public void reset_drive_PID_values(double kP, double kI, double kD) {
 		m_left_leader.config_kP(kSlot_Distanc, kP);
@@ -372,8 +400,10 @@ public class DriveTrain extends SubsystemBase {
 		m_right_leader.config_kP(kSlot_Distanc, kP);
 		m_right_leader.config_kI(kSlot_Distanc, kI);
 		m_right_leader.config_kD(kSlot_Distanc, kD); 
-	  }
-	  public void reset_turn_PID_values(double kP, double kI, double kD) {
+	
+	}
+
+	public void reset_turn_PID_values(double kP, double kI, double kD) {
 		m_left_leader.config_kP(kSlot_Turning, kP);
 		m_left_leader.config_kI(kSlot_Turning, kI);
 		m_left_leader.config_kD(kSlot_Turning, kD);
@@ -554,7 +584,7 @@ public class DriveTrain extends SubsystemBase {
 		double motorRotationsPerSecond = wheelRotationsPerSecond * kSensorGearRatio;
 		double motorRotationsPer100ms = motorRotationsPerSecond / k100msPerSecond;
 		int sensorCountsPer100ms = (int)(motorRotationsPer100ms * kCountsPerRev);
-	return sensorCountsPer100ms;
+		return sensorCountsPer100ms;
 	}
 
 	private double nativeUnitsToDistanceMeters(double sensorCounts){
@@ -562,5 +592,11 @@ public class DriveTrain extends SubsystemBase {
 		double wheelRotations = motorRotations / kSensorGearRatio;
 		double positionMeters = wheelRotations * (2 * Math.PI * Units.inchesToMeters(kWheelRadiusInches));
 	return positionMeters;
+	}
+
+	public void updateDriveLimiters() {
+		m_drive_absMax = m_drive_max.getDouble(m_drive_absMax);
+		m_forward_limiter = new SlewRateLimiter(m_forward_rate.getDouble(3));
+		m_rotation_limiter = new SlewRateLimiter(m_rotation_rate.getDouble(3));
 	}
 }
