@@ -16,6 +16,7 @@ import frc.robot.commands.Intake.ArmMM;
 import frc.robot.commands.Intake.ResetIntakeArmEncoder;
 import frc.robot.commands.Intake.SetForwardLimit;
 import frc.robot.commands.default_commands.DriveTrainDefaultCommand;
+import frc.robot.commands.default_commands.IndexerDefaultCommand;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
@@ -43,10 +44,11 @@ public class RobotContainer {
     m_intake = new Intake();
 
     m_driveTrain.setDefaultCommand(new DriveTrainDefaultCommand(m_driveTrain, m_driver_controller));
+    m_indexer.setDefaultCommand(new IndexerDefaultCommand(m_indexer));
+
     Shuffleboard.getTab("Default Drive Tab").add("DriveForSeconds", new DriveForSecondsFromShuffleboard(m_driveTrain))
                                             .withPosition(4, 1)
                                             .withSize(2, 1);         
-    // SmartDashboard.putData("Turn To Angle", new TurnToAngle(m_driveTrain, 0.2, 90));
     Shuffleboard.getTab("Drive MM Testing").add(new DriveMM(m_driveTrain, 0));
 
     Shuffleboard.getTab("Combined Test").add(new TestIntakeAndIndexer(m_indexer, m_intake)).withPosition(0, 1).withSize(2, 1);

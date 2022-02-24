@@ -5,11 +5,16 @@
 package frc.robot.commands.default_commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Indexer;
 
 public class IndexerDefaultCommand extends CommandBase {
   /** Creates a new IndexerDefaultCommand. */
-  public IndexerDefaultCommand() {
+  Indexer m_indexer;
+  public IndexerDefaultCommand(Indexer indexer) {
     // Use addRequirements() here to declare subsystem dependencies.
+    m_indexer = indexer;
+
+    addRequirements(indexer);
   }
 
   // Called when the command is initially scheduled.
@@ -18,7 +23,9 @@ public class IndexerDefaultCommand extends CommandBase {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    m_indexer.check_and_resolve_indexer();
+  }
 
   // Called once the command ends or is interrupted.
   @Override

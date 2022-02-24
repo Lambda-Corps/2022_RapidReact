@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.*;
-import frc.robot.commands.Indexer.TestIntakeAndIndexer;
 
 public class Indexer extends SubsystemBase {
   /** Creates a new Indexer. */
@@ -50,17 +49,13 @@ public class Indexer extends SubsystemBase {
     // Add a shuffleboard tab for any testing, tuning, or debugging, etc
     ShuffleboardTab tab = Shuffleboard.getTab("Indexer");
 
-    // TODO -- Remove these after tuning and beam break sensors are really in
+    // TODO -- Remove these after tuning and beam break sensors are in
     m_intake_entry = tab.add("Intake Beam", 0).withPosition(0, 3).getEntry();
     m_shooter_entry = tab.add("Shooter Beam", 0).withPosition(1,3).getEntry();
   }
 
   @Override
-  public void periodic() {
-    // TODO -- Fix this to use the 
-    m_bottomBeamState = m_intake_entry.getDouble(0) == 1 ? true : false;
-    m_topBeamState = m_shooter_entry.getDouble(0) == 1 ? true : false;
-  }
+  public void periodic() {}
 
   // Command to be called from the indexer default command that will automate the state of the balls in
   // the indexer.
@@ -74,32 +69,40 @@ public class Indexer extends SubsystemBase {
     // m_bottomBeamState = m_bottomBeam.get();
     // m_topBeamState = m_topBeam.get();
 
+//=========================================================================
+    // For testing ONLY; TODO Redact when beambreaks are in
+    m_bottomBeamState = m_intake_entry.getDouble(0) == 1 ? true : false;
+    m_topBeamState = m_shooter_entry.getDouble(0) == 1 ? true : false;
+//=========================================================================
+
     if (!m_bottomBeamState && !m_topBeamState) {
       m_storageStatus = StorageState.EMPTY;
-    }else {
-      if (m_bottomBeamState && m_topBeamState) {
-        m_storageStatus = StorageState.FULL;
-      }else if (m_bottomBeamState && !m_topBeamState) {
-        m_storageStatus = StorageState.BOTTOMONLY;
-      }else if (!m_bottomBeamState && m_topBeamState) {
-        m_storageStatus = StorageState.TOPONLY;
-      }
+    }else if (m_bottomBeamState && m_topBeamState) {
+      m_storageStatus = StorageState.FULL;
+    }else if (m_bottomBeamState && !m_topBeamState) {
+      m_storageStatus = StorageState.BOTTOMONLY;
+    }else if (!m_bottomBeamState && m_topBeamState) {
+    m_storageStatus = StorageState.TOPONLY;
     }
   }
 
   private void resolveIndexer() {
-    if ((m_storageStatus == StorageState.BOTTOMONLY) || (m_storageStatus == StorageState.TOPONLY)) {
+    if (m_storageStatus == StorageState.EMPTY) {
+      m_intakeIndex.set(ControlMode.PercentOutput, 0);
+      m_midIndex.set(ControlMode.PercentOutput, 0);
+      m_shooterIndex.set(ControlMode.PercentOutput, 0);
+    }else if (m_storageStatus == StorageState.FULL) {
+      m_intakeIndex.set(ControlMode.PercentOutput, 0);
+      m_midIndex.set(ControlMode.PercentOutput, 0);
+      m_shooterIndex.set(ControlMode.PercentOutput, 0);
+    }else if (m_storageStatus == StorageState.TOPONLY) {
+      m_intakeIndex.set(ControlMode.PercentOutput, 0);
+      m_midIndex.set(ControlMode.PercentOutput, 0);
+      m_shooterIndex.set(ControlMode.PercentOutput, 0);
+    }else if (m_storageStatus == StorageState.BOTTOMONLY) {
       m_intakeIndex.set(ControlMode.PercentOutput, INDEXER_SPEED);
       m_midIndex.set(ControlMode.PercentOutput, INDEXER_SPEED);
       m_shooterIndex.set(ControlMode.PercentOutput, 0);
-    }else if (m_storageStatus == StorageState.FULL) {
-      m_intakeIndex.set(ControlMode.PercentOutput, 0);m_shooterIndex.set(ControlMode.PercentOutput, 0);
-      m_midIndex.set(ControlMode.PercentOutput, 0);m_shooterIndex.set(ControlMode.PercentOutput, 0);
-      m_shooterIndex.set(ControlMode.PercentOutput, 0);m_shooterIndex.set(ControlMode.PercentOutput, 0);
-    }else if (m_storageStatus == StorageState.PURGE) {
-      m_intakeIndex.set(ControlMode.PercentOutput, -INDEXER_SPEED);
-      m_midIndex.set(ControlMode.PercentOutput, -INDEXER_SPEED);
-      m_shooterIndex.set(ControlMode.PercentOutput, -INDEXER_SPEED);
     }
   }
 
