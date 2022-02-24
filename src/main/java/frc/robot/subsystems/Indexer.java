@@ -25,7 +25,7 @@ public class Indexer extends SubsystemBase {
     PURGE // This is if the state machine cannot decide what state the indexer is in. If applied it will eject all cargo.
   }
 
-  TalonSRX m_intakeIndex, m_midIndex, m_shooterIndex;
+  TalonSRX m_intakeIndex, m_midIndex, m_shooterIndex, m_shooterFalcon;
 //  private final NetworkTableEntry m_intakeIndexerEntry, m_midIndexerEntry, m_shooterIndexerEntry;
 //  public ShuffleboardTab m_IntakeTab;
 
@@ -40,6 +40,7 @@ public class Indexer extends SubsystemBase {
     m_intakeIndex = new TalonSRX(INTAKE_INDEXER);
     m_midIndex = new TalonSRX(MID_INDEXER);
     m_shooterIndex = new TalonSRX(SHOOTER_INDEXER);
+    m_shooterFalcon = new TalonSRX(SHOOTER_FX);
 
     // m_bottomBeam = new DigitalInput(Constants.BEAM_BREAKER_RECEIVE_BOTTOM);
     // m_topBeam = new DigitalInput(Constants.BEAM_BREAKER_RECEIVE_TOP);
@@ -119,4 +120,9 @@ public class Indexer extends SubsystemBase {
   public NetworkTableEntry getEntry(){
     return m_shooter_entry;
   }
+
+  public void shoot(double shootPower) {
+    m_shooterFalcon.set(ControlMode.PercentOutput, shootPower);
+  }
+
 }

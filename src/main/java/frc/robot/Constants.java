@@ -31,6 +31,7 @@ public final class Constants {
 	public final static int INTAKE_INDEXER = 7;
 	public final static int MID_INDEXER = 8;
 	public final static int SHOOTER_INDEXER = 9;
+	public final static int SHOOTER_FX = 10;
 
 	//////////////////// DIO /////////////////////
 	public final static int BEAM_BREAKER_SEND = 0;

@@ -16,9 +16,9 @@ public class TestIntakeAndIndexer extends CommandBase {
   private final Indexer m_indexer;
   private final Intake m_intake;
 
-  NetworkTableEntry m_in_speed_entry, m_mid_speed_entry, m_shoot_speed_entry, m_duration_entry, m_beamIndex_entry, m_beamShoot_entry, m_intakeWheels_entry;
+  NetworkTableEntry m_in_speed_entry, m_mid_speed_entry, m_shoot_speed_entry, m_duration_entry, m_beamIndex_entry, m_beamShoot_entry, m_intakeWheels_entry, m_shotPower;
 
-  double m_in_speed, m_mid_speed, m_shoot_speed, m_duration, m_intakeWheelSpeed;
+  double m_in_speed, m_mid_speed, m_shoot_speed, m_duration, m_intakeWheelSpeed, m_flywheelSpeed;
 
   Timer m_timer;
   /** Creates a new TestIndexerCommand. */
@@ -32,7 +32,7 @@ public class TestIntakeAndIndexer extends CommandBase {
     // setup shuffleboard testing, tab created in subsystem
     ShuffleboardTab intab = Shuffleboard.getTab("Combined Test");
 
-    m_in_speed_entry=  intab.add("Index Entry Speed", 0).withPosition(0, 0)
+    m_in_speed_entry = intab.add("Index Entry Speed", 0).withPosition(0, 0)
                                 .withSize(1, 1)
                                 .getEntry();
 
@@ -49,6 +49,10 @@ public class TestIntakeAndIndexer extends CommandBase {
                                 .getEntry();
 
     m_intakeWheels_entry = intab.add("Intake Wheel Speed", 0).withPosition(4, 0)
+                                .withSize(1, 1)
+                                .getEntry();
+
+    m_shotPower = intab.add("Flywheel Speed", 0).withPosition(5, 0)
                                 .withSize(1, 1)
                                 .getEntry();
 
@@ -73,6 +77,7 @@ public class TestIntakeAndIndexer extends CommandBase {
     m_shoot_speed = m_shoot_speed_entry.getDouble(0);
     m_duration = m_duration_entry.getDouble(0);
     m_intakeWheelSpeed = m_intakeWheels_entry.getDouble(0);
+    m_flywheelSpeed = m_shoot_speed_entry.getDouble(0);
 
     // Reset the clock
     m_timer.reset();
@@ -83,6 +88,7 @@ public class TestIntakeAndIndexer extends CommandBase {
   public void execute() {
     m_indexer.testIndexDriving(m_in_speed, m_mid_speed, m_shoot_speed);
     m_intake.intakeWheelsMotorOn(m_intakeWheelSpeed);
+    m_indexer.shoot(m_flywheelSpeed);
   }
 
   // Called once the command ends or is interrupted.
@@ -90,6 +96,7 @@ public class TestIntakeAndIndexer extends CommandBase {
   public void end(boolean interrupted) {
     m_indexer.testIndexDriving(0, 0, 0);
     m_intake.stopIntakeMotor();
+    m_indexer.shoot(0);
   }
 
   // Returns true when the command should end.
