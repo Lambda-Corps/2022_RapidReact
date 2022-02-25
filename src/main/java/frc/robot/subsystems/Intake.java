@@ -3,20 +3,13 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
-
-import javax.swing.text.html.HTMLDocument.BlockElement;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
-import com.ctre.phoenix.motorcontrol.RemoteLimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -37,15 +30,12 @@ public class Intake extends SubsystemBase {
   //motors
   TalonSRX m_armMotor; //calling up and down movement arm for lack of better term
   TalonSRX m_intakeMotor;
-  
-  //encoder?
 
   //positions
   public static final int ARM_POSITION_ZERO = 0; //intake fully vertical/up
   public static final int INTAKE_ARM_DOWN = 1000; //intake down to grab ball (currently has temporary value) TODO get this value
-  //TODO Do we want a position somewhere in the middle?
   
-  public static int MM_FEEDFORWARD = 0; //PID (would this one also be motion magic?) TODO get this value
+  public static double MM_FEEDFORWARD = 0.2; //PID (would this one also be motion magic?) TODO get this value (current one is estimated)
   
   //gains for intake arm
   private Gains m_intakeArmGains = Constants.kGains_IntakeArms;
@@ -71,16 +61,23 @@ public class Intake extends SubsystemBase {
   private final double STANDARD_INTAKE_SPEED = 0; //^^^
 
   ShuffleboardTab m_intakeTab;
-  NetworkTableEntry m_armMaxSpeed, m_armStandardSpeed, m_maxFF, m_minFF;
+  NetworkTableEntry m_armMaxSpeed, m_armStandardSpeed, m_maxFF, m_minFF, m_forwardSoftLimit, m_armEncoder;
 
   public Intake() {
     m_armMotor = new TalonSRX(Constants.INTAKE_ARM_TALON);
     m_intakeMotor = new TalonSRX(Constants.INTAKE_TALON);
+
+    // m_intakeTab = Shuffleboard.getTab("Intake");
+    // m_forwardSoftLimit = m_intakeTab.add("unusedname", 0)
+    //                                 .withPosition(0, 0)
+    //                                 .withSize(1, 1)
+    //                                 .getEntry();
+    // m_armEncoder = m_intakeTab.add("Arm Encoder Position", 0).getEntry();
     
     m_intakeMotor.configFactoryDefault();
     m_intakeMotor.setInverted(false);
     m_armMotor.configFactoryDefault();
-    m_armMotor.setInverted(false); //TODO determine if either needs inverted
+    m_armMotor.setInverted(true);
   
     //selected feedback
     m_armMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
@@ -210,7 +207,6 @@ public class Intake extends SubsystemBase {
   }
 
   public void setForwardLimit() {
-    double encoder = m_armMotor.getSelectedSensorPosition();
-    m_armMotor.configForwardSoftLimitThreshold(encoder);
+    m_armMotor.configForwardSoftLimitThreshold(m_forwardSoftLimit.getDouble(0));
   }
 }
