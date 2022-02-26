@@ -68,15 +68,15 @@ public class ShooterPIDTuning extends CommandBase {
   public void initialize() {
         // Grab the relevant values for the PID control from Shuffleboard and set the 
     // motor controller configuration accordingly
-    double kp = m_kpEntry.getDouble(0);
+    double kp = m_kpEntry.getDouble(.0999);
     double ki = m_kiEntry.getDouble(0);
     double kd = m_kdEntry.getDouble(0);
-    double kf = m_kfEntry.getDouble(0);
+    double kf = m_kfEntry.getDouble(.0534);
     m_setpoint = m_spEntry.getDouble(0);
     m_indexerSpeed = m_indexerSpeedEntry.getDouble(0);
     m_indexerDelay = m_indexderDelayEntry.getDouble(2.0);
     m_runTime = m_runTimeEntry.getDouble(0);
-
+    m_Indexer = m_indexerSpeedEntry.getDouble(0);
     m_shooter.configureVelocityPID(kp, ki, kd, kf);
 
     cmdTimer.reset();
@@ -88,7 +88,7 @@ public class ShooterPIDTuning extends CommandBase {
   public void execute() {
     // Drive the shooter motors, as well as the conveyor to start the 
     m_shooter.velocityPID(m_setpoint, m_tolerance);
-    if( cmdTimer.hasElapsed(m_indexerDelay){
+    if( cmdTimer.hasElapsed(m_indexerDelay)){
       // Turn on the conveyor motor after the delay has been meet.
       m_indexer.testIndexDriving(m_indexerSpeed, m_indexerSpeed, m_indexerSpeed);
     }
