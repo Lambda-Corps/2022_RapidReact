@@ -77,4 +77,11 @@ public class Shooter extends SubsystemBase {
     public void test_shooter_percent(double speed){
         m_shooter.set(ControlMode.PercentOutput, speed);
     }
+
+    public void velocityPID(double m_setpoint, double m_tolerance) {
+    }
+
+    public void configureVelocityPID(double kp, double ki, double kd, double kf) {
+
+    }
 }
