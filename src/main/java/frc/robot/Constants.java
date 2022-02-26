@@ -22,11 +22,12 @@ public final class Constants {
 	public final static int RIGHT_TALON_FOLLOWER = 4;
     public final static int LEFT_TALON_LEADER = 1;
 	public final static int LEFT_TALON_FOLLOWER = 3;
+	public final static int SHOOTER_TALON = 10;
 
 
     ///////////// Drive Train Values /////////////
-    public final static double kControllerDeadband = .05;
-    public final static int DRIVER_RIGHT_AXIS = 2;
+    public final static double kControllerDeadband = .1;
+    public final static int DRIVER_RIGHT_AXIS = 4;
     public final static int DRIVER_LEFT_AXIS = 1;
 
     ///////////// Talon Specific Values ////////////////
