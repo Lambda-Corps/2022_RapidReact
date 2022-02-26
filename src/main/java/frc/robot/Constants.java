@@ -39,11 +39,7 @@ public final class Constants {
 	public final static int BEAM_BREAKER_RECEIVE_TOP = 2;
 
     ///////////// Drive Train Values /////////////
-<<<<<<< HEAD
-    public final static double kControllerDeadband = .05;
-=======
     public final static double kControllerDeadband = .1;
->>>>>>> combined
     public final static int DRIVER_RIGHT_AXIS = 4;
     public final static int DRIVER_LEFT_AXIS = 1;
 
