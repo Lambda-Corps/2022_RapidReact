@@ -4,9 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -15,8 +12,10 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.commands.DriveForSecondsFromShuffleboard;
 import frc.robot.commands.DriveMM;
 import frc.robot.commands.Indexer.TestIntakeAndIndexer;
+import frc.robot.commands.Intake.ArmDriveTest;
 import frc.robot.commands.Intake.ArmMM;
 import frc.robot.commands.Intake.ResetIntakeArmEncoder;
+import frc.robot.commands.Intake.SetArm;
 import frc.robot.commands.Intake.SetForwardLimit;
 import frc.robot.commands.default_commands.DriveTrainDefaultCommand;
 import frc.robot.commands.default_commands.IndexerDefaultCommand;
@@ -60,7 +59,9 @@ public class RobotContainer {
     Shuffleboard.getTab("Combined Test").add(new TestIntakeAndIndexer(m_indexer, m_intake, m_shooter)).withPosition(0, 1).withSize(2, 1);
     Shuffleboard.getTab("Combined Test").add(new ResetIntakeArmEncoder(m_intake)).withPosition(0, 2).withSize(2, 1);
     Shuffleboard.getTab("Combined Test").add(new SetForwardLimit(m_intake)).withPosition(0, 3).withSize(2, 1);
-    Shuffleboard.getTab("Arm MM Testing").add("Arm MM", new ArmMM(m_intake, 0)).withPosition(0, 1);
+    Shuffleboard.getTab("Combined Test").add("Arm MM", new ArmMM(m_intake, 0)).withPosition(2, 1);
+    Shuffleboard.getTab("Arm Drive Testing").add("Test Arm Drive", new ArmDriveTest(m_intake)).withPosition(0, 1);
+    Shuffleboard.getTab("Combined Test").add(new SetArm(m_intake)).withPosition(2, 2);
 
     // SmartDashboard.getNumber("Target Angle", 0);
     // Configure the button bindings

@@ -58,6 +58,7 @@ public class TestIntakeAndIndexer extends CommandBase {
     m_shotPower = intab.add("Flywheel Speed", 0).withPosition(5, 0)
                                 .withSize(1, 1)
                                 .getEntry();
+    intab.addNumber("test speed", this::getFlywheelSpeed).withPosition(6,0);
 
     m_timer = new Timer();
     m_timer.start();
@@ -72,7 +73,7 @@ public class TestIntakeAndIndexer extends CommandBase {
     m_shoot_speed = m_shoot_speed_entry.getDouble(0);
     m_duration = m_duration_entry.getDouble(0);
     m_intakeWheelSpeed = m_intakeWheels_entry.getDouble(0);
-    m_flywheelSpeed = m_shoot_speed_entry.getDouble(0);
+    m_flywheelSpeed = m_shotPower.getDouble(0);
 
     // Reset the clock
     m_timer.reset();
@@ -100,5 +101,9 @@ public class TestIntakeAndIndexer extends CommandBase {
     // Command shoot end if the values were 0, or the timer has elapsed.
     return m_timer.hasElapsed(m_duration) || 
            (m_in_speed == 0 && m_mid_speed == 0 && m_shoot_speed == 0);
+  }
+
+  public double getFlywheelSpeed() {
+    return m_flywheelSpeed;
   }
 }

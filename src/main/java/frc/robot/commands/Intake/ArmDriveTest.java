@@ -36,14 +36,14 @@ public class ArmDriveTest extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_intake.setMotor(m_driveSpeed.getDouble(0));
+    m_intake.setArmMotor(m_driveSpeed.getDouble(0));
     m_driveTimer.forceSetDouble(timer.get());
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_intake.setMotor(0);
+    m_intake.setArmMotor(0);
     timer.stop();
   }
 

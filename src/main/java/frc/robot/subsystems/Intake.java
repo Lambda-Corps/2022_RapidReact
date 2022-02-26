@@ -54,8 +54,8 @@ public class Intake extends SubsystemBase {
     // */
   
   //soft limits
-  private final int ARM_REVERSE_SOFT_LIMIT = 0;
-  private final int ARM_FORWARD_SOFT_LIMIT = INTAKE_ARM_DOWN;
+  private final int ARM_REVERSE_SOFT_LIMIT = -20;
+  private final int ARM_FORWARD_SOFT_LIMIT = 1850;
 
   //max speed
   private final double MAX_ARM_SPEED = 0; //TODO set this
@@ -79,6 +79,7 @@ public class Intake extends SubsystemBase {
     m_intakeMotor.setInverted(false);
     m_armMotor.configFactoryDefault();
     m_armMotor.setInverted(true);
+    m_armMotor.setSensorPhase(false);
   
     //selected feedback
     m_armMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
@@ -87,16 +88,16 @@ public class Intake extends SubsystemBase {
     m_armMotor.configForwardSoftLimitEnable(true);
     m_armMotor.configReverseSoftLimitEnable(true);
     //mm
-    m_armMotor.configMotionCruiseVelocity(0, 0);
-    m_armMotor.configMotionAcceleration(0, 0);
+    m_armMotor.configMotionCruiseVelocity(600, 0);
+    m_armMotor.configMotionAcceleration(600, 0);
 
     //current limits?
-    m_armMotor.configPeakCurrentLimit(0);
+    //m_armMotor.configPeakCurrentLimit(0);
     //m_armMotor.configContinuousCurrentLimit(amps);
     
     //limit switches
    //m_armMotor.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled, 0);
-    m_armMotor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled, 0); //hopefully this is correct?
+   // m_armMotor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled, 0); //hopefully this is correct?
 
     //config PIDF values
     m_armMotor.config_kP(0, m_intakeArmGains.kP, 0);
@@ -117,7 +118,7 @@ public class Intake extends SubsystemBase {
     //}
   }
 
-  public void setMotor (double speed){
+  public void setArmMotor (double speed){
     if(Math.abs(speed) > MAX_ARM_SPEED){
       if(speed > 0){
         speed = -MAX_ARM_SPEED;
@@ -129,14 +130,14 @@ public class Intake extends SubsystemBase {
   }
 
 
-  public  void configStartMM(double targetPosition){
+  public  void configStartMM(double targetPosition, double kP, double kI, double kD, double kF){
     // if (targetPos > getRelativeEncoder()) {
             // forward slot
             m_armMotor.selectProfileSlot(0, 0);
-            // armMotor.config_kP(0, kP, 0); // find values
-            // armMotor.config_kI(0, kI, 0); // find values
-            // armMotor.config_kD(0, kD, 0); // find values
-            // armMotor.config_kF(0, kF, 0); // find values
+            m_armMotor.config_kP(0, kP, 0); // find values
+            m_armMotor.config_kI(0, kI, 0); // find values
+            m_armMotor.config_kD(0, kD, 0); // find values
+            m_armMotor.config_kF(0, kF, 0); // find values
             // armMotor.config_kF(0, 1, 0); // find values - auxiliary feed forward
         // } else {
         //     // backward slot
@@ -155,7 +156,7 @@ public class Intake extends SubsystemBase {
         m_armMotor.set(ControlMode.MotionMagic, targetPosition);
         break;
       case INTAKE_ARM_DOWN:
-        m_armMotor.set(ControlMode.MotionMagic,  targetPosition, DemandType.ArbitraryFeedForward, MM_FEEDFORWARD); //basing off of 2019 arm
+        m_armMotor.set(ControlMode.MotionMagic,  targetPosition); //basing off of 2019 arm
         break;
       default:
         //this shouldn't happen, if it does motors stay off
@@ -208,6 +209,11 @@ public class Intake extends SubsystemBase {
   }
 
   public void setForwardLimit() {
-    m_armMotor.configForwardSoftLimitThreshold(m_forwardSoftLimit.getDouble(0));
+    double pos = m_armMotor.getSelectedSensorPosition();
+    m_armMotor.configForwardSoftLimitThreshold(pos);
+  }
+
+  public void holdMotorPosition(int position, double arbFF){
+    m_armMotor.set(ControlMode.Position, position, DemandType.ArbitraryFeedForward, arbFF);
   }
 }

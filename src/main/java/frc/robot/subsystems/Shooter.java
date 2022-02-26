@@ -52,7 +52,7 @@ public class Shooter extends SubsystemBase {
         config.slot0.kP = k_kP;
         config.slot0.kI = k_kI;
         config.slot0.kD = k_kD;
-        config.statorCurrLimit = new StatorCurrentLimitConfiguration(true, 20, 25, 1.0);
+        // config.statorCurrLimit = new StatorCurrentLimitConfiguration(true, 20, 25, 1.0);
 
         
         m_shooter.configAllSettings(config);

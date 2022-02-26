@@ -17,8 +17,9 @@ public class ArmMM extends CommandBase {
   int m_targetPosition;
   public final ShuffleboardTab armMMTab;
   private double m_arm_kP, m_kI, m_kD, m_kF;
-  private NetworkTableEntry m_armkPEntry, m_kIEntry, m_kDEntry, m_targetPosEntry, m_iterationEntry, m_drivedurationEntry, m_countokEntry, m_kFEntry;
+  private NetworkTableEntry m_armkPEntry, m_kIEntry, m_kDEntry, m_targetPosEntry, m_iterationEntry, m_drivedurationEntry, m_countokEntry, m_kFEntry, m_arbFFEntry;
   private double m_start_time;
+  private double m_upFF, m_downFF;
   public ArmMM(Intake intake, int target) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_intake = intake;
@@ -34,6 +35,7 @@ public class ArmMM extends CommandBase {
     armMMTab.addNumber("Encoder", m_intake::getRelativeEncoder).withPosition(1, 1);
     m_drivedurationEntry = armMMTab.add("drive duration", 0).withPosition(6, 0).getEntry();
     //m_countokEntry = turnMMTab.add("count_ok", 0).getEntry();
+    m_arbFFEntry = armMMTab.add("Arbitrary Feedforward", 0).withPosition(7, 0).getEntry();
   }
 
   // Called when the command is initially scheduled.
@@ -45,9 +47,10 @@ public class ArmMM extends CommandBase {
     m_kI = m_kIEntry.getDouble(0.0);
     m_kD = m_kDEntry.getDouble(0.0);
     m_targetPosEntry.forceSetDouble(m_targetPosition);
-    m_intake.configStartMM(m_targetPosition);
+    m_intake.configStartMM(m_targetPosition, m_arm_kP, m_kI, m_kD, m_kF);
     m_intake.moveMM(m_targetPosition);
     m_start_time = Timer.getFPGATimestamp();
+    m_downFF = m_arbFFEntry.getDouble(0.0);
     m_intake.reset_arm_PIDF_values(m_arm_kP, m_kI, m_kD, m_kF);
   }
 
@@ -60,7 +63,7 @@ public class ArmMM extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    
+    m_intake.holdMotorPosition(m_targetPosition, m_downFF);
   }
 
   // Returns true when the command should end.
