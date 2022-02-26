@@ -18,18 +18,44 @@ public final class Constants {
     // Robot Electronics Map
 
     ///////////// CAN Bus IDs  ////////////////
+	// public final static int INTAKE_INDEXER = ;
+	// public final static int MIDDLE_INDEXER = ;
+	// public final static int SHOOTER_INDEXER = ;
+	// public final static int SHOOTER_FALCON =;
+	public final static int INTAKE_TALON = 5;
+	public final static int INTAKE_ARM_TALON = 6;
     public final static int RIGHT_TALON_LEADER = 2;
 	public final static int RIGHT_TALON_FOLLOWER = 4;
     public final static int LEFT_TALON_LEADER = 1;
 	public final static int LEFT_TALON_FOLLOWER = 3;
+	public final static int INTAKE_INDEXER = 7;
+	public final static int MID_INDEXER = 8;
+	public final static int SHOOTER_INDEXER = 9;
+	public final static int SHOOTER_FX = 10;
 
+	//////////////////// DIO /////////////////////
+	public final static int BEAM_BREAKER_SEND = 0;
+	public final static int BEAM_BREAKER_RECEIVE_BOTTOM = 1;
+	public final static int BEAM_BREAKER_RECEIVE_TOP = 2;
 
     ///////////// Drive Train Values /////////////
+<<<<<<< HEAD
     public final static double kControllerDeadband = .05;
+=======
+    public final static double kControllerDeadband = .1;
+>>>>>>> combined
     public final static int DRIVER_RIGHT_AXIS = 4;
     public final static int DRIVER_LEFT_AXIS = 1;
 
-    ///////////// Talon Specific Values ////////////////
+	/////////// Indexer Specific Values //////////
+	public final static double INDEXER_SPEED = 0.5;
+
+	/////////// Vision Specific Values ///////////
+	public final static double CAMERA_HEIGHT_METERS = 0;
+	public final static double CAMERA_PITCH_RADIANS = 0;
+	public final static double TARGET_HEIGHT_METERS = 0;
+
+    //////////// Talon Specific Values ///////////
     /**
 	 * Using the configSelectedFeedbackCoefficient() function, scale units to 3600 per rotation.
 	 * This is nice as it keeps 0.1 degrees of resolution, and is fairly intuitive.
@@ -63,10 +89,10 @@ public final class Constants {
      * kF: 1023 represents output value to Talon at 100%, 6800 represents Velocity units at 100% output
      * Not all set of Gains are used in this project and may be removed as desired.
      * 
-	 * 	                                    			  kP   kI   kD   kF               Iz    PeakOut */
-	public final static Gains kGains_Turning = new Gains( 0.1, 0.0,  0.0, 0.0,            200,  1.0 );
-	public final static Gains kGains_Driving = new Gains( 0.1, 0.0,  0.0, 0.003699,         0,  1.0 );
-	
+	 * 	                                    			    kP   kI   kD   kF               Iz    PeakOut */
+	public final static Gains kGains_Turning = new Gains(   0.1, 0.0,  0.0, 0.003699,            200,  1.0 );
+	public final static Gains kGains_Driving = new Gains(   0.1, 0.0,  0.0, 0.003699,         0,  1.0 );
+	public final static Gains kGains_IntakeArms = new Gains(0.1, 0.0, 0.0, 0.0,               0,  1.0 );
 	/** ---- Flat constants, you should not need to change these ---- */
 	/* We allow either a 0 or 1 when selecting an ordinal for remote devices [You can have up to 2 devices assigned remotely to a talon/victor] */
 	public final static int REMOTE_0 = 0;
