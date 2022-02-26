@@ -76,7 +76,6 @@ public class ShooterPIDTuning extends CommandBase {
     m_indexerSpeed = m_indexerSpeedEntry.getDouble(0);
     m_indexerDelay = m_indexderDelayEntry.getDouble(2.0);
     m_runTime = m_runTimeEntry.getDouble(0);
-    m_Indexer = m_indexerSpeedEntry.getDouble(0);
     m_shooter.configureVelocityPID(kp, ki, kd, kf);
 
     cmdTimer.reset();
@@ -97,13 +96,13 @@ public class ShooterPIDTuning extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    // TODO finish
+    m_shooter.stopmotor();
+    m_indexer.testIndexDriving(0, 0, 0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    // TODO finish
-    return false;
+    return cmdTimer.hasElapsed(m_runTime);
   }
 }

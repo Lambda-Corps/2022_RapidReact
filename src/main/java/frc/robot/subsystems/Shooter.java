@@ -79,11 +79,18 @@ public class Shooter extends SubsystemBase {
     }
 
     public void velocityPID(double m_setpoint, double m_tolerance) {
-        // TODO finish
+        m_shooter.set(ControlMode.Velocity, m_setpoint);
 
     }
 
     public void configureVelocityPID(double kp, double ki, double kd, double kf) {
-        // TODO finish
+        m_shooter.config_kI(0, kp);
+        m_shooter.config_kI(0, ki);
+        m_shooter.config_kD(0, kd);
+        m_shooter.config_kF(0, kf);
+    }
+
+    public void stopmotor() {
+        m_shooter.set(ControlMode.PercentOutput, 0);
     }
 }
