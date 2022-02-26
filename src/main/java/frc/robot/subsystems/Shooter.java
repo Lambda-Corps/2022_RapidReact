@@ -79,9 +79,11 @@ public class Shooter extends SubsystemBase {
     }
 
     public void velocityPID(double m_setpoint, double m_tolerance) {
+        // TODO finish
+
     }
 
     public void configureVelocityPID(double kp, double ki, double kd, double kf) {
-
+        // TODO finish
     }
 }
