@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -67,12 +68,12 @@ public class Intake extends SubsystemBase {
     m_armMotor = new TalonSRX(Constants.INTAKE_ARM_TALON);
     m_intakeMotor = new TalonSRX(Constants.INTAKE_TALON);
 
-    // m_intakeTab = Shuffleboard.getTab("Intake");
-    // m_forwardSoftLimit = m_intakeTab.add("unusedname", 0)
-    //                                 .withPosition(0, 0)
-    //                                 .withSize(1, 1)
-    //                                 .getEntry();
-    // m_armEncoder = m_intakeTab.add("Arm Encoder Position", 0).getEntry();
+    m_intakeTab = Shuffleboard.getTab("Intake");
+    m_forwardSoftLimit = m_intakeTab.add("unusedname", 0)
+                                    .withPosition(0, 0)
+                                    .withSize(1, 1)
+                                    .getEntry();
+    m_armEncoder = m_intakeTab.add("Arm Encoder Position", 0).getEntry();
     
     m_intakeMotor.configFactoryDefault();
     m_intakeMotor.setInverted(false);

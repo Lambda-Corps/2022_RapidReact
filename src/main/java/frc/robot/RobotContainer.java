@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -20,6 +23,7 @@ import frc.robot.commands.default_commands.IndexerDefaultCommand;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -32,6 +36,7 @@ public class RobotContainer {
   DriveTrain m_driveTrain;
   Indexer m_indexer;
   Intake m_intake;
+  Shooter m_shooter;
 
   // OI
   XboxController m_driver_controller;
@@ -42,6 +47,7 @@ public class RobotContainer {
     m_driveTrain = new DriveTrain();
     m_indexer = new Indexer();
     m_intake = new Intake();
+    m_shooter = new Shooter();
 
     m_driveTrain.setDefaultCommand(new DriveTrainDefaultCommand(m_driveTrain, m_driver_controller));
     m_indexer.setDefaultCommand(new IndexerDefaultCommand(m_indexer));
@@ -51,17 +57,14 @@ public class RobotContainer {
                                             .withSize(2, 1);         
     Shuffleboard.getTab("Drive MM Testing").add(new DriveMM(m_driveTrain, 0));
 
-    Shuffleboard.getTab("Combined Test").add(new TestIntakeAndIndexer(m_indexer, m_intake)).withPosition(0, 1).withSize(2, 1);
+    Shuffleboard.getTab("Combined Test").add(new TestIntakeAndIndexer(m_indexer, m_intake, m_shooter)).withPosition(0, 1).withSize(2, 1);
     Shuffleboard.getTab("Combined Test").add(new ResetIntakeArmEncoder(m_intake)).withPosition(0, 2).withSize(2, 1);
     Shuffleboard.getTab("Combined Test").add(new SetForwardLimit(m_intake)).withPosition(0, 3).withSize(2, 1);
-
+    Shuffleboard.getTab("Arm MM Testing").add("Arm MM", new ArmMM(m_intake, 0)).withPosition(0, 1);
 
     // SmartDashboard.getNumber("Target Angle", 0);
     // Configure the button bindings
     configureButtonBindings();
-    m_intake = new Intake();
-
-    Shuffleboard.getTab("Arm MM Testing").add("Arm MM", new ArmMM(m_intake, 0)).withPosition(0, 1);
   }
 
   /**

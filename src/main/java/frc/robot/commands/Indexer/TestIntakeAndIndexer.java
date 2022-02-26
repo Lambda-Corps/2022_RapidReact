@@ -11,10 +11,12 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 
 public class TestIntakeAndIndexer extends CommandBase {
   private final Indexer m_indexer;
   private final Intake m_intake;
+  private final Shooter m_shooter;
 
   NetworkTableEntry m_in_speed_entry, m_mid_speed_entry, m_shoot_speed_entry, m_duration_entry, m_beamIndex_entry, m_beamShoot_entry, m_intakeWheels_entry, m_shotPower;
 
@@ -22,12 +24,13 @@ public class TestIntakeAndIndexer extends CommandBase {
 
   Timer m_timer;
   /** Creates a new TestIndexerCommand. */
-  public TestIntakeAndIndexer(Indexer indexer, Intake intake) {
+  public TestIntakeAndIndexer(Indexer indexer, Intake intake, Shooter shooter) {
     m_indexer = indexer;
     m_intake = intake;
+    m_shooter = shooter;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(m_indexer, m_intake);
+    addRequirements(m_indexer, m_intake, m_shooter);
 
     // setup shuffleboard testing, tab created in subsystem
     ShuffleboardTab intab = Shuffleboard.getTab("Combined Test");
@@ -56,14 +59,6 @@ public class TestIntakeAndIndexer extends CommandBase {
                                 .withSize(1, 1)
                                 .getEntry();
 
-    // m_beamIndex_entry = intab.add("Intake Beam", 0).withPosition(0, 3)
-    //                             .withSize(1, 1)
-    //                             .getEntry();
-
-    // m_beamShoot_entry =  intab.add("Shooter Beam", 0).withPosition(1, 3)
-    //                             .withSize(1, 1)
-    //                             .getEntry();
-
     m_timer = new Timer();
     m_timer.start();
   }
@@ -88,7 +83,7 @@ public class TestIntakeAndIndexer extends CommandBase {
   public void execute() {
     m_indexer.testIndexDriving(m_in_speed, m_mid_speed, m_shoot_speed);
     m_intake.intakeWheelsMotorOn(m_intakeWheelSpeed);
-    m_indexer.shoot(m_flywheelSpeed);
+    m_shooter.test_shooter_percent(m_flywheelSpeed);
   }
 
   // Called once the command ends or is interrupted.
@@ -96,7 +91,7 @@ public class TestIntakeAndIndexer extends CommandBase {
   public void end(boolean interrupted) {
     m_indexer.testIndexDriving(0, 0, 0);
     m_intake.stopIntakeMotor();
-    m_indexer.shoot(0);
+    m_shooter.test_shooter_percent(0);
   }
 
   // Returns true when the command should end.
