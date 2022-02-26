@@ -14,12 +14,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.commands.DriveForSecondsFromShuffleboard;
 import frc.robot.commands.DriveMM;
-import frc.robot.commands.Indexer.TestIntakeAndIndexer;
+import frc.robot.commands.Indexer.TestIntakeIndexerAndShooter;
 import frc.robot.commands.Intake.ArmMM;
 import frc.robot.commands.Intake.ResetIntakeArmEncoder;
 import frc.robot.commands.Intake.SetForwardLimit;
 import frc.robot.commands.default_commands.DriveTrainDefaultCommand;
 import frc.robot.commands.default_commands.IndexerDefaultCommand;
+import frc.robot.commands.shooter.ShooterPIDTuning;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
@@ -57,11 +58,11 @@ public class RobotContainer {
                                             .withSize(2, 1);         
     Shuffleboard.getTab("Drive MM Testing").add(new DriveMM(m_driveTrain, 0));
 
-    Shuffleboard.getTab("Combined Test").add(new TestIntakeAndIndexer(m_indexer, m_intake, m_shooter)).withPosition(0, 1).withSize(2, 1);
+    Shuffleboard.getTab("Combined Test").add(new TestIntakeIndexerAndShooter(m_indexer, m_intake, m_shooter)).withPosition(0, 1).withSize(2, 1);
     Shuffleboard.getTab("Combined Test").add(new ResetIntakeArmEncoder(m_intake)).withPosition(0, 2).withSize(2, 1);
     Shuffleboard.getTab("Combined Test").add(new SetForwardLimit(m_intake)).withPosition(0, 3).withSize(2, 1);
     Shuffleboard.getTab("Arm MM Testing").add("Arm MM", new ArmMM(m_intake, 0)).withPosition(0, 1);
-
+    Shuffleboard.getTab("ShooterPID").add("Shoot" , new ShooterPIDTuning(m_shooter, m_indexer)).withPosition(0, 3);
     // SmartDashboard.getNumber("Target Angle", 0);
     // Configure the button bindings
     configureButtonBindings();
