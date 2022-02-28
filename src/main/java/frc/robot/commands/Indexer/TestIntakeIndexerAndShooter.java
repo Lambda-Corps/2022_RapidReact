@@ -13,7 +13,7 @@ import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 
-public class TestIntakeAndIndexer extends CommandBase {
+public class TestIntakeIndexerAndShooter extends CommandBase {
   private final Indexer m_indexer;
   private final Intake m_intake;
   private final Shooter m_shooter;
@@ -24,7 +24,7 @@ public class TestIntakeAndIndexer extends CommandBase {
 
   Timer m_timer;
   /** Creates a new TestIndexerCommand. */
-  public TestIntakeAndIndexer(Indexer indexer, Intake intake, Shooter shooter) {
+  public TestIntakeIndexerAndShooter(Indexer indexer, Intake intake, Shooter shooter) {
     m_indexer = indexer;
     m_intake = intake;
     m_shooter = shooter;

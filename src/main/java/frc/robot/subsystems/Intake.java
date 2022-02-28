@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import static frc.robot.Constants.*;
 import frc.robot.Gains;
 
 public class Intake extends SubsystemBase {
@@ -33,13 +33,16 @@ public class Intake extends SubsystemBase {
   TalonSRX m_intakeMotor;
 
   //positions
-  public static final int ARM_POSITION_ZERO = 0; //intake fully vertical/up
-  public static final int INTAKE_ARM_DOWN = 1000; //intake down to grab ball (currently has temporary value) TODO get this value
-  
-  public static double MM_FEEDFORWARD = 0.2; //PID (would this one also be motion magic?) TODO get this value (current one is estimated)
+  final int ARM_POSITION_ZERO = 0; //intake fully vertical/up
+  final int INTAKE_ARM_DOWN = 1500; //intake down to grab ball (currently has temporary value) TODO get this value
+
+  final double DOWN_FEEDFORWARD = .2;
+  final double UP_FEEDFORWARD = -.3;
+  final double HOLD_FEEDFORWARD = UP_FEEDFORWARD; //PID (would this one also be motion magic?) TODO get this value (current one is estimated)
   
   //gains for intake arm
-  private Gains m_intakeArmGains = Constants.kGains_IntakeArms;
+  private Gains m_intakeArmDownGains = kGains_IntakeDown;
+  private Gains m_intakeArmUpGains = kGains_IntakeUp;
 
   // /*
     // * kF = full forward value * duty-cycle (%) / runtime calculated target
@@ -64,9 +67,12 @@ public class Intake extends SubsystemBase {
   ShuffleboardTab m_intakeTab;
   NetworkTableEntry m_armMaxSpeed, m_armStandardSpeed, m_maxFF, m_minFF, m_forwardSoftLimit, m_armEncoder;
 
+  private double MM_FEEDFORWARD = 0;
+  private boolean m_is_on_target;
+
   public Intake() {
-    m_armMotor = new TalonSRX(Constants.INTAKE_ARM_TALON);
-    m_intakeMotor = new TalonSRX(Constants.INTAKE_TALON);
+    m_armMotor = new TalonSRX(INTAKE_ARM_TALON);
+    m_intakeMotor = new TalonSRX(INTAKE_TALON);
 
     m_intakeTab = Shuffleboard.getTab("Intake");
     m_forwardSoftLimit = m_intakeTab.add("unusedname", 0)
@@ -85,11 +91,11 @@ public class Intake extends SubsystemBase {
     m_armMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
     m_armMotor.configForwardSoftLimitThreshold(ARM_FORWARD_SOFT_LIMIT);
     m_armMotor.configReverseSoftLimitThreshold(ARM_REVERSE_SOFT_LIMIT);
-    m_armMotor.configForwardSoftLimitEnable(true);
-    m_armMotor.configReverseSoftLimitEnable(true);
+    m_armMotor.configForwardSoftLimitEnable(false);
+    m_armMotor.configReverseSoftLimitEnable(false);
     //mm
-    m_armMotor.configMotionCruiseVelocity(600, 0);
-    m_armMotor.configMotionAcceleration(600, 0);
+    m_armMotor.configMotionCruiseVelocity(100, 0);
+    m_armMotor.configMotionAcceleration(100, 0);
 
     //current limits?
     //m_armMotor.configPeakCurrentLimit(0);
@@ -100,10 +106,15 @@ public class Intake extends SubsystemBase {
    // m_armMotor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled, 0); //hopefully this is correct?
 
     //config PIDF values
-    m_armMotor.config_kP(0, m_intakeArmGains.kP, 0);
-    m_armMotor.config_kI(0, m_intakeArmGains.kI, 0);
-    m_armMotor.config_kD(0, m_intakeArmGains.kD, 0);
-    m_armMotor.config_kF(0, m_intakeArmGains.kF, 0);
+    m_armMotor.config_kP(0, m_intakeArmDownGains.kP, 0);
+    m_armMotor.config_kI(0, m_intakeArmDownGains.kI, 0);
+    m_armMotor.config_kD(0, m_intakeArmDownGains.kD, 0);
+    m_armMotor.config_kF(0, m_intakeArmDownGains.kF, 0);
+
+    m_armMotor.config_kP(1, m_intakeArmUpGains.kP, 0);
+    m_armMotor.config_kI(1, m_intakeArmUpGains.kI, 0);
+    m_armMotor.config_kD(1, m_intakeArmUpGains.kD, 0);
+    m_armMotor.config_kF(1, m_intakeArmUpGains.kF, 0);
 
     //config closed loop error
     m_armMotor.configAllowableClosedloopError(0, 10, 0); //TODO determine what tolerance needs to be
@@ -130,44 +141,43 @@ public class Intake extends SubsystemBase {
   }
 
 
-  public  void configStartMM(double targetPosition, double kP, double kI, double kD, double kF){
-    // if (targetPos > getRelativeEncoder()) {
-            // forward slot
-            m_armMotor.selectProfileSlot(0, 0);
-            m_armMotor.config_kP(0, kP, 0); // find values
-            m_armMotor.config_kI(0, kI, 0); // find values
-            m_armMotor.config_kD(0, kD, 0); // find values
-            m_armMotor.config_kF(0, kF, 0); // find values
-            // armMotor.config_kF(0, 1, 0); // find values - auxiliary feed forward
-        // } else {
-        //     // backward slot
-        //     armMotor.selectProfileSlot(1, 0);
-        //     // armMotor.config_kP(1, kP, 0); // find values
-        //     // armMotor.config_kI(1, kI, 0); // find values
-        //     // armMotor.config_kD(1, kD, 0); // find values
-        //     // armMotor.config_kF(1, kF, 0); // find values
-        //     // armMotor.config_kF(1, 1, 0); // find values - auxiliary feed forward
-        // }
+  public  void configStartMM(int position, double kP, double kI, double kD, double kF){
+      if (position > getRelativeEncoder()) {
+          // forward slot
+          m_armMotor.selectProfileSlot(0, 0);
+          m_armMotor.config_kP(0, kP, 0); // find values
+          m_armMotor.config_kI(0, kI, 0); // find values
+          m_armMotor.config_kD(0, kD, 0); // find values
+          m_armMotor.config_kF(0, kF, 0); // find values
+          // armMotor.config_kF(0, 1, 0); // find values - auxiliary feed forward
+          MM_FEEDFORWARD = DOWN_FEEDFORWARD;
+      } else {
+          // backward slot
+          m_armMotor.selectProfileSlot(1, 0);
+          m_armMotor.config_kP(1, kP, 0); // find values
+          m_armMotor.config_kI(1, kI, 0); // find values
+          m_armMotor.config_kD(1, kD, 0); // find values
+          m_armMotor.config_kF(1, kF, 0); // find values
+          // armMotor.config_kF(1, 1, 0); // find values - auxiliary feed forward
+          MM_FEEDFORWARD = UP_FEEDFORWARD;
+      }
+
   }
 
-  public void moveMM(int targetPosition){
-    switch(targetPosition){
-      case ARM_POSITION_ZERO:
-        m_armMotor.set(ControlMode.MotionMagic, targetPosition);
-        break;
-      case INTAKE_ARM_DOWN:
-        m_armMotor.set(ControlMode.MotionMagic,  targetPosition); //basing off of 2019 arm
-        break;
-      default:
-        //this shouldn't happen, if it does motors stay off
-        break;
-    }
-  }
-
-  public boolean onTarget_MM(double targetPosition){
-    double tolerance = 10; //TODO
+  public boolean moveMM(int targetPosition){    
+    m_armMotor.set(ControlMode.MotionMagic, targetPosition, DemandType.ArbitraryFeedForward, MM_FEEDFORWARD);
+    double tolerance = 20; //TODO
     double currentPosition = m_armMotor.getSelectedSensorPosition();
-    return Math.abs(currentPosition - targetPosition) < tolerance;
+    m_is_on_target = Math.abs(currentPosition - targetPosition) < tolerance;
+    return m_is_on_target;
+  }
+
+  public boolean isOnTarget(){
+    return m_is_on_target;
+  }
+
+  public double getMMError(){
+    return m_armMotor.getClosedLoopError(0);
   }
 
   //getter methods if needed? (would pheonix tuner be easier?)
@@ -214,6 +224,15 @@ public class Intake extends SubsystemBase {
   }
 
   public void holdMotorPosition(int position, double arbFF){
-    m_armMotor.set(ControlMode.Position, position, DemandType.ArbitraryFeedForward, arbFF);
+    if( position <= 75){
+      // No feedforward when resting at home
+      m_armMotor.set(ControlMode.Position, position);
+      System.out.println("not setting arbFF");
+    }
+    else {
+      // We are holding the arm in space, requires about -0.3 % measured
+      m_armMotor.set(ControlMode.Position, position, DemandType.ArbitraryFeedForward, arbFF);
+      System.out.println("setting Position-arbFF: " + position + "-" + arbFF);
+    }
   }
 }
