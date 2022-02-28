@@ -33,8 +33,8 @@ public class Intake extends SubsystemBase {
   TalonSRX m_intakeMotor;
 
   //positions
-  final int ARM_POSITION_ZERO = 0; //intake fully vertical/up
-  final int INTAKE_ARM_DOWN = 1500; //intake down to grab ball (currently has temporary value) TODO get this value
+  final int INTAKE_ARM_RETRACT = 65; //intake fully vertical/up
+  final int INTAKE_ARM_EXTEND = 1500; //intake down to grab ball (currently has temporary value) TODO get this value
 
   final double DOWN_FEEDFORWARD = .2;
   final double UP_FEEDFORWARD = -.3;
@@ -43,6 +43,7 @@ public class Intake extends SubsystemBase {
   //gains for intake arm
   private Gains m_intakeArmDownGains = kGains_IntakeDown;
   private Gains m_intakeArmUpGains = kGains_IntakeUp;
+  private Gains m_intakeHoldPositionGains = kGains_IntakeHold;
 
   // /*
     // * kF = full forward value * duty-cycle (%) / runtime calculated target
@@ -57,7 +58,7 @@ public class Intake extends SubsystemBase {
     // */
   
   //soft limits
-  private final int ARM_REVERSE_SOFT_LIMIT = -20;
+  private final int ARM_REVERSE_SOFT_LIMIT = 0;
   private final int ARM_FORWARD_SOFT_LIMIT = 1850;
 
   //max speed
@@ -69,6 +70,10 @@ public class Intake extends SubsystemBase {
 
   private double MM_FEEDFORWARD = 0;
   private boolean m_is_on_target;
+
+  private final int ARM_SLOT_DOWN = 0;
+  private final int ARM_SLOT_UP   = 1;
+  private final int ARM_SLOT_HOLD = 2;
 
   public Intake() {
     m_armMotor = new TalonSRX(INTAKE_ARM_TALON);
@@ -91,12 +96,13 @@ public class Intake extends SubsystemBase {
     m_armMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
     m_armMotor.configForwardSoftLimitThreshold(ARM_FORWARD_SOFT_LIMIT);
     m_armMotor.configReverseSoftLimitThreshold(ARM_REVERSE_SOFT_LIMIT);
-    m_armMotor.configForwardSoftLimitEnable(false);
-    m_armMotor.configReverseSoftLimitEnable(false);
+    m_armMotor.configForwardSoftLimitEnable(true);
+    m_armMotor.configReverseSoftLimitEnable(true);
     //mm
     m_armMotor.configMotionCruiseVelocity(100, 0);
     m_armMotor.configMotionAcceleration(100, 0);
 
+    // TODO set the limits
     //current limits?
     //m_armMotor.configPeakCurrentLimit(0);
     //m_armMotor.configContinuousCurrentLimit(amps);
@@ -106,15 +112,29 @@ public class Intake extends SubsystemBase {
    // m_armMotor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled, 0); //hopefully this is correct?
 
     //config PIDF values
-    m_armMotor.config_kP(0, m_intakeArmDownGains.kP, 0);
-    m_armMotor.config_kI(0, m_intakeArmDownGains.kI, 0);
-    m_armMotor.config_kD(0, m_intakeArmDownGains.kD, 0);
-    m_armMotor.config_kF(0, m_intakeArmDownGains.kF, 0);
+    m_armMotor.config_kP(ARM_SLOT_DOWN, m_intakeArmDownGains.kP, 0);
+    m_armMotor.config_kI(ARM_SLOT_DOWN, m_intakeArmDownGains.kI, 0);
+    m_armMotor.config_kD(ARM_SLOT_DOWN, m_intakeArmDownGains.kD, 0);
+    m_armMotor.config_kF(ARM_SLOT_DOWN, m_intakeArmDownGains.kF, 0);
 
-    m_armMotor.config_kP(1, m_intakeArmUpGains.kP, 0);
-    m_armMotor.config_kI(1, m_intakeArmUpGains.kI, 0);
-    m_armMotor.config_kD(1, m_intakeArmUpGains.kD, 0);
-    m_armMotor.config_kF(1, m_intakeArmUpGains.kF, 0);
+    m_armMotor.config_kP(ARM_SLOT_UP, m_intakeArmUpGains.kP, 0);
+    m_armMotor.config_kI(ARM_SLOT_UP, m_intakeArmUpGains.kI, 0);
+    m_armMotor.config_kD(ARM_SLOT_UP, m_intakeArmUpGains.kD, 0);
+    m_armMotor.config_kF(ARM_SLOT_UP, m_intakeArmUpGains.kF, 0);
+    
+    /*
+     * CTRE documentation says "When using position closed loop, it is generally desired to use a kF of ‘0’. 
+     * During this mode target position is multiplied by kF and added to motor output. 
+     * If providing a feedforward is necessary, we recommend using the arbitrary 
+     * feed forward term (4 param Set) to better implement this."
+     * 
+     * So this set of gains is put in place to be the position closed-loop used to keep our intake arm
+     * in the place where we want it to be. So, no kF in these gains. 
+     */
+    m_armMotor.config_kP(ARM_SLOT_HOLD, m_intakeHoldPositionGains.kP, 0);
+    m_armMotor.config_kI(ARM_SLOT_HOLD, m_intakeHoldPositionGains.kI, 0);
+    m_armMotor.config_kD(ARM_SLOT_HOLD, m_intakeHoldPositionGains.kD, 0);
+    m_armMotor.config_kF(ARM_SLOT_HOLD, m_intakeHoldPositionGains.kF, 0);
 
     //config closed loop error
     m_armMotor.configAllowableClosedloopError(0, 10, 0); //TODO determine what tolerance needs to be
@@ -125,7 +145,7 @@ public class Intake extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     //if(getArmLimit()){
-      m_armMotor.getSelectedSensorPosition(0);
+      // m_armMotor.getSelectedSensorPosition(0);
     //}
   }
 
@@ -144,7 +164,7 @@ public class Intake extends SubsystemBase {
   public  void configStartMM(int position, double kP, double kI, double kD, double kF){
       if (position > getRelativeEncoder()) {
           // forward slot
-          m_armMotor.selectProfileSlot(0, 0);
+          m_armMotor.selectProfileSlot(ARM_SLOT_DOWN, PID_PRIMARY);
           m_armMotor.config_kP(0, kP, 0); // find values
           m_armMotor.config_kI(0, kI, 0); // find values
           m_armMotor.config_kD(0, kD, 0); // find values
@@ -153,7 +173,7 @@ public class Intake extends SubsystemBase {
           MM_FEEDFORWARD = DOWN_FEEDFORWARD;
       } else {
           // backward slot
-          m_armMotor.selectProfileSlot(1, 0);
+          m_armMotor.selectProfileSlot(ARM_SLOT_UP, PID_PRIMARY);
           m_armMotor.config_kP(1, kP, 0); // find values
           m_armMotor.config_kI(1, kI, 0); // find values
           m_armMotor.config_kD(1, kD, 0); // find values
@@ -224,6 +244,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void holdMotorPosition(int position, double arbFF){
+    m_armMotor.selectProfileSlot(ARM_SLOT_HOLD, PID_PRIMARY);
     if( position <= 75){
       // No feedforward when resting at home
       m_armMotor.set(ControlMode.Position, position);
