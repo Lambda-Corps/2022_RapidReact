@@ -164,29 +164,39 @@ public class Intake extends SubsystemBase {
   public  void configStartMM(int position, double kP, double kI, double kD, double kF){
       if (position > getRelativeEncoder()) {
           // forward slot
-          m_armMotor.selectProfileSlot(ARM_SLOT_DOWN, PID_PRIMARY);
-          m_armMotor.config_kP(0, kP, 0); // find values
-          m_armMotor.config_kI(0, kI, 0); // find values
-          m_armMotor.config_kD(0, kD, 0); // find values
-          m_armMotor.config_kF(0, kF, 0); // find values
+          m_armMotor.config_kP(ARM_SLOT_DOWN, kP, 0); // find values
+          m_armMotor.config_kI(ARM_SLOT_DOWN, kI, 0); // find values
+          m_armMotor.config_kD(ARM_SLOT_DOWN, kD, 0); // find values
+          m_armMotor.config_kF(ARM_SLOT_DOWN, kF, 0); // find values
           // armMotor.config_kF(0, 1, 0); // find values - auxiliary feed forward
           MM_FEEDFORWARD = DOWN_FEEDFORWARD;
+          m_armMotor.selectProfileSlot(ARM_SLOT_DOWN, PID_PRIMARY);
       } else {
           // backward slot
-          m_armMotor.selectProfileSlot(ARM_SLOT_UP, PID_PRIMARY);
-          m_armMotor.config_kP(1, kP, 0); // find values
-          m_armMotor.config_kI(1, kI, 0); // find values
-          m_armMotor.config_kD(1, kD, 0); // find values
-          m_armMotor.config_kF(1, kF, 0); // find values
+          m_armMotor.config_kP(ARM_SLOT_UP, kP, 0); // find values
+          m_armMotor.config_kI(ARM_SLOT_UP, kI, 0); // find values
+          m_armMotor.config_kD(ARM_SLOT_UP, kD, 0); // find values
+          m_armMotor.config_kF(ARM_SLOT_UP, kF, 0); // find values
           // armMotor.config_kF(1, 1, 0); // find values - auxiliary feed forward
           MM_FEEDFORWARD = UP_FEEDFORWARD;
+          m_armMotor.selectProfileSlot(ARM_SLOT_UP, PID_PRIMARY);
+
       }
 
   }
 
-  public boolean moveMM(int targetPosition){    
-    m_armMotor.set(ControlMode.MotionMagic, targetPosition, DemandType.ArbitraryFeedForward, MM_FEEDFORWARD);
-    double tolerance = 20; //TODO
+  public boolean moveMM(int targetPosition){
+    // TODO find tolerance, ticks per degree estimate, just needs to be close
+    // int kMeasuredPosHorizontal = 840; //Position measured when arm is horizontal
+    // double kTicksPerDegree = 4096 / 360; //Sensor is 1:1 with arm rotation
+    // int currentPos = m_armMotor.getSelectedSensorPosition();
+    // double degrees = (currentPos - kMeasuredPosHorizontal) / kTicksPerDegree;
+    // double radians = java.lang.Math.toRadians(degrees);
+    // double cosineScalar = java.lang.Math.cos(radians);
+    double cosineScalar = 1;
+    
+    m_armMotor.set(ControlMode.MotionMagic, targetPosition, DemandType.ArbitraryFeedForward, MM_FEEDFORWARD * cosineScalar);
+    double tolerance = 20; 
     double currentPosition = m_armMotor.getSelectedSensorPosition();
     m_is_on_target = Math.abs(currentPosition - targetPosition) < tolerance;
     return m_is_on_target;

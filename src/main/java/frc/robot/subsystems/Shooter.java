@@ -4,17 +4,13 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.SHOOTER_FX;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import static frc.robot.Constants.*;
 
 public class Shooter extends SubsystemBase {
 
@@ -33,7 +29,7 @@ public class Shooter extends SubsystemBase {
     * kP = (.20 * 1023) / (2048 * 1:1) = .0999
     */
     private double k_kF = .0534;
-    private double k_kP = .0999;
+    private double k_kP = .0999; // TODO update the code with the measured values from testing
     private double k_kD = 0;
     private double k_kI = 0;
 

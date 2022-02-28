@@ -148,7 +148,7 @@ public class DriveTrain extends SubsystemBase {
 		_rightConfig.slot0.closedLoopPeriod = closedLoopTimeMs;
 		_rightConfig.slot1.closedLoopPeriod = closedLoopTimeMs;
 		_rightConfig.slot2.closedLoopPeriod = closedLoopTimeMs;
-   		 _rightConfig.slot3.closedLoopPeriod = closedLoopTimeMs;
+   		_rightConfig.slot3.closedLoopPeriod = closedLoopTimeMs;
 
 		// _rightConfig.openloopRamp = kOpenLoopRamp;
 		// _leftConfig.openloopRamp = kOpenLoopRamp;
@@ -157,9 +157,16 @@ public class DriveTrain extends SubsystemBase {
 		m_right_leader.configAllSettings(_rightConfig);
 		
 		/* Set status frame periods */
+		// Leader Talons need faster updates 
 		m_right_leader.setStatusFramePeriod(StatusFrame.Status_12_Feedback1, 20, kTimeoutMs);
 		m_right_leader.setStatusFramePeriod(StatusFrame.Status_14_Turn_PIDF1, 20, kTimeoutMs);
 		m_left_leader.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, kTimeoutMs);		//Used remotely by right Talon, speed up
+		// Followers can slow down certain status messages to reduce the can bus usage, per CTRE:
+		// "Motor controllers that are followers can set Status 1 and Status 2 to 255ms(max) using setStatusFramePeriod."
+		m_right_follower.setStatusFramePeriod(StatusFrame.Status_1_General, 255);
+		m_right_follower.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255);
+		m_left_follower.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255);
+		m_left_follower.setStatusFramePeriod(StatusFrame.Status_1_General, 255);
 
 		setEncodersToZero();
 
