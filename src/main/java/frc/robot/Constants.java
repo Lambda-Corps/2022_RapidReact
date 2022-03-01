@@ -32,6 +32,7 @@ public final class Constants {
 	public final static int MID_INDEXER = 8;
 	public final static int SHOOTER_INDEXER = 9;
 	public final static int SHOOTER_FX = 10;
+	public final static int CLIMER_SRX = 11;
 
 	//////////////////// DIO /////////////////////
 	public final static int BEAM_BREAKER_SEND = 0;
@@ -88,9 +89,9 @@ public final class Constants {
 	 * 	                                    			    kP      kI   kD   kF        Iz    PeakOut */
 	public final static Gains kGains_Turning =    new Gains(0.1,   0.0,  0.0, 0.003699, 200,  1.0 );
 	public final static Gains kGains_Driving =    new Gains(0.1,   0.0,  0.0, 0.003699, 100,  1.0 );
-	public final static Gains kGains_IntakeDown = new Gains(0.142, 0.0,  0.0, 0.0341,   100,  .5 );
+	public final static Gains kGains_IntakeDown = new Gains(2.69,  0.0,  0.0, 0.341,   100,  1.0 );
 	public final static Gains kGains_IntakeUp =   new Gains(0.299, 0.0,  0.0, 1.023,	200,  1.0 );
-	public final static Gains kGains_IntakeHold=  new Gains(0.299, 0.0,  0.0, 0.0,		300,  0.5 );
+	public final static Gains kGains_IntakeHold=  new Gains(8, 0.0,  40,  0.0,		300,  1.0 );
 
 	/** ---- Flat constants, you should not need to change these ---- */
 	/* We allow either a 0 or 1 when selecting an ordinal for remote devices [You can have up to 2 devices assigned remotely to a talon/victor] */

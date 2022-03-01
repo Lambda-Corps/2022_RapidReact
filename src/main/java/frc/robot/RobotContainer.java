@@ -56,13 +56,13 @@ public class RobotContainer {
                                             .withPosition(4, 1)
                                             .withSize(2, 1);         
     Shuffleboard.getTab("Drive MM Testing").add(new DriveMM(m_driveTrain, 0));
-
     Shuffleboard.getTab("Combined Test").add(new TestIntakeIndexerAndShooter(m_indexer, m_intake, m_shooter)).withPosition(0, 1).withSize(2, 1);
-    Shuffleboard.getTab("Arm MM Testing").add(new ResetIntakeArmEncoder(m_intake)).withPosition(0, 2).withSize(2, 1);
     Shuffleboard.getTab("Combined Test").add(new SetForwardLimit(m_intake)).withPosition(0, 3).withSize(2, 1);
     Shuffleboard.getTab("Arm Drive Testing").add("Test Arm Drive", new ArmDriveTest(m_intake)).withPosition(0, 1);
-    Shuffleboard.getTab("Arm MM Testing").add(new SetArm(m_intake)).withPosition(2, 2);
-    Shuffleboard.getTab("Arm MM Testing").add("Arm MM", new ArmMM(m_intake, 0)).withPosition(0, 1).withSize(2,1);
+    Shuffleboard.getTab("Arm MM Testing").add("ReSet Intake Arm", new SetArm(m_intake)).withPosition(0, 3).withSize(2, 1);
+    Shuffleboard.getTab("Arm MM Testing").add("Extend Intake", new ArmMM(m_intake, Intake.INTAKE_ARM_EXTEND)).withPosition(0, 0).withSize(2,1);
+    Shuffleboard.getTab("Arm MM Testing").add("Retract Intake", new ArmMM(m_intake, Intake.INTAKE_ARM_RETRACT)).withPosition(2,0).withSize(2,1);
+    Shuffleboard.getTab("Arm MM Testing").add(new ResetIntakeArmEncoder(m_intake)).withPosition(0, 2).withSize(2, 1);
     Shuffleboard.getTab("ShooterPID").add("Shoot" , new ShooterPIDTuning(m_shooter, m_indexer)).withPosition(0, 3);
     // SmartDashboard.getNumber("Target Angle", 0);
     // Configure the button bindings

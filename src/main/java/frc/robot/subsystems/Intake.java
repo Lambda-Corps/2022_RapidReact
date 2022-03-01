@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.Faults;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
 import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
@@ -31,14 +32,16 @@ public class Intake extends SubsystemBase {
   //motors
   TalonSRX m_armMotor; //calling up and down movement arm for lack of better term
   TalonSRX m_intakeMotor;
+  Faults m_faults;
 
   //positions
-  final int INTAKE_ARM_RETRACT = 65; //intake fully vertical/up
-  final int INTAKE_ARM_EXTEND = 1500; //intake down to grab ball (currently has temporary value) TODO get this value
+  public static final int INTAKE_ARM_RETRACT = 0; //intake fully vertical/up
+  public static final int INTAKE_ARM_EXTEND = 1550; //intake down to grab ball (currently has temporary value)
 
   final double DOWN_FEEDFORWARD = .2;
   final double UP_FEEDFORWARD = -.3;
-  final double HOLD_FEEDFORWARD = UP_FEEDFORWARD; //PID (would this one also be motion magic?) TODO get this value (current one is estimated)
+  final double HOLD_FEEDFORWARD = -.2; //PID (would this one also be motion magic?) TODO get this value (current one is estimated)
+  final double MM_DONE_TOLERANCE = 10;
   
   //gains for intake arm
   private Gains m_intakeArmDownGains = kGains_IntakeDown;
@@ -76,6 +79,7 @@ public class Intake extends SubsystemBase {
   private final int ARM_SLOT_HOLD = 2;
 
   public Intake() {
+    m_faults = new Faults();
     m_armMotor = new TalonSRX(INTAKE_ARM_TALON);
     m_intakeMotor = new TalonSRX(INTAKE_TALON);
 
@@ -98,9 +102,11 @@ public class Intake extends SubsystemBase {
     m_armMotor.configReverseSoftLimitThreshold(ARM_REVERSE_SOFT_LIMIT);
     m_armMotor.configForwardSoftLimitEnable(true);
     m_armMotor.configReverseSoftLimitEnable(true);
+    // m_armMotor.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
+    // m_armMotor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
     //mm
-    m_armMotor.configMotionCruiseVelocity(100, 0);
-    m_armMotor.configMotionAcceleration(100, 0);
+    m_armMotor.configMotionCruiseVelocity(300, 0);
+    m_armMotor.configMotionAcceleration(300, 0);
 
     // TODO set the limits
     //current limits?
@@ -139,6 +145,12 @@ public class Intake extends SubsystemBase {
     //config closed loop error
     m_armMotor.configAllowableClosedloopError(0, 10, 0); //TODO determine what tolerance needs to be
 
+    ShuffleboardTab armMMTab = Shuffleboard.getTab("Arm MM Testing");
+    armMMTab.addNumber("Encoder", this::getRelativeEncoder).withPosition(1, 1);
+    armMMTab.addBoolean("Integrated Forward", this::getArmIntegratedForwardLimit).withPosition(2, 1);
+    armMMTab.addBoolean("Integrated Reverse", this::getArmIntegratedReverseLimit).withPosition(3,1);
+    armMMTab.addBoolean("Soft Forward", this::getArmSoftForwardLimit).withPosition(4, 1);
+    armMMTab.addBoolean("Soft Reverse", this::getArmSoftReverseLimit).withPosition(5,1);
   }
 
   @Override
@@ -147,6 +159,9 @@ public class Intake extends SubsystemBase {
     //if(getArmLimit()){
       // m_armMotor.getSelectedSensorPosition(0);
     //}
+
+    // Periodically grab the talon faults
+    m_armMotor.getFaults(m_faults);
   }
 
   public void setArmMotor (double speed){
@@ -161,22 +176,22 @@ public class Intake extends SubsystemBase {
   }
 
 
-  public  void configStartMM(int position, double kP, double kI, double kD, double kF){
+  public  void configStartMM(int position){
       if (position > getRelativeEncoder()) {
           // forward slot
-          m_armMotor.config_kP(ARM_SLOT_DOWN, kP, 0); // find values
-          m_armMotor.config_kI(ARM_SLOT_DOWN, kI, 0); // find values
-          m_armMotor.config_kD(ARM_SLOT_DOWN, kD, 0); // find values
-          m_armMotor.config_kF(ARM_SLOT_DOWN, kF, 0); // find values
+          // m_armMotor.config_kP(ARM_SLOT_DOWN, kP, 0); // find values
+          // m_armMotor.config_kI(ARM_SLOT_DOWN, kI, 0); // find values
+          // m_armMotor.config_kD(ARM_SLOT_DOWN, kD, 0); // find values
+          // m_armMotor.config_kF(ARM_SLOT_DOWN, kF, 0); // find values
           // armMotor.config_kF(0, 1, 0); // find values - auxiliary feed forward
           MM_FEEDFORWARD = DOWN_FEEDFORWARD;
           m_armMotor.selectProfileSlot(ARM_SLOT_DOWN, PID_PRIMARY);
       } else {
           // backward slot
-          m_armMotor.config_kP(ARM_SLOT_UP, kP, 0); // find values
-          m_armMotor.config_kI(ARM_SLOT_UP, kI, 0); // find values
-          m_armMotor.config_kD(ARM_SLOT_UP, kD, 0); // find values
-          m_armMotor.config_kF(ARM_SLOT_UP, kF, 0); // find values
+          // m_armMotor.config_kP(ARM_SLOT_UP, kP, 0); // find values
+          // m_armMotor.config_kI(ARM_SLOT_UP, kI, 0); // find values
+          // m_armMotor.config_kD(ARM_SLOT_UP, kD, 0); // find values
+          // m_armMotor.config_kF(ARM_SLOT_UP, kF, 0); // find values
           // armMotor.config_kF(1, 1, 0); // find values - auxiliary feed forward
           MM_FEEDFORWARD = UP_FEEDFORWARD;
           m_armMotor.selectProfileSlot(ARM_SLOT_UP, PID_PRIMARY);
@@ -186,19 +201,14 @@ public class Intake extends SubsystemBase {
   }
 
   public boolean moveMM(int targetPosition){
-    // TODO find tolerance, ticks per degree estimate, just needs to be close
-    // int kMeasuredPosHorizontal = 840; //Position measured when arm is horizontal
-    // double kTicksPerDegree = 4096 / 360; //Sensor is 1:1 with arm rotation
-    // int currentPos = m_armMotor.getSelectedSensorPosition();
-    // double degrees = (currentPos - kMeasuredPosHorizontal) / kTicksPerDegree;
-    // double radians = java.lang.Math.toRadians(degrees);
-    // double cosineScalar = java.lang.Math.cos(radians);
-    double cosineScalar = 1;
-    
+    int kMeasuredPosHorizontal = 900; //Position measured when arm is horizontal
+    double kTicksPerDegree = 4096 / 360; //Sensor is 1:1 with arm rotation
+    double currentPos = m_armMotor.getSelectedSensorPosition();
+    double degrees = (currentPos - kMeasuredPosHorizontal) / kTicksPerDegree;
+    double radians = java.lang.Math.toRadians(degrees);
+    double cosineScalar = java.lang.Math.cos(radians);
     m_armMotor.set(ControlMode.MotionMagic, targetPosition, DemandType.ArbitraryFeedForward, MM_FEEDFORWARD * cosineScalar);
-    double tolerance = 20; 
-    double currentPosition = m_armMotor.getSelectedSensorPosition();
-    m_is_on_target = Math.abs(currentPosition - targetPosition) < tolerance;
+    m_is_on_target = Math.abs(currentPos - targetPosition) < MM_DONE_TOLERANCE;
     return m_is_on_target;
   }
 
@@ -253,17 +263,39 @@ public class Intake extends SubsystemBase {
     m_armMotor.configForwardSoftLimitThreshold(pos);
   }
 
-  public void holdMotorPosition(int position, double arbFF){
+  public void holdMotorPosition(int position){
+    int kMeasuredPosHorizontal = 900; //Position measured when arm is horizontal
+    double kTicksPerDegree = 4096 / 360; //Sensor is 1:1 with arm rotation
+    double degrees = (position - kMeasuredPosHorizontal) / kTicksPerDegree;
+    double radians = java.lang.Math.toRadians(degrees);
+    double cosineScalar = java.lang.Math.cos(radians);
     m_armMotor.selectProfileSlot(ARM_SLOT_HOLD, PID_PRIMARY);
-    if( position <= 75){
+    if( position == INTAKE_ARM_RETRACT){
       // No feedforward when resting at home
       m_armMotor.set(ControlMode.Position, position);
-      System.out.println("not setting arbFF");
     }
-    else {
-      // We are holding the arm in space, requires about -0.3 % measured
-      m_armMotor.set(ControlMode.Position, position, DemandType.ArbitraryFeedForward, arbFF);
-      System.out.println("setting Position-arbFF: " + position + "-" + arbFF);
+    else if( position == INTAKE_ARM_EXTEND){
+      m_armMotor.set(ControlMode.Position, position, DemandType.ArbitraryFeedForward, HOLD_FEEDFORWARD * cosineScalar);
     }
+    else 
+    {
+      m_armMotor.set(ControlMode.PercentOutput, 0);
+    }
+  }
+
+  public boolean getArmIntegratedForwardLimit() {
+    return m_faults.ForwardLimitSwitch;
+  }
+
+  public boolean getArmIntegratedReverseLimit() {
+    return m_faults.ReverseLimitSwitch;
+  }
+
+  public boolean getArmSoftForwardLimit() {
+    return m_faults.ForwardSoftLimit;
+  }
+
+  public boolean getArmSoftReverseLimit() {
+    return m_faults.ReverseSoftLimit;
   }
 }
