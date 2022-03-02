@@ -29,7 +29,7 @@ public class Indexer extends SubsystemBase {
 //  private final NetworkTableEntry m_intakeIndexerEntry, m_midIndexerEntry, m_shooterIndexerEntry;
 //  public ShuffleboardTab m_IntakeTab;
 
-  private DigitalInput m_bottomBeam, m_topBeam;
+  private DigitalInput m_bottomBeam, m_topBeam, m_midbeam;
   private StorageState m_storageStatus;
 
   private boolean m_bottomBeamState, m_topBeamState;
@@ -44,6 +44,9 @@ public class Indexer extends SubsystemBase {
 
     // m_bottomBeam = new DigitalInput(Constants.BEAM_BREAKER_RECEIVE_BOTTOM);
     // m_topBeam = new DigitalInput(Constants.BEAM_BREAKER_RECEIVE_TOP);
+    m_bottomBeam = new DigitalInput(INDEXER_INTAKE_BEAM);
+    m_midbeam = new DigitalInput(INDEXER_INTAKE_MID);
+    m_topBeam = new DigitalInput(INDEXER_INTAKE_SHOOTER);
 
     m_storageStatus = StorageState.EMPTY;
 
@@ -51,8 +54,10 @@ public class Indexer extends SubsystemBase {
     ShuffleboardTab tab = Shuffleboard.getTab("Indexer");
 
     // TODO -- Remove these after tuning and beam break sensors are in
-    m_intake_entry = tab.add("Intake Beam", 0).withPosition(0, 3).getEntry();
-    m_shooter_entry = tab.add("Shooter Beam", 0).withPosition(1,3).getEntry();
+    tab.addBoolean("Shooter Beam", m_topBeam::get);
+    tab.addBoolean("Mid Beam", m_midbeam::get);
+    tab.addBoolean("Intake Beam", m_bottomBeam::get);
+    tab.addBoolean("All beams", this::getBeams);
   }
 
   @Override
@@ -67,13 +72,14 @@ public class Indexer extends SubsystemBase {
 
   private void checkIndexState() {
     // Real State Machine
-    // m_bottomBeamState = m_bottomBeam.get();
-    // m_topBeamState = m_topBeam.get();
+    m_bottomBeamState = m_bottomBeam.get();
+    m_topBeamState = m_topBeam.get();
+  
 
 //=========================================================================
     // For testing ONLY; TODO Redact when beambreaks are in
-    m_bottomBeamState = m_intake_entry.getDouble(0) == 1 ? true : false;
-    m_topBeamState = m_shooter_entry.getDouble(0) == 1 ? true : false;
+    // m_bottomBeamState = m_intake_entry.getDouble(0) == 1 ? true : false;
+    // m_topBeamState = m_shooter_entry.getDouble(0) == 1 ? true : false;
 //=========================================================================
 
     if (!m_bottomBeamState && !m_topBeamState) {
@@ -117,5 +123,8 @@ public class Indexer extends SubsystemBase {
     m_shooterIndex.set(ControlMode.PercentOutput, shooter);
   }
 
+  public boolean getBeams(){
+    return m_bottomBeam.get() && m_midbeam.get() && m_topBeam.get();
+  }
   
 }
