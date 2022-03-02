@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.*;
 
 public class Indexer extends SubsystemBase {
-  /** Creates a new Indexer. */
+  private final double INTAKE_SHOOT_SPEED = .27; // measured testing
 
   public enum StorageState {
     EMPTY, 
@@ -36,6 +36,7 @@ public class Indexer extends SubsystemBase {
 
   private NetworkTableEntry m_intake_entry, m_shooter_entry;
   
+  /** Creates a new Indexer. */
   public Indexer() {
     m_intakeIndex = new TalonSRX(INTAKE_INDEXER);
     m_midIndex = new TalonSRX(MID_INDEXER);
@@ -115,4 +116,6 @@ public class Indexer extends SubsystemBase {
     m_midIndex.set(ControlMode.PercentOutput, mid);
     m_shooterIndex.set(ControlMode.PercentOutput, shooter);
   }
+
+  
 }

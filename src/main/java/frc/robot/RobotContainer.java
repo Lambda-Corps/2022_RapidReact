@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.commands.DriveForSecondsFromShuffleboard;
 import frc.robot.commands.DriveMM;
+import frc.robot.commands.TurnToAngle;
 import frc.robot.commands.Intake.ArmDriveTest;
 import frc.robot.commands.Indexer.TestIntakeIndexerAndShooter;
 import frc.robot.commands.Intake.ArmMM;
@@ -64,6 +65,7 @@ public class RobotContainer {
     Shuffleboard.getTab("Arm MM Testing").add("Retract Intake", new ArmMM(m_intake, Intake.INTAKE_ARM_RETRACT)).withPosition(2,0).withSize(2,1);
     Shuffleboard.getTab("Arm MM Testing").add(new ResetIntakeArmEncoder(m_intake)).withPosition(0, 2).withSize(2, 1);
     Shuffleboard.getTab("ShooterPID").add("Shoot" , new ShooterPIDTuning(m_shooter, m_indexer)).withPosition(0, 3);
+    Shuffleboard.getTab("Turn MM Testing").add("Turn MM", new TurnToAngle(m_driveTrain, 0)).withPosition(4, 1);
     // SmartDashboard.getNumber("Target Angle", 0);
     // Configure the button bindings
     configureButtonBindings();

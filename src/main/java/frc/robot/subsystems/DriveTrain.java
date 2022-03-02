@@ -347,9 +347,9 @@ public class DriveTrain extends SubsystemBase {
 	public void motion_magic_start_config_drive(boolean isForward){
 		setEncodersToZero();
 
-		m_left_leader.configMotionCruiseVelocity(16636,kTimeoutMs);
+		m_left_leader.configMotionCruiseVelocity(8318,kTimeoutMs);
 		m_left_leader.configMotionAcceleration(8318, kTimeoutMs); //cruise velocity / 2, so will take 2 seconds
-		m_right_leader.configMotionCruiseVelocity(16636,kTimeoutMs);
+		m_right_leader.configMotionCruiseVelocity(8318,kTimeoutMs);
 		m_right_leader.configMotionAcceleration(8318, kTimeoutMs);
 		
 		//set up talon to use DriveMM slots
