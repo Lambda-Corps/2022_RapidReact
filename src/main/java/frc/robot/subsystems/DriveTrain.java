@@ -35,11 +35,12 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import frc.robot.commands.UpdateDriveLimiters;
+import frc.robot.commands.drivetrain.UpdateDriveLimiters;
 
 import static frc.robot.Constants.*;
 
 public class DriveTrain extends SubsystemBase {
+	private final double MAX_TELEOP_DRIVE_SPEED = .8;
 	// TalonFX's for the drivetrain
 	// Right side is inverted here to drive forward
 	WPI_TalonFX m_left_leader, m_right_leader, m_left_follower, m_right_follower;
@@ -210,7 +211,7 @@ public class DriveTrain extends SubsystemBase {
 		  // Default the slew rate limiters to 1/3 of a second from 0 -> full
 		  m_forward_limiter = new SlewRateLimiter(3);
 		  m_rotation_limiter = new SlewRateLimiter(3);
-		  m_drive_absMax = 1.0;
+		  m_drive_absMax = MAX_TELEOP_DRIVE_SPEED;
 		  // Setup Shuffleboard tuning
 		  ShuffleboardTab tab = Shuffleboard.getTab("Default Drive");
 		  m_forward_rate = tab.add("ForwardLimiter", 3).withSize(1, 1).withPosition(0, 0).getEntry();
@@ -607,5 +608,9 @@ public class DriveTrain extends SubsystemBase {
 		m_drive_absMax = m_drive_max.getDouble(m_drive_absMax);
 		m_forward_limiter = new SlewRateLimiter(m_forward_rate.getDouble(3));
 		m_rotation_limiter = new SlewRateLimiter(m_rotation_rate.getDouble(3));
+	}
+
+	public double getHeading(){
+		return Math.IEEEremainder(m_gyro.getAngle(), 360);
 	}
 }

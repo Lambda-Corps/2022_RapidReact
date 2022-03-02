@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.drivetrain;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Timer;
@@ -31,18 +31,18 @@ public class TurnToAngle extends CommandBase {
     m_driveTrain = driveTrain;
     arclengthDegrees = angle;
     turnMMTab = Shuffleboard.getTab("Turn MM Testing");
-    m_turnkPEntry = turnMMTab.add("kP_turn", 0 ).withPosition(1, 0).getEntry();
-    m_kIEntry = turnMMTab.add("kI", 0 ).withPosition(2, 0).getEntry();
-    m_kDEntry = turnMMTab.add("kD", 0 ).withPosition(3, 0).getEntry();
-    m_kFEntry = turnMMTab.add("kF", 0 ).withPosition(0, 0).getEntry();
-    m_iterationEntry = turnMMTab.add("stable iteration before finishing", 5 ).withPosition(0, 1).getEntry();
-    m_arclengthEntry = turnMMTab.add("target position", 0).withPosition(4, 0).getEntry();
-    m_arclengthticksEntry = turnMMTab.add("target ticks", 0).getEntry();
-    turnMMTab.addNumber("Left Encoder", m_driveTrain::getLeftEncoderValue).withPosition(1, 1);
+    m_kFEntry = turnMMTab.add("kF", 0 )                   .withPosition(0, 0).getEntry();
+    m_turnkPEntry = turnMMTab.add("kP", 0 )               .withPosition(1, 0).getEntry();
+    m_kIEntry = turnMMTab.add("kI", 0 )                   .withPosition(2, 0).getEntry();
+    m_kDEntry = turnMMTab.add("kD", 0 )                   .withPosition(3, 0).getEntry();
+    m_arclengthEntry = turnMMTab.add("target ticks", 0)   .withPosition(4, 0).getEntry();
+    m_iterationEntry = turnMMTab.add("Finish Iter.", 5 )  .withPosition(5, 0).getEntry();
+    m_drivedurationEntry = turnMMTab.add("Run Time", 0)   .withPosition(6, 0).getEntry();
+    
+    turnMMTab.addNumber("Gyro Read", m_driveTrain::getHeading)              .withPosition(0,1);
+    turnMMTab.addNumber("Left Encoder", m_driveTrain::getLeftEncoderValue)  .withPosition(1, 1);
     turnMMTab.addNumber("Right Encoder", m_driveTrain::getRightEncoderValue).withPosition(2,1);
-    m_drivedurationEntry = turnMMTab.add("drive duration", 0).withPosition(6, 0).getEntry();
-    m_countokEntry = turnMMTab.add("count_ok", 0).getEntry();
-    SmartDashboard.putNumber("Target Angle", arclengthDegrees);
+    
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_driveTrain);
   }
