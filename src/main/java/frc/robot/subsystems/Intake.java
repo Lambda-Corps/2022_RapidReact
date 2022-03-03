@@ -151,6 +151,8 @@ public class Intake extends SubsystemBase {
     armMMTab.addBoolean("Integrated Reverse", this::getArmIntegratedReverseLimit).withPosition(3,1);
     armMMTab.addBoolean("Soft Forward", this::getArmSoftForwardLimit).withPosition(4, 1);
     armMMTab.addBoolean("Soft Reverse", this::getArmSoftReverseLimit).withPosition(5,1);
+
+    holdMotorPosition(0);
   }
 
   @Override

@@ -220,6 +220,8 @@ public class DriveTrain extends SubsystemBase {
 		  m_left_output = tab.add("Left Output", 0).withSize(1, 1).withPosition(3, 0).getEntry();
 		  m_right_output = tab.add("Right Output",0).withSize(1, 1).withPosition(4, 0).getEntry();
 		  tab.add("Reset Limits", new UpdateDriveLimiters(this)).withSize(3, 1).withPosition(2, 1);
+
+		  m_gyro.reset();
   	}
 
 	@Override
@@ -324,7 +326,7 @@ public class DriveTrain extends SubsystemBase {
   	}
 
 	public boolean motionMagicDrive(double target_position) {
-		double tolerance = 500;
+		double tolerance = 25;
 		
 		m_left_leader.set(ControlMode.MotionMagic, target_position);
 			m_right_leader.set(ControlMode.MotionMagic, target_position);
@@ -612,5 +614,9 @@ public class DriveTrain extends SubsystemBase {
 
 	public double getHeading(){
 		return Math.IEEEremainder(m_gyro.getAngle(), 360);
+	}
+
+	public double getRawAngle(){
+		return m_gyro.getAngle();
 	}
 }
