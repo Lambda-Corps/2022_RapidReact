@@ -15,9 +15,10 @@ import static frc.robot.Constants.SHOOTER_INDEXER;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Indexer extends SubsystemBase {
@@ -36,7 +37,7 @@ public class Indexer extends SubsystemBase {
   }
 
   TalonSRX m_intakeIndex, m_midIndex, m_shooterIndex;
-//  private final NetworkTableEntry m_intakeIndexerEntry, m_midIndexerEntry, m_shooterIndexerEntry;
+ private final NetworkTableEntry m_intakeIndexerEntry, m_midIndexerEntry, m_shooterIndexerEntry, m_BallCountEntry;
 //  public ShuffleboardTab m_IntakeTab;
 
   private DigitalInput m_bottomBeam, m_topBeam, m_midbeam;
@@ -59,14 +60,38 @@ public class Indexer extends SubsystemBase {
     m_storageStatus = StorageState.EMPTY;
 
     // Add a shuffleboard tab for any testing, tuning, or debugging, etc
-    ShuffleboardTab tab = Shuffleboard.getTab("Indexer");
-    tab.addBoolean("Shooter Beam", m_topBeam::get);
-    tab.addBoolean("Mid Beam", m_midbeam::get);
-    tab.addBoolean("Intake Beam", m_bottomBeam::get);
+    NetworkTable driveTable = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Drive");
+
+    m_intakeIndexerEntry = driveTable.getEntry("IntakeBreak");
+    m_midIndexerEntry = driveTable.getEntry("MidBreak");
+    m_shooterIndexerEntry = driveTable.getEntry("ShootBreak");
+    m_BallCountEntry = driveTable.getEntry("Ball Count");
   }
 
   @Override
-  public void periodic() {}
+  public void periodic() {
+    boolean bottom = m_bottomBeam.get();
+    boolean mid = m_bottomBeam.get();
+    boolean top = m_bottomBeam.get();
+    m_intakeIndexerEntry.setBoolean(bottom);
+    m_midIndexerEntry.setBoolean(mid);
+    m_shooterIndexerEntry.setBoolean(top);
+
+    // Calculate How many balls we have
+    double count = 0;
+    if( !bottom && !top ){
+      // Should mean two balls
+      count = 2;
+    }
+    else if ( (!bottom && top )|| (bottom && !top) ) {
+      count = 1;
+    }
+    else {
+      // Probably some malfunction or none
+      count = 0;
+    }
+    m_BallCountEntry.setNumber(count);
+  }
 
   public void checkIndexState() {
     // Real State Machine
