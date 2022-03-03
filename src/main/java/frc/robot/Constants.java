@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -15,11 +17,35 @@ package frc.robot;
 public final class Constants {
     // Robot Electronics Map
 
+<<<<<<< HEAD
     /////////////// CAN Bus IDs  ////////////////
     public final static int RIGHT_TALON_LEADER = 1;
     public final static int LEFT_TALON_LEADER = 2;
+=======
+    ///////////// CAN Bus IDs  ////////////////
+	// public final static int INTAKE_INDEXER = ;
+	// public final static int MIDDLE_INDEXER = ;
+	// public final static int SHOOTER_INDEXER = ;
+	// public final static int SHOOTER_FALCON =;
+	public final static int INTAKE_TALON = 5;
+	public final static int INTAKE_ARM_TALON = 6;
+    public final static int RIGHT_TALON_LEADER = 2;
+	public final static int RIGHT_TALON_FOLLOWER = 4;
+    public final static int LEFT_TALON_LEADER = 1;
+	public final static int LEFT_TALON_FOLLOWER = 3;
+	public final static int INTAKE_INDEXER = 7;
+	public final static int MID_INDEXER = 8;
+	public final static int SHOOTER_INDEXER = 9;
+	public final static int SHOOTER_FX = 10;
+	public final static int CLIMER_SRX = 11;
+>>>>>>> everything
 
+	//////////////////// DIO /////////////////////
+	public final static int INDEXER_INTAKE_BEAM = 2;
+	public final static int INDEXER_INTAKE_MID = 1;
+	public final static int INDEXER_INTAKE_SHOOTER = 0;
 
+<<<<<<< HEAD
     ///////////// Drive Train Values ////////////
     public final static double kControllerDeadband = .05;
     public final static int DRIVER_RIGHT_AXIS = 2;
@@ -31,6 +57,22 @@ public final class Constants {
 	public final static double TARGET_HEIGHT_METERS = 2.64;
 
 	////////// Talon Specific Values ////////////
+=======
+    ///////////// Drive Train Values /////////////
+    public final static double kControllerDeadband = .1;
+    public final static int DRIVER_RIGHT_AXIS = 4;
+    public final static int DRIVER_LEFT_AXIS = 1;
+
+	/////////// Indexer Specific Values //////////
+	public final static double INDEXER_SPEED = 0.5;
+
+	/////////// Vision Specific Values ///////////
+	public final static double CAMERA_HEIGHT_METERS = 0;
+	public final static double CAMERA_PITCH_RADIANS = 0;
+	public final static double TARGET_HEIGHT_METERS = 0;
+
+    //////////// Talon Specific Values ///////////
+>>>>>>> everything
     /**
 	 * Using the configSelectedFeedbackCoefficient() function, scale units to 3600 per rotation.
 	 * This is nice as it keeps 0.1 degrees of resolution, and is fairly intuitive.
@@ -54,7 +96,7 @@ public final class Constants {
     /**
 	 * Motor neutral dead-band, set to the minimum 0.1%.
 	 */
-    public final static double kNeutralDeadband = 0.001;
+    public final static double kNeutralDeadband = 0.005;
 
 	// Open Loop Ramp-up times
 	public final static double kOpenLoopRamp = 0.2;
@@ -64,9 +106,13 @@ public final class Constants {
      * kF: 1023 represents output value to Talon at 100%, 6800 represents Velocity units at 100% output
      * Not all set of Gains are used in this project and may be removed as desired.
      * 
-	 * 	                                    			  kP   kI   kD   kF               Iz    PeakOut */
-	public final static Gains kGains_Turning = new Gains( 0.1, 0.0,  0.0, 0.0,            200,  1.0 );
-	
+	 * 	                                    			    kP      kI   kD   kF        Iz    PeakOut */
+	public final static Gains kGains_Turning =    new Gains(0.1,   0.0,  0.0, 0.003699, 200,  1.0 );
+	public final static Gains kGains_Driving =    new Gains(0.1,   0.0,  0.0, 0.003699, 100,  1.0 );
+	public final static Gains kGains_IntakeDown = new Gains(2.69,  0.0,  0.0, 0.341,   100,  1.0 );
+	public final static Gains kGains_IntakeUp =   new Gains(0.299, 0.0,  0.0, 1.023,	200,  1.0 );
+	public final static Gains kGains_IntakeHold=  new Gains(8, 0.0,  40,  0.0,		300,  1.0 );
+
 	/** ---- Flat constants, you should not need to change these ---- */
 	/* We allow either a 0 or 1 when selecting an ordinal for remote devices [You can have up to 2 devices assigned remotely to a talon/victor] */
 	public final static int REMOTE_0 = 0;
@@ -84,4 +130,29 @@ public final class Constants {
 	public final static int kSlot_Turning = SLOT_1;
 	public final static int kSlot_Velocit = SLOT_2;
 	public final static int kSlot_MotProf = SLOT_3;
+
+	public static final int kCountsPerRev = 2048;    // Encoder counts per revolution of the motor shaft.
+	public static final double kSensorGearRatio = 10.71; // Gear ratio is the ratio between the *encoder* and the wheels. On the AndyMark
+														// drivetrain, encoders mount 1:1 with the gearbox shaft.
+	public static final double kGearRatio = 10.71;   // Switch kSensorGearRatio to this gear ratio if encoder is on the motor instead
+														// of on the gearbox.
+	public static final double kWheelRadiusInches = 3.25;
+	public static final int k100msPerSecond = 10;
+
+	public static boolean kGyroReversed = true;
+
+	/* ---- Characterization Calculations ---- */
+	public static final double ksVolts = 0.65154;
+	public static final double kvVoltSecondsPerMeter = .000012616;
+	public static final double kaVoltSecondsSquaredPerMeter = 0.0000003799;
+	public static final double kPDriveVel = 8.5;
+	public static final double kTrackwidthMeters = 0.6731;
+	public static final DifferentialDriveKinematics kDriveKinematics = 
+			new DifferentialDriveKinematics(kTrackwidthMeters);
+	public static final double kMaxSpeedMetersPerSecond = 3;
+	public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+	// Reasonable baseline values for a RAMSETE follower in units of meters and seconds
+	public static final double kRamseteB = 2;
+	public static final double kRamseteZeta = 0.7;
+	
 }
