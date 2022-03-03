@@ -107,7 +107,7 @@ public class Indexer extends SubsystemBase {
     switch(m_storageStatus) {
       case EMPTY:
         if (forceSpinBottom) {
-          m_intakeIndex.set(ControlMode.PercentOutput, INDEXER_SPEED);
+          m_intakeIndex.set(ControlMode.PercentOutput, 0.8);
         }else {
           m_intakeIndex.set(ControlMode.PercentOutput, 0);
         }
