@@ -35,9 +35,9 @@ public final class Constants {
 	public final static int CLIMER_SRX = 11;
 
 	//////////////////// DIO /////////////////////
-	public final static int INDEXER_INTAKE_BEAM = 0;
+	public final static int INDEXER_INTAKE_BEAM = 2;
 	public final static int INDEXER_INTAKE_MID = 1;
-	public final static int INDEXER_INTAKE_SHOOTER = 2;
+	public final static int INDEXER_INTAKE_SHOOTER = 0;
 
     ///////////// Drive Train Values /////////////
     public final static double kControllerDeadband = .1;
