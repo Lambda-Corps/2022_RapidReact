@@ -4,11 +4,8 @@
 
 package frc.robot.commands.Intake;
 
-import org.ejml.ops.DConvertArrays;
-
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Intake;
@@ -18,7 +15,6 @@ public class TestForwardSoftLimits extends CommandBase {
   Intake m_intake;
   ShuffleboardTab m_intakeTab;
   NetworkTableEntry m_encoderPos_entry;
-  private double m_encoderPos;
   public TestForwardSoftLimits(Intake intake) {
     m_intake = intake;
     m_encoderPos_entry = NetworkTableInstance.getDefault().getTable("Intake").getEntry("Arm Encoder Position");
@@ -29,7 +25,7 @@ public class TestForwardSoftLimits extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_encoderPos = m_encoderPos_entry.getDouble(0);
+    // m_encoderPos = m_encoderPos_entry.getDouble(0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

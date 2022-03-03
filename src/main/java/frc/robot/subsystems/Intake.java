@@ -3,31 +3,27 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
+import static frc.robot.Constants.INTAKE_ARM_TALON;
+import static frc.robot.Constants.INTAKE_TALON;
+import static frc.robot.Constants.PID_PRIMARY;
+import static frc.robot.Constants.kGains_IntakeDown;
+import static frc.robot.Constants.kGains_IntakeHold;
+import static frc.robot.Constants.kGains_IntakeUp;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.Faults;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.LimitSwitchNormal;
-import com.ctre.phoenix.motorcontrol.LimitSwitchSource;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.Constants.*;
 import frc.robot.Gains;
 
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
-  /*self notes:
-    needs 1 or 2 talons (with enconder), 2 limit switches (mechanical and software) (see remote limit switch ctre example), 
-    pid commands for moving
-    need to find
-    see 2019 arm code for reference
-    TODO should arm moving and grabbing ball be separate subsystems?
-    TODO ^^i.e. do we want to do both (start the intake spinning while arm moving position) at the same time for efficiency
-  */
 
   //motors
   TalonSRX m_armMotor; //calling up and down movement arm for lack of better term
@@ -36,11 +32,11 @@ public class Intake extends SubsystemBase {
 
   //positions
   public static final int INTAKE_ARM_RETRACT = 0; //intake fully vertical/up
-  public static final int INTAKE_ARM_EXTEND = 1500; //intake down to grab ball (currently has temporary value)
+  public static final int INTAKE_ARM_EXTEND = 1525; //intake down to grab ball (currently has temporary value)
 
   final double DOWN_FEEDFORWARD = .2;
   final double UP_FEEDFORWARD = -.3;
-  final double HOLD_FEEDFORWARD = -.2; //PID (would this one also be motion magic?) TODO get this value (current one is estimated)
+  final double HOLD_FEEDFORWARD = -.2; //PID (would this one also be motion magic?)
   final double MM_DONE_TOLERANCE = 10;
   
   //gains for intake arm
@@ -63,10 +59,6 @@ public class Intake extends SubsystemBase {
   //soft limits
   private final int ARM_REVERSE_SOFT_LIMIT = 0;
   private final int ARM_FORWARD_SOFT_LIMIT = 1850;
-
-  //max speed
-  private final double MAX_ARM_SPEED = 0; //TODO set this
-  private final double STANDARD_INTAKE_SPEED = 0; //^^^
 
   ShuffleboardTab m_intakeTab;
   NetworkTableEntry m_armMaxSpeed, m_armStandardSpeed, m_maxFF, m_minFF, m_forwardSoftLimit, m_armEncoder;
@@ -143,7 +135,7 @@ public class Intake extends SubsystemBase {
     m_armMotor.config_kF(ARM_SLOT_HOLD, m_intakeHoldPositionGains.kF, 0);
 
     //config closed loop error
-    m_armMotor.configAllowableClosedloopError(0, 10, 0); //TODO determine what tolerance needs to be
+    m_armMotor.configAllowableClosedloopError(0, 10, 0);
 
     ShuffleboardTab armMMTab = Shuffleboard.getTab("Arm MM Testing");
     armMMTab.addNumber("Encoder", this::getRelativeEncoder).withPosition(1, 1);
@@ -166,16 +158,16 @@ public class Intake extends SubsystemBase {
     m_armMotor.getFaults(m_faults);
   }
 
-  public void setArmMotor (double speed){
-    if(Math.abs(speed) > MAX_ARM_SPEED){
-      if(speed > 0){
-        speed = -MAX_ARM_SPEED;
-      } else{
-        speed = MAX_ARM_SPEED;
-      }
-    }
-    m_armMotor.set(ControlMode.PercentOutput, speed);
-  }
+  // public void setArmMotor (double speed){
+  //   if(Math.abs(speed) > MAX_ARM_SPEED){
+  //     if(speed > 0){
+  //       speed = -MAX_ARM_SPEED;
+  //     } else{
+  //       speed = MAX_ARM_SPEED;
+  //     }
+  //   }
+  //   m_armMotor.set(ControlMode.PercentOutput, speed);
+  // }
 
 
   public  void configStartMM(int position){

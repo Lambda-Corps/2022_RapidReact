@@ -4,15 +4,21 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.INDEXER_INTAKE_BEAM;
+import static frc.robot.Constants.INDEXER_INTAKE_MID;
+import static frc.robot.Constants.INDEXER_INTAKE_SHOOTER;
+import static frc.robot.Constants.INDEXER_SPEED;
+import static frc.robot.Constants.INTAKE_INDEXER;
+import static frc.robot.Constants.MID_INDEXER;
+import static frc.robot.Constants.SHOOTER_INDEXER;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.Constants.*;
 
 public class Indexer extends SubsystemBase {
   private final double INTAKE_SHOOT_SPEED = .27; // measured testing
@@ -38,8 +44,6 @@ public class Indexer extends SubsystemBase {
 
   private boolean m_bottomBeamState, m_topBeamState, m_midBeamState;
 
-  private NetworkTableEntry m_intake_entry, m_shooter_entry, m_mid_entry;
-  
   /** Creates a new Indexer. */
   public Indexer() {
     m_intakeIndex = new TalonSRX(INTAKE_INDEXER);
@@ -56,15 +60,9 @@ public class Indexer extends SubsystemBase {
 
     // Add a shuffleboard tab for any testing, tuning, or debugging, etc
     ShuffleboardTab tab = Shuffleboard.getTab("Indexer");
-    m_intake_entry = tab.add("Bottom Beam Set", 0).getEntry();
-    m_mid_entry = tab.add("Mid Beam Set", 0).getEntry();
-    m_shooter_entry = tab.add("Top Beam Set", 0).getEntry();
-
-    // TODO -- Remove these after tuning and beam break sensors are in
     tab.addBoolean("Shooter Beam", m_topBeam::get);
     tab.addBoolean("Mid Beam", m_midbeam::get);
     tab.addBoolean("Intake Beam", m_bottomBeam::get);
-    tab.addBoolean("All beams", this::getBeams);
   }
 
   @Override
@@ -76,14 +74,6 @@ public class Indexer extends SubsystemBase {
     m_midBeamState = m_midbeam.get();
     m_topBeamState = m_topBeam.get();
   
-//=========================================================================
-    // // Manually set breaks; TODO Redact if beambreaks are in
-    // m_bottomBeamState = m_intake_entry.getDouble(0) == 1 ? true : false;
-    // m_topBeamState = m_shooter_entry.getDouble(0) == 1 ? true : false;
-    // m_midBeamState = m_mid_entry.getDouble(0) == 1? true : false;
-//=========================================================================
-
-
     if (!m_bottomBeamState && !m_topBeamState && !m_midBeamState) {
       m_storageStatus = StorageState.EMPTY;
     }else if (!m_bottomBeamState && m_topBeamState && m_midBeamState) {
@@ -115,23 +105,9 @@ public class Indexer extends SubsystemBase {
         m_shooterIndex.set(ControlMode.PercentOutput, 0);
         break;
       case BOTTOMONLY:
-        m_intakeIndex.set(ControlMode.PercentOutput, INDEXER_SPEED);
-        m_midIndex.set(ControlMode.PercentOutput, INDEXER_SPEED);
-        m_shooterIndex.set(ControlMode.PercentOutput, 0);
-        break;
       case BOTTOMTWO:
         m_intakeIndex.set(ControlMode.PercentOutput, INDEXER_SPEED);
         m_midIndex.set(ControlMode.PercentOutput, INDEXER_SPEED);
-        m_shooterIndex.set(ControlMode.PercentOutput, 0);
-        break;
-      case TOPTWO:
-        m_intakeIndex.set(ControlMode.PercentOutput, 0);
-        m_midIndex.set(ControlMode.PercentOutput, 0);
-        m_shooterIndex.set(ControlMode.PercentOutput, 0);
-        break;
-      case TOPONLY:
-        m_intakeIndex.set(ControlMode.PercentOutput, 0);
-        m_midIndex.set(ControlMode.PercentOutput, 0);
         m_shooterIndex.set(ControlMode.PercentOutput, 0);
         break;
       case MIDDLEONLY:
@@ -139,16 +115,10 @@ public class Indexer extends SubsystemBase {
         m_midIndex.set(ControlMode.PercentOutput, INDEXER_SPEED);
         m_shooterIndex.set(ControlMode.PercentOutput, 0);
         break;
+      case TOPTWO:
+      case TOPONLY:
       case TOPANDBOTTOM:
-        m_intakeIndex.set(ControlMode.PercentOutput, 0);
-        m_midIndex.set(ControlMode.PercentOutput, 0);
-        m_shooterIndex.set(ControlMode.PercentOutput, 0);
-        break;
       case FULL:
-        m_intakeIndex.set(ControlMode.PercentOutput, 0);
-        m_midIndex.set(ControlMode.PercentOutput, 0);
-        m_shooterIndex.set(ControlMode.PercentOutput, 0);
-        break;
       default:
         m_intakeIndex.set(ControlMode.PercentOutput, 0);
         m_midIndex.set(ControlMode.PercentOutput, 0);
@@ -171,4 +141,15 @@ public class Indexer extends SubsystemBase {
     return m_bottomBeam.get() && m_midbeam.get() && m_topBeam.get();
   }
   
+  public void shootBalls(){
+    m_intakeIndex.set(ControlMode.PercentOutput, INTAKE_SHOOT_SPEED);
+    m_midIndex.set(ControlMode.PercentOutput, INTAKE_SHOOT_SPEED);
+    m_shooterIndex.set(ControlMode.PercentOutput, INTAKE_SHOOT_SPEED);
+  }
+
+  public void ejectBallsBackward(){
+    m_intakeIndex.set(ControlMode.PercentOutput, -INTAKE_SHOOT_SPEED);
+    m_midIndex.set(ControlMode.PercentOutput, -INTAKE_SHOOT_SPEED);
+    m_shooterIndex.set(ControlMode.PercentOutput, -INTAKE_SHOOT_SPEED);
+  }
 }

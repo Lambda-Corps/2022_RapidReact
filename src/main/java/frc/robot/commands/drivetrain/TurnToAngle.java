@@ -24,14 +24,13 @@ public class TurnToAngle extends CommandBase {
   int arclengthTicks;
   int STABLE_ITERATIONS_BEFORE_FINISHED = 5;
   public final ShuffleboardTab turnMMTab;
-  private double m_turn_kP, m_kI, m_kD, m_kF;
-  private NetworkTableEntry m_turnkPEntry, m_kIEntry, m_kDEntry, m_arclengthEntry, m_iterationEntry, m_drivedurationEntry, m_countokEntry, m_arclengthticksEntry, m_kFEntry;
+  private double m_turn_kP, m_kI, m_kD;
+  private NetworkTableEntry m_turnkPEntry, m_kIEntry, m_kDEntry, m_arclengthEntry, m_iterationEntry, m_drivedurationEntry, m_arclengthticksEntry;
   /** Creates a new TurnToAngle. */
   public TurnToAngle(DriveTrain driveTrain, double angle) {
     m_driveTrain = driveTrain;
     arclengthDegrees = angle;
     turnMMTab = Shuffleboard.getTab("Turn MM Testing");
-    m_kFEntry = turnMMTab.add("kF", 0 )                   .withPosition(0, 0).getEntry();
     m_turnkPEntry = turnMMTab.add("kP", 0 )               .withPosition(1, 0).getEntry();
     m_kIEntry = turnMMTab.add("kI", 0 )                   .withPosition(2, 0).getEntry();
     m_kDEntry = turnMMTab.add("kD", 0 )                   .withPosition(3, 0).getEntry();
@@ -56,7 +55,6 @@ public class TurnToAngle extends CommandBase {
     arclengthTicks = (int) (arclengthDegrees * 1108.23 * 0.2291); 
     // ^^^ arc length in ticks = degrees to turn * ticks per 1 inch * degrees per 1 inch
     m_arclengthticksEntry.forceSetDouble(arclengthTicks);
-    m_kF = m_kFEntry.getDouble(0.003699);
     m_turn_kP = m_turnkPEntry.getDouble(0.0);
     m_kI = m_kIEntry.getDouble(0.0);
     m_kD = m_kDEntry.getDouble(0.0);

@@ -4,10 +4,10 @@
 
 package frc.robot.commands.Intake;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+// import edu.wpi.first.networktables.NetworkTableEntry;
+// import edu.wpi.first.wpilibj.Timer;
+// import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+// import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Intake;
 
@@ -16,10 +16,10 @@ public class ArmMM extends CommandBase {
   Intake m_intake;
   int m_targetPosition;
   // public final ShuffleboardTab armMMTab;
-  private double m_arm_kP, m_kI, m_kD, m_kF;
-  private NetworkTableEntry m_armkPEntry, m_kIEntry, m_kDEntry, m_targetPosEntry, m_kFEntry, m_arbFFEntry, m_MMError;
-  private double m_start_time;
-  private double m_upFF, m_downFF;
+  // private double m_arm_kP, m_kI, m_kD, m_kF;
+  // private NetworkTableEntry m_armkPEntry, m_kIEntry, m_kDEntry, m_targetPosEntry, m_kFEntry, m_arbFFEntry, m_MMError;
+  // private double m_start_time;
+  // private double m_upFF, m_downFF;
   private boolean m_isFinished;
   private int m_count_done;
 

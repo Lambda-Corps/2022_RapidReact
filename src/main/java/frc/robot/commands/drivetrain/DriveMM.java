@@ -5,7 +5,6 @@
 package frc.robot.commands.drivetrain;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -74,7 +73,6 @@ public class DriveMM extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    double drive_duration = Timer.getFPGATimestamp() - m_start_time;
     m_driveTrain.teleop_drive(0, 0);
     m_driveTrain.enableMotorSafety();
   }

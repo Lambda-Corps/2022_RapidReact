@@ -4,7 +4,7 @@
 
 package frc.robot.commands.Intake;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
+// import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.Intake;
 
@@ -22,6 +22,6 @@ public class SetArm extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_intake.setArmMotor(0);
+    m_intake.stopIntakeMotor();
   }
 }

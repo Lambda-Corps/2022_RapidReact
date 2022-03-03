@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
-import static frc.robot.Constants.*;
 
 public class TestIntakeIndexerAndShooter extends CommandBase {
   private final Indexer m_indexer;

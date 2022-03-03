@@ -4,9 +4,27 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.LEFT_TALON_FOLLOWER;
+import static frc.robot.Constants.LEFT_TALON_LEADER;
+import static frc.robot.Constants.PID_PRIMARY;
+import static frc.robot.Constants.RIGHT_TALON_FOLLOWER;
+import static frc.robot.Constants.RIGHT_TALON_LEADER;
+import static frc.robot.Constants.k100msPerSecond;
+import static frc.robot.Constants.kControllerDeadband;
+import static frc.robot.Constants.kCountsPerRev;
+import static frc.robot.Constants.kEncoderUnitsPerRotation;
+import static frc.robot.Constants.kGains_Driving;
+import static frc.robot.Constants.kGains_Turning;
+import static frc.robot.Constants.kGearRatio;
+import static frc.robot.Constants.kNeutralDeadband;
+import static frc.robot.Constants.kSensorGearRatio;
+import static frc.robot.Constants.kSlot_Distanc;
+import static frc.robot.Constants.kSlot_Turning;
+import static frc.robot.Constants.kTimeoutMs;
+import static frc.robot.Constants.kTurnTravelUnitsPerRotation;
+import static frc.robot.Constants.kWheelRadiusInches;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
-import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
@@ -37,8 +55,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.commands.drivetrain.UpdateDriveLimiters;
 
-import static frc.robot.Constants.*;
-
 public class DriveTrain extends SubsystemBase {
 	private final double MAX_TELEOP_DRIVE_SPEED = .8;
 	// TalonFX's for the drivetrain
@@ -52,8 +68,8 @@ public class DriveTrain extends SubsystemBase {
 	public AHRS m_gyro;
 	
 	// Auxilliary PID tracker
-	private boolean m_was_correcting = false;
-	private boolean m_is_correcting = false;
+	// private boolean m_was_correcting = false;
+	// private boolean m_is_correcting = false;
 
 	///////////// Odometry Trackers //////////////
 	// Odometry class for tracking robot pose
@@ -173,7 +189,6 @@ public class DriveTrain extends SubsystemBase {
 
 		/// Odometry Tracker objects
 		m_2dField = new Field2d();
-		// TODO, see if we can put this on our driver's shuffleboard tab and see it update
 		SmartDashboard.putData(m_2dField);
 		m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
 
@@ -314,8 +329,8 @@ public class DriveTrain extends SubsystemBase {
 		// 	m_was_correcting = true;
 		// }
 		// else {
-			m_is_correcting = false;
-			m_was_correcting = false;
+			// m_is_correcting = false;
+			// m_was_correcting = false;
 			
 			// Just set the motors
 			m_right_leader.set(ControlMode.PercentOutput, speeds.right);
