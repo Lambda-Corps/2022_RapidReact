@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import static frc.robot.Constants.*;
 
 public class TestIntakeIndexerAndShooter extends CommandBase {
   private final Indexer m_indexer;
@@ -82,7 +83,6 @@ public class TestIntakeIndexerAndShooter extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_indexer.testIndexDriving(m_in_speed, m_mid_speed, m_shoot_speed);
     m_intake.intakeWheelsMotorOn(m_intakeWheelSpeed);
     m_shooter.test_shooter_percent(m_flywheelSpeed);
     m_indexer.checkIndexState();
