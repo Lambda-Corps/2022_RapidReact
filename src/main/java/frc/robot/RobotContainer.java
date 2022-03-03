@@ -4,6 +4,11 @@
 
 package frc.robot;
 
+import java.security.KeyStore.Entry;
+
+import com.fasterxml.jackson.databind.deser.ValueInstantiator.Gettable;
+
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -23,6 +28,7 @@ import frc.robot.commands.shooter.ShooterPIDTuning;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LEDsubsystem;
 import frc.robot.subsystems.Shooter;
 
 /**
@@ -37,7 +43,7 @@ public class RobotContainer {
   Indexer m_indexer;
   Intake m_intake;
   Shooter m_shooter;
-
+  LEDsubsystem m_ledsubsystem;
   // OI
   XboxController m_driver_controller;
 
@@ -48,11 +54,13 @@ public class RobotContainer {
     m_indexer = new Indexer();
     m_intake = new Intake();
     m_shooter = new Shooter();
-
+    m_ledsubsystem = new LEDsubsystem();
     m_driveTrain.setDefaultCommand(new DriveTrainDefaultCommand(m_driveTrain, m_driver_controller));
     m_indexer.setDefaultCommand(new IndexerDefaultCommand(m_indexer));
 
-    Shuffleboard.getTab("Default Drive Tab").add("DriveForSeconds", new DriveForSecondsFromShuffleboard(m_driveTrain))
+    
+
+        Shuffleboard.getTab("Default Drive Tab").add("DriveForSeconds", new DriveForSecondsFromShuffleboard(m_driveTrain))
                                             .withPosition(4, 1)
                                             .withSize(2, 1);         
     Shuffleboard.getTab("Drive MM Testing").add(new DriveMM(m_driveTrain, 0));
