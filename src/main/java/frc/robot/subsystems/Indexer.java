@@ -20,7 +20,11 @@ public class Indexer extends SubsystemBase {
   public enum StorageState {
     EMPTY, 
     BOTTOMONLY,
-    TOPONLY, 
+    MIDDLEONLY,
+    TOPONLY,
+    BOTTOMTWO,
+    TOPTWO,
+    TOPANDBOTTOM,
     FULL,
     PURGE // This is if the state machine cannot decide what state the indexer is in. If applied it will eject all cargo.
   }
@@ -32,9 +36,9 @@ public class Indexer extends SubsystemBase {
   private DigitalInput m_bottomBeam, m_topBeam, m_midbeam;
   private StorageState m_storageStatus;
 
-  private boolean m_bottomBeamState, m_topBeamState;
+  private boolean m_bottomBeamState, m_topBeamState, m_midBeamState;
 
-  private NetworkTableEntry m_intake_entry, m_shooter_entry;
+  private NetworkTableEntry m_intake_entry, m_shooter_entry, m_mid_entry;
   
   /** Creates a new Indexer. */
   public Indexer() {
@@ -52,6 +56,9 @@ public class Indexer extends SubsystemBase {
 
     // Add a shuffleboard tab for any testing, tuning, or debugging, etc
     ShuffleboardTab tab = Shuffleboard.getTab("Indexer");
+    m_intake_entry = tab.add("Bottom Beam Set", 0).getEntry();
+    m_mid_entry = tab.add("Mid Beam Set", 0).getEntry();
+    m_shooter_entry = tab.add("Top Beam Set", 0).getEntry();
 
     // TODO -- Remove these after tuning and beam break sensors are in
     tab.addBoolean("Shooter Beam", m_topBeam::get);
@@ -63,53 +70,90 @@ public class Indexer extends SubsystemBase {
   @Override
   public void periodic() {}
 
-  // Command to be called from the indexer default command that will automate the state of the balls in
-  // the indexer.
-  public void check_and_resolve_indexer(){
-    checkIndexState();
-    resolveIndexer();
-  }
-
-  private void checkIndexState() {
+  public void checkIndexState() {
     // Real State Machine
     m_bottomBeamState = m_bottomBeam.get();
+    m_midBeamState = m_midbeam.get();
     m_topBeamState = m_topBeam.get();
   
-
 //=========================================================================
-    // For testing ONLY; TODO Redact when beambreaks are in
+    // // Manually set breaks; TODO Redact if beambreaks are in
     // m_bottomBeamState = m_intake_entry.getDouble(0) == 1 ? true : false;
     // m_topBeamState = m_shooter_entry.getDouble(0) == 1 ? true : false;
+    // m_midBeamState = m_mid_entry.getDouble(0) == 1? true : false;
 //=========================================================================
 
-    if (!m_bottomBeamState && !m_topBeamState) {
+
+    if (!m_bottomBeamState && !m_topBeamState && !m_midBeamState) {
       m_storageStatus = StorageState.EMPTY;
-    }else if (m_bottomBeamState && m_topBeamState) {
-      m_storageStatus = StorageState.FULL;
-    }else if (m_bottomBeamState && !m_topBeamState) {
+    }else if (!m_bottomBeamState && m_topBeamState && m_midBeamState) {
       m_storageStatus = StorageState.BOTTOMONLY;
-    }else if (!m_bottomBeamState && m_topBeamState) {
-    m_storageStatus = StorageState.TOPONLY;
+    }else if (!m_bottomBeamState && m_topBeamState && !m_midBeamState) { 
+      m_storageStatus = StorageState.BOTTOMTWO;
+    }else if (!m_bottomBeamState && !m_topBeamState && m_midBeamState) {
+      m_storageStatus = StorageState.TOPANDBOTTOM;
+    }else if (m_bottomBeamState && !m_topBeamState && !m_midBeamState) {
+      m_storageStatus = StorageState.TOPTWO; 
+    }else if (!m_bottomBeamState && m_topBeamState && m_midBeamState) {
+      m_storageStatus = StorageState.BOTTOMONLY;
+    }else if (m_bottomBeamState && m_topBeamState && !m_midBeamState) {
+      m_storageStatus = StorageState.MIDDLEONLY;
+    }else if (m_bottomBeamState && !m_topBeamState && m_midBeamState) {
+      m_storageStatus = StorageState.TOPONLY;
     }
   }
 
-  private void resolveIndexer() {
-    if (m_storageStatus == StorageState.EMPTY) {
-      m_intakeIndex.set(ControlMode.PercentOutput, 0);
-      m_midIndex.set(ControlMode.PercentOutput, 0);
-      m_shooterIndex.set(ControlMode.PercentOutput, 0);
-    }else if (m_storageStatus == StorageState.FULL) {
-      m_intakeIndex.set(ControlMode.PercentOutput, 0);
-      m_midIndex.set(ControlMode.PercentOutput, 0);
-      m_shooterIndex.set(ControlMode.PercentOutput, 0);
-    }else if (m_storageStatus == StorageState.TOPONLY) {
-      m_intakeIndex.set(ControlMode.PercentOutput, 0);
-      m_midIndex.set(ControlMode.PercentOutput, 0);
-      m_shooterIndex.set(ControlMode.PercentOutput, 0);
-    }else if (m_storageStatus == StorageState.BOTTOMONLY) {
-      m_intakeIndex.set(ControlMode.PercentOutput, INDEXER_SPEED);
-      m_midIndex.set(ControlMode.PercentOutput, INDEXER_SPEED);
-      m_shooterIndex.set(ControlMode.PercentOutput, 0);
+  public void resolveIndexer(boolean forceSpinBottom) {
+    switch(m_storageStatus) {
+      case EMPTY:
+        if (forceSpinBottom) {
+          m_intakeIndex.set(ControlMode.PercentOutput, INDEXER_SPEED);
+        }else {
+          m_intakeIndex.set(ControlMode.PercentOutput, 0);
+        }
+        m_midIndex.set(ControlMode.PercentOutput, 0);
+        m_shooterIndex.set(ControlMode.PercentOutput, 0);
+        break;
+      case BOTTOMONLY:
+        m_intakeIndex.set(ControlMode.PercentOutput, INDEXER_SPEED);
+        m_midIndex.set(ControlMode.PercentOutput, INDEXER_SPEED);
+        m_shooterIndex.set(ControlMode.PercentOutput, 0);
+        break;
+      case BOTTOMTWO:
+        m_intakeIndex.set(ControlMode.PercentOutput, INDEXER_SPEED);
+        m_midIndex.set(ControlMode.PercentOutput, INDEXER_SPEED);
+        m_shooterIndex.set(ControlMode.PercentOutput, 0);
+        break;
+      case TOPTWO:
+        m_intakeIndex.set(ControlMode.PercentOutput, 0);
+        m_midIndex.set(ControlMode.PercentOutput, 0);
+        m_shooterIndex.set(ControlMode.PercentOutput, 0);
+        break;
+      case TOPONLY:
+        m_intakeIndex.set(ControlMode.PercentOutput, 0);
+        m_midIndex.set(ControlMode.PercentOutput, 0);
+        m_shooterIndex.set(ControlMode.PercentOutput, 0);
+        break;
+      case MIDDLEONLY:
+        m_intakeIndex.set(ControlMode.PercentOutput, 0);
+        m_midIndex.set(ControlMode.PercentOutput, INDEXER_SPEED);
+        m_shooterIndex.set(ControlMode.PercentOutput, 0);
+        break;
+      case TOPANDBOTTOM:
+        m_intakeIndex.set(ControlMode.PercentOutput, 0);
+        m_midIndex.set(ControlMode.PercentOutput, 0);
+        m_shooterIndex.set(ControlMode.PercentOutput, 0);
+        break;
+      case FULL:
+        m_intakeIndex.set(ControlMode.PercentOutput, 0);
+        m_midIndex.set(ControlMode.PercentOutput, 0);
+        m_shooterIndex.set(ControlMode.PercentOutput, 0);
+        break;
+      default:
+        m_intakeIndex.set(ControlMode.PercentOutput, 0);
+        m_midIndex.set(ControlMode.PercentOutput, 0);
+        m_shooterIndex.set(ControlMode.PercentOutput, 0);
+        break;
     }
   }
 
