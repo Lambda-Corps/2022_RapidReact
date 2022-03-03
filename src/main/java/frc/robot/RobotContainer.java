@@ -4,9 +4,15 @@
 
 package frc.robot;
 
+import java.util.Map;
+
+import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.commands.Indexer.TestIntakeIndexerAndShooter;
@@ -52,16 +58,9 @@ public class RobotContainer {
 
     m_driveTrain.setDefaultCommand(new DriveTrainDefaultCommand(m_driveTrain, m_driver_controller));
     m_indexer.setDefaultCommand(new IndexerDefaultCommand(m_indexer));
-      
-    Shuffleboard.getTab("Drive MM Testing").add(new DriveMM(m_driveTrain, 0));
-    Shuffleboard.getTab("Combined Test").add(new TestIntakeIndexerAndShooter(m_indexer, m_intake, m_shooter)).withPosition(0, 1).withSize(2, 1);
-    Shuffleboard.getTab("Combined Test").add(new SetForwardLimit(m_intake)).withPosition(0, 3).withSize(2, 1);
-    Shuffleboard.getTab("Arm MM Testing").add("ReSet Intake Arm", new SetArm(m_intake)).withPosition(0, 3).withSize(2, 1);
-    Shuffleboard.getTab("Arm MM Testing").add("Extend Intake", new ArmMM(m_intake, Intake.INTAKE_ARM_EXTEND)).withPosition(0, 0).withSize(2,1);
-    Shuffleboard.getTab("Arm MM Testing").add("Retract Intake", new ArmMM(m_intake, Intake.INTAKE_ARM_RETRACT)).withPosition(2,0).withSize(2,1);
-    Shuffleboard.getTab("Arm MM Testing").add(new ResetIntakeArmEncoder(m_intake)).withPosition(0, 2).withSize(2, 1);
-    Shuffleboard.getTab("ShooterPID").add("Shoot" , new ShooterPIDTuning(m_shooter, m_indexer)).withPosition(0, 3);
-    Shuffleboard.getTab("Turn MM Testing").add("Turn MM", new TurnToAngle(m_driveTrain, 0)).withPosition(0, 3).withSize(2, 1);
+    
+    // Build up the driver's heads up display
+    buildShuffleboard();
 
     // Configure the button bindings
     configureButtonBindings();
@@ -85,5 +84,63 @@ public class RobotContainer {
     return new PrintCommand("Auto");
   }
   
-  
+  private void buildShuffleboard(){
+    buildDriverTab();
+
+    Shuffleboard.getTab("Drive MM Testing").add(new DriveMM(m_driveTrain, 0));
+    Shuffleboard.getTab("Combined Test").add(new TestIntakeIndexerAndShooter(m_indexer, m_intake, m_shooter)).withPosition(0, 1).withSize(2, 1);
+    Shuffleboard.getTab("Combined Test").add(new SetForwardLimit(m_intake)).withPosition(0, 3).withSize(2, 1);
+    Shuffleboard.getTab("Arm MM Testing").add("ReSet Intake Arm", new SetArm(m_intake)).withPosition(0, 3).withSize(2, 1);
+    Shuffleboard.getTab("Arm MM Testing").add("Extend Intake", new ArmMM(m_intake, Intake.INTAKE_ARM_EXTEND)).withPosition(0, 0).withSize(2,1);
+    Shuffleboard.getTab("Arm MM Testing").add("Retract Intake", new ArmMM(m_intake, Intake.INTAKE_ARM_RETRACT)).withPosition(2,0).withSize(2,1);
+    Shuffleboard.getTab("Arm MM Testing").add(new ResetIntakeArmEncoder(m_intake)).withPosition(0, 2).withSize(2, 1);
+    Shuffleboard.getTab("ShooterPID").add("Shoot" , new ShooterPIDTuning(m_shooter, m_indexer)).withPosition(0, 3);
+    Shuffleboard.getTab("Turn MM Testing").add("Turn MM", new TurnToAngle(m_driveTrain, 0)).withPosition(0, 3).withSize(2, 1);
+  }
+
+  private void buildDriverTab(){
+    ShuffleboardTab driveTab = Shuffleboard.getTab("Drive");
+
+    // The drive tab is roughly 9 x 5 (columns x rows)
+    // Camera can be 4 x 4, gyro 
+    driveTab.add("Cargo Cam", new HttpCamera("Cargo Photon", "http://10.50.24.11:5800"))
+                                            .withWidget(BuiltInWidgets.kCameraStream).withPosition(0, 0)
+                                            .withSize(4, 4);
+    // Add heading and outputs to the driver views
+    driveTab.add("Gyro", m_driveTrain.getGyro()).withPosition(4, 0).withWidget(BuiltInWidgets.kGyro);
+    driveTab.add("Left Output", 0).withSize(1, 1).withPosition(4, 2).withWidget(BuiltInWidgets.kDial)
+                                  .withProperties(Map.of("Min", -1, "Max", 1));
+    driveTab.add("Right Output", 0).withSize(1, 1).withPosition(5, 2).withWidget(BuiltInWidgets.kDial)
+                                  .withProperties(Map.of("Min", -1, "Max", 1));
+
+    // Add vision cues below the camera stream block
+    driveTab.add("HighTarget", false).withSize(1, 1).withPosition(0, 4).withWidget(BuiltInWidgets.kBooleanBox);
+    driveTab.add("BallTarget", false).withSize(1, 1).withPosition(1, 4).withWidget(BuiltInWidgets.kBooleanBox);
+    driveTab.add("Pipeline",0).withSize(1, 1).withPosition(2, 4).withWidget(BuiltInWidgets.kDial)
+                              .withProperties(Map.of("Min", 0, "Max", 2));
+    driveTab.add("Distance", 0).withSize(1, 1).withPosition(3, 4);
+
+    // Add Intake Sensors and Ball Count
+    driveTab.add("Ball Count",0).withSize(1, 1).withPosition(6, 0).withWidget(BuiltInWidgets.kDial)
+                              .withProperties(Map.of("Min", 0, "Max", 2));
+    driveTab.add("Shootbreak", false).withSize(1, 1).withPosition(7, 0).withWidget(BuiltInWidgets.kBooleanBox);
+    driveTab.add("MidBreak", false).withSize(1, 1).withPosition(8, 0).withWidget(BuiltInWidgets.kBooleanBox);
+    driveTab.add("IntakeBreak", false).withSize(1, 1).withPosition(9, 0).withWidget(BuiltInWidgets.kBooleanBox);
+    // Add Intake Limits
+    driveTab.add("Int. Fwd Hard", false).withSize(1, 1).withPosition(6, 1).withWidget(BuiltInWidgets.kBooleanBox);
+    driveTab.add("Int. Fwd Soft", false).withSize(1, 1).withPosition(7, 1).withWidget(BuiltInWidgets.kBooleanBox);
+    driveTab.add("Int. Rev Hard", false).withSize(1, 1).withPosition(8, 1).withWidget(BuiltInWidgets.kBooleanBox);
+    driveTab.add("Int. Rev Soft", false).withSize(1, 1).withPosition(9, 1).withWidget(BuiltInWidgets.kBooleanBox);
+    // // Climber Limits
+    driveTab.add("Clm. Fwd Hard", false).withSize(1, 1).withPosition(6, 2).withWidget(BuiltInWidgets.kBooleanBox);
+    driveTab.add("Clm. Fwd Soft", false).withSize(1, 1).withPosition(7, 2).withWidget(BuiltInWidgets.kBooleanBox);
+    driveTab.add("Clm. Rev Hard", false).withSize(1, 1).withPosition(8, 2).withWidget(BuiltInWidgets.kBooleanBox);
+    driveTab.add("Clm. Rev Soft", false).withSize(1, 1).withPosition(9, 2).withWidget(BuiltInWidgets.kBooleanBox);
+
+    // Field
+    driveTab.add("Field", m_driveTrain.getField()).withPosition(6, 3).withSize(4, 2).withWidget(BuiltInWidgets.kField);
+
+
+
+  }
 }

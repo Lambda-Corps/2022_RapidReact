@@ -24,6 +24,8 @@ import static frc.robot.Constants.kTimeoutMs;
 import static frc.robot.Constants.kTurnTravelUnitsPerRotation;
 import static frc.robot.Constants.kWheelRadiusInches;
 
+import java.util.Map;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -42,12 +44,16 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -228,14 +234,15 @@ public class DriveTrain extends SubsystemBase {
 		  m_rotation_limiter = new SlewRateLimiter(3);
 		  m_drive_absMax = MAX_TELEOP_DRIVE_SPEED;
 		  // Setup Shuffleboard tuning
-		  ShuffleboardTab tab = Shuffleboard.getTab("Default Drive");
+		  ShuffleboardTab tab = Shuffleboard.getTab("Drive Testing");
 		  m_forward_rate = tab.add("ForwardLimiter", 3).withSize(1, 1).withPosition(0, 0).getEntry();
 		  m_rotation_rate = tab.add("RotationLimiter", 3).withSize(1, 1).withPosition(1, 0).getEntry();
 		  m_drive_max = tab.add("Drive Max (abs)", m_drive_absMax).withSize(1, 1).withPosition(2, 0).getEntry();
-		  m_left_output = tab.add("Left Output", 0).withSize(1, 1).withPosition(3, 0).getEntry();
-		  m_right_output = tab.add("Right Output",0).withSize(1, 1).withPosition(4, 0).getEntry();
 		  tab.add("Reset Limits", new UpdateDriveLimiters(this)).withSize(3, 1).withPosition(2, 1);
-
+		  
+		  NetworkTable driveTable = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Drive");
+		  m_left_output =  driveTable.getEntry("Left Output");
+		  m_right_output = driveTable.getEntry("Right Output");
 		  m_gyro.reset();
   	}
 
@@ -633,5 +640,13 @@ public class DriveTrain extends SubsystemBase {
 
 	public double getRawAngle(){
 		return m_gyro.getAngle();
+	}
+
+	public AHRS getGyro(){
+		return m_gyro;
+	}
+
+	public Field2d getField(){
+		return m_2dField;
 	}
 }
