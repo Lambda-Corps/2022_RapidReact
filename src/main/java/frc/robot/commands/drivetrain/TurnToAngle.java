@@ -52,7 +52,7 @@ public class TurnToAngle extends CommandBase {
   public void initialize() {
     arclengthDegrees = m_arclengthEntry.getDouble(0);
     //see 2020 or 2019 code for explanation on these calculations
-    arclengthTicks = (int) (arclengthDegrees * 1074.67 * 0.2291); 
+    arclengthTicks = (int) (arclengthDegrees * 1108.23 * 0.2291); 
     // ^^^ arc length in ticks = degrees to turn * ticks per 1 inch * degrees per 1 inch
     m_arclengthticksEntry.forceSetDouble(arclengthTicks);
     m_kF = m_kFEntry.getDouble(0.003699);

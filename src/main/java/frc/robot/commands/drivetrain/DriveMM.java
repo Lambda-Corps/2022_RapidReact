@@ -52,7 +52,7 @@ public class DriveMM extends CommandBase {
     m_kD = m_kDEntry.getDouble(0.0);
     STABLE_ITERATIONS_BEFORE_FINISHED = (int) m_iterationEntry.getDouble(5.0);
     m_targetPosition = m_targetPosEntry.getDouble(0.0);
-    m_targetTicks = m_targetPosition * 1074.13;
+    m_targetTicks = m_targetPosition * 1108.23;
     m_targetTicksEntry.forceSetDouble((int) m_targetTicks);
     count = 0;
     m_driveTrain.setEncodersToZero();
