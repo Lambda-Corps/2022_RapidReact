@@ -4,6 +4,7 @@
 
 package frc.robot.commands.Intake;
 
+import edu.wpi.first.wpilibj.Timer;
 // import edu.wpi.first.networktables.NetworkTableEntry;
 // import edu.wpi.first.wpilibj.Timer;
 // import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -22,10 +23,14 @@ public class ArmMM extends CommandBase {
   // private double m_upFF, m_downFF;
   private boolean m_isFinished;
   private int m_count_done;
+  private Timer m_timer;
 
   public ArmMM(Intake intake, int target_position) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_intake = intake;
+    m_timer = new Timer();
+    m_timer.start();
+
     addRequirements(m_intake);
     m_targetPosition = target_position;
   }
@@ -33,6 +38,7 @@ public class ArmMM extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    m_timer.reset();
     m_isFinished = false;
     m_count_done = 0;
     // m_targetPosition = (int) m_targetPosEntry.getDouble(0.0);
@@ -66,7 +72,7 @@ public class ArmMM extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_count_done >= 3;
+    return m_count_done >= 10 || m_timer.hasElapsed(1);
   }
 
 }

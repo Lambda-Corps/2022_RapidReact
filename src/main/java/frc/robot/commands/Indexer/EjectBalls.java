@@ -2,19 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.default_commands;
+package frc.robot.commands.Indexer;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 
-public class IndexerDefaultCommand extends CommandBase {
-  /** Creates a new IndexerDefaultCommand. */
-  Indexer m_indexer;
-  public IndexerDefaultCommand(Indexer indexer) {
+public class EjectBalls extends CommandBase {
+  Indexer m_Indexer;
+  /** Creates a new EjectBalls. */
+  public EjectBalls(Indexer indexer) {
+    m_Indexer = indexer;
     // Use addRequirements() here to declare subsystem dependencies.
-    m_indexer = indexer;
-
-    addRequirements(indexer);
+    addRequirements(m_Indexer);
   }
 
   // Called when the command is initially scheduled.
@@ -24,8 +23,7 @@ public class IndexerDefaultCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_indexer.checkIndexState();
-    m_indexer.resolveIndexer();
+    m_Indexer.ejectBallsBackward();
   }
 
   // Called once the command ends or is interrupted.

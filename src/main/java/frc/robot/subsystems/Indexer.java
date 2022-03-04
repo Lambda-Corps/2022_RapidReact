@@ -13,6 +13,7 @@ import static frc.robot.Constants.MID_INDEXER;
 import static frc.robot.Constants.SHOOTER_INDEXER;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.networktables.NetworkTable;
@@ -23,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Indexer extends SubsystemBase {
   private final double INTAKE_SHOOT_SPEED = .27; // measured testing
-  private final double INTAKE_INTAKE_SPEED = .8;
+  private final double INTAKE_INTAKE_SPEED = .43;
 
   public enum StorageState {
     EMPTY, 
@@ -52,6 +53,10 @@ public class Indexer extends SubsystemBase {
     m_intakeIndex = new TalonSRX(INTAKE_INDEXER);
     m_midIndex = new TalonSRX(MID_INDEXER);
     m_shooterIndex = new TalonSRX(SHOOTER_INDEXER);
+
+    m_midIndex.setNeutralMode(NeutralMode.Brake);
+    m_intakeIndex.setNeutralMode(NeutralMode.Brake);
+    m_shooterIndex.setNeutralMode(NeutralMode.Brake);
 
     // m_bottomBeam = new DigitalInput(Constants.BEAM_BREAKER_RECEIVE_BOTTOM);
     // m_topBeam = new DigitalInput(Constants.BEAM_BREAKER_RECEIVE_TOP);
@@ -192,5 +197,11 @@ public class Indexer extends SubsystemBase {
 
   public boolean isFull(){
     return m_ball_count == 2;
+  }
+
+  public void stopMotors(){
+    m_intakeIndex.set(ControlMode.PercentOutput, 0);
+    m_midIndex.set(ControlMode.PercentOutput, 0);
+    m_shooterIndex.set(ControlMode.PercentOutput, 0);
   }
 }
