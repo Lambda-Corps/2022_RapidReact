@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
   public enum ShotDistance {
-    Field_Wall, InitiationLine, FrontTarmack
+    MidTarmac, ClosestShot, TarmacLine
   }
   private final WPI_TalonFX m_Shooter;
   private final TalonFXConfiguration shooterConfig;
@@ -90,9 +90,6 @@ public class Shooter extends SubsystemBase {
     m_Shooter.set(ControlMode.Velocity, setpoint);
   }
 
-  public void velocityPID(){
-    m_Shooter.set(ControlMode.Velocity, m_shooter_set_point);
-  }
   public void configureVelocityPID(double kp, double ki, double kd, double kf) {
     m_Shooter.selectProfileSlot(kSlot_CloseShot, PID_PRIMARY);
     m_Shooter.config_kP(kSlot_CloseShot, kp);
@@ -102,21 +99,21 @@ public class Shooter extends SubsystemBase {
   }
   public void setShotDistance(ShotDistance distance){
     switch(distance){
-      case InitiationLine:
+      case ClosestShot:
         // Config the shooter for close shot
         m_Shooter.selectProfileSlot(kSlot_CloseShot, PID_PRIMARY);
         // Set the setpoint
         m_shooter_set_point = SHOOTER_SETPOINT_CLOSESHOT ;
         // Set the pistons
         break;
-      case Field_Wall:
+      case MidTarmac:
         // Config the shooter for mid tarmac
         m_Shooter.selectProfileSlot(kSlot_MidTarmac, PID_PRIMARY);
         // Set the setpoint
         m_shooter_set_point = SHOOTER_SETPOINT_MIDTARMAC;
         // Set the pistons
         break;
-      case FrontTarmack:
+      case TarmacLine:
         // Config the shooter for tarmac line
         m_Shooter.selectProfileSlot(SHOOTER_SETPOINT_TARMAC_LINE, PID_PRIMARY);
         // Set the setpoint
@@ -132,10 +129,16 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
-
-
-
-
     // This method will be called once per scheduler run
+  }
+
+  public void startVelocityPID(){
+    m_Shooter.set(ControlMode.Velocity, m_shooter_set_point);
+  }
+
+  public boolean isUpToSpeed(){
+    double currentLoopError = m_Shooter.getClosedLoopError();
+
+    return (currentLoopError >= (m_shooter_set_point * .95));
   }
 }

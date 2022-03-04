@@ -4,21 +4,37 @@
 
 package frc.robot.commands.Indexer;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import java.net.Inet4Address;
 
-public class Index_Balls_into_FlyWheel extends CommandBase {
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Indexer;
+
+public class ShootBallsTilEmptyOrThreeSeconds extends CommandBase {
+
+  Indexer m_indexer;
+  Timer m_timer;
+
   /** Creates a new Index_Balls_into_FlyWheel. */
-  public Index_Balls_into_FlyWheel() {
+  public ShootBallsTilEmptyOrThreeSeconds(Indexer indexer) {
+    m_indexer = indexer;
+    m_timer = new Timer();
+    m_timer.start();
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(m_indexer);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    m_timer.reset();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    m_indexer.shootBalls();
+  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -27,6 +43,11 @@ public class Index_Balls_into_FlyWheel extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    boolean done = m_indexer.isEmpty();
+    if(m_timer.hasElapsed(3)){
+      done = true;
+    }
+  
+    return done;
   }
 }

@@ -6,17 +6,14 @@ package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Shooter.ShotDistance;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class SetShooterDistance extends InstantCommand {
+public class StartShooterWheel extends InstantCommand {
   Shooter m_shooter;
-  ShotDistance m_distance;
-  public SetShooterDistance(Shooter shooter, ShotDistance distance) {
+  public StartShooterWheel(Shooter shooter) {
     m_shooter = shooter;
-    m_distance = distance;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_shooter);
   }
@@ -24,6 +21,6 @@ public class SetShooterDistance extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_shooter.setShotDistance(m_distance);
+    m_shooter.startVelocityPID();
   }
 }

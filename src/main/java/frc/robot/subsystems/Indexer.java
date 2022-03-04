@@ -204,4 +204,8 @@ public class Indexer extends SubsystemBase {
     m_midIndex.set(ControlMode.PercentOutput, 0);
     m_shooterIndex.set(ControlMode.PercentOutput, 0);
   }
+
+  public boolean isEmpty(){
+    return m_ball_count == 0;
+  }
 }
