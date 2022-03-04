@@ -14,6 +14,13 @@ public class Shooting_Sequence extends SequentialCommandGroup {
   public Shooting_Sequence() {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands();
+    addCommands(
+      // Spinup flywheel
+      // Wait until setpoint
+      // index balls
+      // Wait until empty
+      // turn off motors
+    
+    );
   }
 }

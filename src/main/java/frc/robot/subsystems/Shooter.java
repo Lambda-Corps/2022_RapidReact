@@ -86,12 +86,12 @@ public class Shooter extends SubsystemBase {
   public void stopMotor() {
     m_Shooter.set(ControlMode.PercentOutput, 0);
   }
-  public void velocityPID(double m_setpoint){
-    m_Shooter.set(ControlMode.Velocity, m_setpoint);
+  public void velocityPID(double setpoint){
+    m_Shooter.set(ControlMode.Velocity, setpoint);
   }
 
   public void velocityPID(){
-    m_Shooter.set(ControlMode.Velocity, m_shooter_set_point);)
+    m_Shooter.set(ControlMode.Velocity, m_shooter_set_point);
   }
   public void configureVelocityPID(double kp, double ki, double kd, double kf) {
     m_Shooter.selectProfileSlot(kSlot_CloseShot, PID_PRIMARY);
