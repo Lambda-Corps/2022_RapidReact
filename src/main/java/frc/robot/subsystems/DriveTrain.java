@@ -24,8 +24,6 @@ import static frc.robot.Constants.kTimeoutMs;
 import static frc.robot.Constants.kTurnTravelUnitsPerRotation;
 import static frc.robot.Constants.kWheelRadiusInches;
 
-import java.util.Map;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -240,7 +238,7 @@ public class DriveTrain extends SubsystemBase {
 		  m_drive_absMax = MAX_TELEOP_DRIVE_SPEED;
 		  // Setup Shuffleboard tuning
 		  ShuffleboardTab tab = Shuffleboard.getTab("Drive Testing");
-		  m_forward_rate = tab.add("ForwardLimiter", 3).withSize(1, 1).withPosition(0, 0).getEntry();
+		  m_forward_rate = tab.add("Forward Limiter", 3).withSize(1, 1).withPosition(0, 0).getEntry();
 		  m_rotation_rate = tab.add("RotationLimiter", 3).withSize(1, 1).withPosition(1, 0).getEntry();
 		  m_drive_max = tab.add("Drive Max (abs)", m_drive_absMax).withSize(1, 1).withPosition(2, 0).getEntry();
 		  tab.add("Reset Limits", new UpdateDriveLimiters(this)).withSize(3, 1).withPosition(2, 1);

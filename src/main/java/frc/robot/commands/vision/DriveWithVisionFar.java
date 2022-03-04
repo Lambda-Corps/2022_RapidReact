@@ -11,8 +11,8 @@ public class DriveWithVisionFar extends CommandBase {
   Vision m_vision;
 
   public DriveWithVisionFar(DriveTrain driveTrain, Vision vision) {
-    m_vision = new Vision();
-    m_driveTrain = new DriveTrain();
+    m_vision = vision;
+    m_driveTrain = driveTrain;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(driveTrain, vision);

@@ -61,7 +61,7 @@ public class RobotContainer {
 
   // OI
   XboxController m_driver_controller, m_partner_controller;
-  JoystickButton m_d_a, m_d_b, m_d_rb, m_d_lb, m_d_rs, m_d_ls, m_p_a, m_p_b, m_p_rb, m_d_sel, m_p_x;
+  JoystickButton m_d_a, m_d_b, m_d_rb, m_d_lb, m_d_rs, m_d_ls, m_p_a, m_p_b, m_p_rb, m_d_sel, m_p_x, m_d_y;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -77,6 +77,7 @@ public class RobotContainer {
     // Joystick Buttons
     m_d_a = new JoystickButton(m_driver_controller, XboxController.Button.kA.value);
     m_d_b = new JoystickButton(m_driver_controller, XboxController.Button.kB.value);
+    m_d_y = new JoystickButton(m_driver_controller, XboxController.Button.kY.value);
     m_d_rb = new JoystickButton(m_driver_controller, XboxController.Button.kRightBumper.value);
     m_d_lb = new JoystickButton(m_driver_controller, XboxController.Button.kLeftBumper.value);
     m_d_ls = new JoystickButton(m_driver_controller, XboxController.Button.kLeftStick.value);
@@ -111,6 +112,7 @@ public class RobotContainer {
     m_d_lb.whenReleased(new ArmMM(m_intake, Intake.INTAKE_ARM_RETRACT));
     m_d_rs.whenPressed(new PrintCommand("Climber Up"));
     m_d_ls.whenPressed(new PrintCommand("Climber Down"));
+    m_d_y.whenPressed(new PrintCommand("Climber Cancelled"));
     
     m_p_a.whenPressed(new Shoot/*Long Shot*/()); 
     m_p_b.whenPressed(new Shoot/*Short Shot*/());
