@@ -17,11 +17,6 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 public final class Constants {
     // Robot Electronics Map
 
-<<<<<<< HEAD
-    /////////////// CAN Bus IDs  ////////////////
-    public final static int RIGHT_TALON_LEADER = 1;
-    public final static int LEFT_TALON_LEADER = 2;
-=======
     ///////////// CAN Bus IDs  ////////////////
 	// public final static int INTAKE_INDEXER = ;
 	// public final static int MIDDLE_INDEXER = ;
@@ -38,26 +33,12 @@ public final class Constants {
 	public final static int SHOOTER_INDEXER = 9;
 	public final static int SHOOTER_FX = 10;
 	public final static int CLIMER_SRX = 11;
->>>>>>> everything
 
 	//////////////////// DIO /////////////////////
 	public final static int INDEXER_INTAKE_BEAM = 2;
 	public final static int INDEXER_INTAKE_MID = 1;
 	public final static int INDEXER_INTAKE_SHOOTER = 0;
 
-<<<<<<< HEAD
-    ///////////// Drive Train Values ////////////
-    public final static double kControllerDeadband = .05;
-    public final static int DRIVER_RIGHT_AXIS = 2;
-    public final static int DRIVER_LEFT_AXIS = 1;
-
-	/////////////// Vision Values ///////////////
-	public final static double CAMERA_HEIGHT_METERS = 0.9144;
-	public final static double CAMERA_PITCH_RADIANS = 0.785398;
-	public final static double TARGET_HEIGHT_METERS = 2.64;
-
-	////////// Talon Specific Values ////////////
-=======
     ///////////// Drive Train Values /////////////
     public final static double kControllerDeadband = .1;
     public final static int DRIVER_RIGHT_AXIS = 4;
@@ -67,12 +48,12 @@ public final class Constants {
 	public final static double INDEXER_SPEED = 0.5;
 
 	/////////// Vision Specific Values ///////////
-	public final static double CAMERA_HEIGHT_METERS = 0;
-	public final static double CAMERA_PITCH_RADIANS = 0;
-	public final static double TARGET_HEIGHT_METERS = 0;
+	public final static double CAMERA_HEIGHT_METERS = 0.9144;
+	public final static double CAMERA_PITCH_RADIANS = 0.785398;
+	public final static double TARGET_HEIGHT_METERS = 2.64;
+	public final static double TAREGET_DISTANCE_CLOSE = 2.17805;
 
     //////////// Talon Specific Values ///////////
->>>>>>> everything
     /**
 	 * Using the configSelectedFeedbackCoefficient() function, scale units to 3600 per rotation.
 	 * This is nice as it keeps 0.1 degrees of resolution, and is fairly intuitive.

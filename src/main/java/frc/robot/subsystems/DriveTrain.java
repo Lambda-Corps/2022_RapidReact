@@ -40,6 +40,7 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -92,6 +93,10 @@ public class DriveTrain extends SubsystemBase {
 	SlewRateLimiter m_forward_limiter, m_rotation_limiter;
 	private double m_drive_absMax;
 	NetworkTableEntry m_left_output, m_right_output, m_forward_rate, m_rotation_rate, m_drive_max;
+
+	/////////// Vision PID Controllers ///////////
+	PIDController m_speedPidController, m_turnPidController;
+	double visionDrivekP, visionDrivekD, visionTurnkP, visionTurnkD;
 
   	/** Creates a new DriveTrain. */
  	public DriveTrain() {
@@ -244,6 +249,9 @@ public class DriveTrain extends SubsystemBase {
 		  m_left_output =  driveTable.getEntry("Left Output");
 		  m_right_output = driveTable.getEntry("Right Output");
 		  m_gyro.reset();
+
+		  m_speedPidController = new PIDController(visionDrivekD, 0, visionDrivekD);
+		  m_turnPidController = new PIDController(visionTurnkP, 0, visionTurnkD);
   	}
 
 	@Override
@@ -648,5 +656,22 @@ public class DriveTrain extends SubsystemBase {
 
 	public Field2d getField(){
 		return m_2dField;
+	}
+
+	public void resetVisionPidController() {
+		m_speedPidController.reset();
+		m_turnPidController.reset();
+	}
+
+	public void visionDrive(double range,  double yaw, double goalInMeters) {
+		double forwardspeed = 0;
+		double turnspeed = 0;
+		
+		if (range > 0) {
+			forwardspeed = -m_speedPidController.calculate(range, goalInMeters);
+			turnspeed = -m_turnPidController.calculate(yaw, 0);
+		}
+
+		teleop_drive(forwardspeed, turnspeed);
 	}
 }

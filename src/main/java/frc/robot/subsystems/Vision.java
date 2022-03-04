@@ -38,38 +38,25 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
-    getTargetStatus();
-    getPhotonTargets();
   }
 
-  public boolean getTargetStatus() {
+  private boolean getTargetStatus() {
     var result = m_camera.getLatestResult();
      hasTargets = result.hasTargets();
     return hasTargets;
   }
 
-  private void getPhotonTargets() {
+  public double[] getTargetRange() {
+    double[] range = {0,0};
     var result = m_camera.getLatestResult();
     if (hasTargets == true) {
-      List<PhotonTrackedTarget> targets = result.getTargets();
-      m_target = result.getBestTarget();
-      
-      double yaw = m_target.getYaw();
-      double pitch = m_target.getPitch();
-
-      targetPitch = m_visionTab.add("Target Y", pitch).getEntry();
-      targetYaw = m_visionTab.add("Target X", yaw).getEntry();
-
-      if (result.hasTargets()) {
-        double range = PhotonUtils.calculateDistanceToTargetMeters(CAMERA_HEIGHT_METERS, TARGET_HEIGHT_METERS, CAMERA_PITCH_RADIANS, Units.degreesToRadians(pitch));
-        targetRange = m_visionTab.add("Target Range", range).getEntry();
-      }
-
-      int listSize = targets.size();
-      targetCount = m_visionTab.add("Target Count", listSize).getEntry();
+      range[0] = PhotonUtils.calculateDistanceToTargetMeters(CAMERA_HEIGHT_METERS, TARGET_HEIGHT_METERS, CAMERA_PITCH_RADIANS, Units.degreesToRadians(result.getBestTarget().getPitch()));
+      range[1] = result.getBestTarget().getYaw();
     }
+
+    return range;
   }
-  
+
   public void setTeamPipeline() {
     int pipelineIndex;
     String allianceColor;
