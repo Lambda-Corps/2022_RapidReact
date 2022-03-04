@@ -13,6 +13,7 @@ import static frc.robot.Constants.MID_INDEXER;
 import static frc.robot.Constants.SHOOTER_INDEXER;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.networktables.NetworkTable;
@@ -23,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Indexer extends SubsystemBase {
   private final double INTAKE_SHOOT_SPEED = .27; // measured testing
+  private final double INTAKE_INTAKE_SPEED = .43;
 
   public enum StorageState {
     EMPTY, 
@@ -43,13 +45,18 @@ public class Indexer extends SubsystemBase {
   private DigitalInput m_bottomBeam, m_topBeam, m_midbeam;
   private StorageState m_storageStatus;
 
-  private boolean m_bottomBeamState, m_topBeamState, m_midBeamState;
+  private boolean m_bottomBeamState, m_topBeamState, m_midBeamState, m_IntakingBalls;
+  private double m_ball_count;
 
   /** Creates a new Indexer. */
   public Indexer() {
     m_intakeIndex = new TalonSRX(INTAKE_INDEXER);
     m_midIndex = new TalonSRX(MID_INDEXER);
     m_shooterIndex = new TalonSRX(SHOOTER_INDEXER);
+
+    m_midIndex.setNeutralMode(NeutralMode.Brake);
+    m_intakeIndex.setNeutralMode(NeutralMode.Brake);
+    m_shooterIndex.setNeutralMode(NeutralMode.Brake);
 
     // m_bottomBeam = new DigitalInput(Constants.BEAM_BREAKER_RECEIVE_BOTTOM);
     // m_topBeam = new DigitalInput(Constants.BEAM_BREAKER_RECEIVE_TOP);
@@ -66,6 +73,9 @@ public class Indexer extends SubsystemBase {
     m_midIndexerEntry = driveTable.getEntry("MidBreak");
     m_shooterIndexerEntry = driveTable.getEntry("ShootBreak");
     m_BallCountEntry = driveTable.getEntry("Ball Count");
+
+    m_IntakingBalls = false;
+    m_ball_count = 0;
   }
 
   @Override
@@ -78,19 +88,18 @@ public class Indexer extends SubsystemBase {
     m_shooterIndexerEntry.setBoolean(top);
 
     // Calculate How many balls we have
-    double count = 0;
     if( !bottom && !top ){
       // Should mean two balls
-      count = 2;
+      m_ball_count = 2;
     }
     else if ( (!bottom && top )|| (bottom && !top) ) {
-      count = 1;
+      m_ball_count = 1;
     }
     else {
       // Probably some malfunction or none
-      count = 0;
+      m_ball_count = 0;
     }
-    m_BallCountEntry.setNumber(count);
+    m_BallCountEntry.setNumber(m_ball_count);
   }
 
   public void checkIndexState() {
@@ -118,38 +127,38 @@ public class Indexer extends SubsystemBase {
     }
   }
 
-  public void resolveIndexer(boolean forceSpinBottom) {
+  public void resolveIndexer() {
+    // Set the default speeds to off.
+    double intake_speed, mid_speed, shooter_speed;
+    intake_speed = mid_speed = shooter_speed = 0;
+
     switch(m_storageStatus) {
-      case EMPTY:
-        if (forceSpinBottom) {
-          m_intakeIndex.set(ControlMode.PercentOutput, 0.8);
-        }else {
-          m_intakeIndex.set(ControlMode.PercentOutput, 0);
-        }
-        m_midIndex.set(ControlMode.PercentOutput, 0);
-        m_shooterIndex.set(ControlMode.PercentOutput, 0);
-        break;
       case BOTTOMONLY:
       case BOTTOMTWO:
-        m_intakeIndex.set(ControlMode.PercentOutput, INDEXER_SPEED);
-        m_midIndex.set(ControlMode.PercentOutput, INDEXER_SPEED);
-        m_shooterIndex.set(ControlMode.PercentOutput, 0);
+        intake_speed = INDEXER_SPEED;
+        mid_speed = INDEXER_SPEED;
         break;
       case MIDDLEONLY:
-        m_intakeIndex.set(ControlMode.PercentOutput, 0);
-        m_midIndex.set(ControlMode.PercentOutput, INDEXER_SPEED);
-        m_shooterIndex.set(ControlMode.PercentOutput, 0);
+        mid_speed = INDEXER_SPEED;
         break;
+      case EMPTY:
       case TOPTWO:
       case TOPONLY:
       case TOPANDBOTTOM:
       case FULL:
       default:
-        m_intakeIndex.set(ControlMode.PercentOutput, 0);
-        m_midIndex.set(ControlMode.PercentOutput, 0);
-        m_shooterIndex.set(ControlMode.PercentOutput, 0);
+      intake_speed = 0;
+      mid_speed = 0;
+      shooter_speed = 0;
         break;
     }
+
+    if(m_IntakingBalls){
+      intake_speed = INTAKE_INTAKE_SPEED;
+    }
+    m_intakeIndex.set(ControlMode.PercentOutput, intake_speed);
+    m_midIndex.set(ControlMode.PercentOutput, mid_speed);
+    m_shooterIndex.set(ControlMode.PercentOutput, shooter_speed);
   }
 
   /*
@@ -176,5 +185,23 @@ public class Indexer extends SubsystemBase {
     m_intakeIndex.set(ControlMode.PercentOutput, -INTAKE_SHOOT_SPEED);
     m_midIndex.set(ControlMode.PercentOutput, -INTAKE_SHOOT_SPEED);
     m_shooterIndex.set(ControlMode.PercentOutput, -INTAKE_SHOOT_SPEED);
+  }
+
+  public void setIntakingBallsTrue(){
+    m_IntakingBalls = true;
+  }
+
+  public void setIntakingBallsFalse(){
+    m_IntakingBalls = false;
+  }
+
+  public boolean isFull(){
+    return m_ball_count == 2;
+  }
+
+  public void stopMotors(){
+    m_intakeIndex.set(ControlMode.PercentOutput, 0);
+    m_midIndex.set(ControlMode.PercentOutput, 0);
+    m_shooterIndex.set(ControlMode.PercentOutput, 0);
   }
 }

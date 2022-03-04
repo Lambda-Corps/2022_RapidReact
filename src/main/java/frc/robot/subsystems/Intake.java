@@ -70,17 +70,12 @@ public class Intake extends SubsystemBase {
   private final int ARM_SLOT_UP   = 1;
   private final int ARM_SLOT_HOLD = 2;
 
+  private final double INTAKE_WHEEL_SPEEDS = .8;
+
   public Intake() {
     m_faults = new Faults();
     m_armMotor = new TalonSRX(INTAKE_ARM_TALON);
     m_intakeMotor = new TalonSRX(INTAKE_TALON);
-
-    m_intakeTab = Shuffleboard.getTab("Intake");
-    m_forwardSoftLimit = m_intakeTab.add("unusedname", 0)
-                                    .withPosition(0, 0)
-                                    .withSize(1, 1)
-                                    .getEntry();
-    m_armEncoder = m_intakeTab.add("Arm Encoder Position", 0).getEntry();
     
     m_intakeMotor.configFactoryDefault();
     m_intakeMotor.setInverted(false);
@@ -227,9 +222,13 @@ public class Intake extends SubsystemBase {
     return m_armMotor.getSelectedSensorPosition(0);
     }
   
-  public void intakeWheelsMotorOn(double speed){
-    m_intakeMotor.set(ControlMode.PercentOutput, speed);
-  }
+    public void intakeWheelsMotorOn(double speed){
+      m_intakeMotor.set(ControlMode.PercentOutput, speed);
+    }
+
+    public void collectBalls(){
+      m_intakeMotor.set(ControlMode.PercentOutput, INTAKE_WHEEL_SPEEDS);
+    }
 
   public void stopIntakeMotor(){
     m_intakeMotor.set(ControlMode.PercentOutput, 0);

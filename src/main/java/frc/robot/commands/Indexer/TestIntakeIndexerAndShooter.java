@@ -85,7 +85,7 @@ public class TestIntakeIndexerAndShooter extends CommandBase {
     m_intake.intakeWheelsMotorOn(m_intakeWheelSpeed);
     m_shooter.test_shooter_percent(m_flywheelSpeed);
     m_indexer.checkIndexState();
-    m_indexer.resolveIndexer(true);
+    m_indexer.resolveIndexer();
   }
 
   // Called once the command ends or is interrupted.

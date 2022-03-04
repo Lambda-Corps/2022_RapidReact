@@ -4,89 +4,116 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.SHOOTER_FX;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import static frc.robot.Constants.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class Shooter extends SubsystemBase {
-
-    private final TalonFX m_shooter;
-    private double k_MaxShooterOutput = .6;
-
-    // Velocity PID calculations //
-    /*
-    * Shooting at ~ 40% is a good trajectory in simple testing
-    * 40% = 7670 ticks per 100 ms <-- measured in phoenix tuner
-    * kF = (.40 * 1023) / 7670 = .0534
-    * 
-    * We want KP to respond with no more than 20% of an increase to recover
-    * if we're more than one motor rotation behind
-    * kP = (.20 * 1023) / (ticks per rotation * gear ratio)
-    * kP = (.20 * 1023) / (2048 * 1:1) = .0999
-    */
-    private double k_kF = .0534;
-    private double k_kP = .0999; // TODO update the code with the measured values from testing
-    private double k_kD = 0;
-    private double k_kI = 0;
-
-    /** Creates a new Shooter. */
-    public Shooter() {
-        m_shooter = new TalonFX(SHOOTER_FX);
-        m_shooter.configFactoryDefault();
-
-        TalonFXConfiguration config = new TalonFXConfiguration();
-
-        config.peakOutputReverse = 0; // Don't drive backward.
-        config.nominalOutputReverse = 0;
-        config.nominalOutputForward = 0;
-        config.peakOutputForward = k_MaxShooterOutput;
-        config.slot0.kF = k_kF;
-        config.slot0.kP = k_kP;
-        config.slot0.kI = k_kI;
-        config.slot0.kD = k_kD;
-        // config.statorCurrLimit = new StatorCurrentLimitConfiguration(true, 20, 25, 1.0);
-
-        
-        m_shooter.configAllSettings(config);
-
-        // Invert the motor so forward shoots
-        m_shooter.setInverted(true);
-    }
-
-    @Override
-    public void periodic() {
-    // This method will be called once per scheduler run
-    }
-
-    public void update_shooter_pid_config(double kf, double kp, double ki, double kd){
-        return;
-    }
+  public enum ShotDistance {
+    Field_Wall, InitiationLine, FrontTarmack
+  }
+  private final WPI_TalonFX m_Shooter;
+  private final TalonFXConfiguration shooterConfig;
+  private int m_shooter_set_point;
     
-    public void update_shooter_max_output(double max){
-        k_MaxShooterOutput = max;
-    }
+  /** Creates a new Shooter. */
+  public Shooter() {
+    m_Shooter = new WPI_TalonFX(SHOOTER_FX);
+    
+    shooterConfig = new TalonFXConfiguration();
+    // This is the configuration for the initation line shot
+    shooterConfig.slot0.kF = kGains_InitiationLine.kF;
+    shooterConfig.slot0.kP = kGains_InitiationLine.kP;
+    shooterConfig.slot0.kI = kGains_InitiationLine.kI;
+    shooterConfig.slot0.kD = kGains_InitiationLine.kD;
+    shooterConfig.slot0.integralZone = kGains_InitiationLine.kIzone;
+    shooterConfig.slot0.closedLoopPeakOutput = kGains_InitiationLine.kPeakOutput;
 
-    public void test_shooter_percent(double speed){
-        m_shooter.set(ControlMode.PercentOutput, speed);
-    }
+    // Configuration to shoot from up against the wall
+    shooterConfig.slot1.kF = kGains_Field_Wall.kF;
+    shooterConfig.slot1.kP = kGains_Field_Wall.kP;
+    shooterConfig.slot1.kI = kGains_Field_Wall.kI;
+    shooterConfig.slot1.kD = kGains_Field_Wall.kD;
+    shooterConfig.slot1.integralZone = kGains_Field_Wall.kIzone;
+    shooterConfig.slot1.closedLoopPeakOutput = kGains_Field_Wall.kPeakOutput;
 
-    public void velocityPID(double m_setpoint, double m_tolerance) {
-        m_shooter.set(ControlMode.Velocity, m_setpoint);
+    // Configuration to shoot from the front of the TARMACK
+    shooterConfig.slot2.kF = kGains_FrontTarmack.kF;
+    shooterConfig.slot2.kP = kGains_FrontTarmack.kP;
+    shooterConfig.slot2.kI = kGains_FrontTarmack.kI;
+    shooterConfig.slot2.kD = kGains_FrontTarmack.kD;
+    shooterConfig.slot2.integralZone = kGains_FrontTarmack.kIzone;
+    shooterConfig.slot2.closedLoopPeakOutput = kGains_FrontTarmack.kPeakOutput;
+    
+    // Setup the open loop limits so the drivers can't mess it up
+    shooterConfig.peakOutputReverse = 0;
+    shooterConfig.peakOutputForward = 1;
+    shooterConfig.nominalOutputForward = 0;
 
-    }
+    m_Shooter.configAllSettings(shooterConfig);
 
-    public void configureVelocityPID(double kp, double ki, double kd, double kf) {
-        m_shooter.config_kI(0, kp);
-        m_shooter.config_kI(0, ki);
-        m_shooter.config_kD(0, kd);
-        m_shooter.config_kF(0, kf);
+    m_Shooter.setInverted(false);
+    m_Shooter.setSensorPhase(false);
+    m_Shooter.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
+    // config bottom motor to follow top
+    m_Shooter.setInverted(false);
+    m_Shooter.follow(m_Shooter);
+    m_shooter_set_point = SHOOTER_SETPOINT_LINE;
+    // Default to the initiation line
+  }
+  public void stopMotors() {
+    m_Shooter.set(ControlMode.PercentOutput, 0);
+  }
+  public void velocityPID(double m_setpoint){
+    m_Shooter.set(ControlMode.Velocity, m_setpoint);
+  }
+  public void configureVelocityPID(double kp, double ki, double kd, double kf) {
+    m_Shooter.selectProfileSlot(SHOOTER_SLOT_INITIATION_LINE, PID_PRIMARY);
+    m_Shooter.config_kP(SHOOTER_SLOT_INITIATION_LINE, kp);
+    m_Shooter.config_kI(SHOOTER_SLOT_INITIATION_LINE, ki);
+    m_Shooter.config_kD(SHOOTER_SLOT_INITIATION_LINE, kd);
+    m_Shooter.config_kF(SHOOTER_SLOT_INITIATION_LINE, kf);
+  }
+  public void setShotDistance(ShotDistance distance){
+    switch(distance){
+      case InitiationLine:
+        // Config the shooter for initiation line
+        m_Shooter.selectProfileSlot(SHOOTER_SLOT_INITIATION_LINE, PID_PRIMARY);
+        // Set the setpoint
+        m_shooter_set_point = SHOOTER_SETPOINT_LINE;
+        // Set the pistons
+        break;
+      case Field_Wall:
+        // Config the shooter for initiation line
+        m_Shooter.selectProfileSlot(SHOOTER_SLOT_Field_Wall, PID_PRIMARY);
+        // Set the setpoint
+        m_shooter_set_point = SHOOTER_SETPOINT_WALL;
+        // Set the pistons
+        break;
+      case FrontTarmack:
+        // Config the shooter for initiation line
+        m_Shooter.selectProfileSlot(SHOOTER_SLOT_FRONT_TARMACK, PID_PRIMARY);
+        // Set the setpoint
+        m_shooter_set_point = SHOOTER_SETPOINT_TARMACK;
+        // Set the pistons
+        break;
     }
+    }
+  @Override
+  public void periodic() {
 
-    public void stopmotor() {
-        m_shooter.set(ControlMode.PercentOutput, 0);
-    }
+
+
+
+    // This method will be called once per scheduler run
+  }
 }
