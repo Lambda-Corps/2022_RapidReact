@@ -86,7 +86,7 @@ public class ShooterPIDTuning extends CommandBase {
   @Override
   public void execute() {
     // Drive the shooter motors, as well as the conveyor to start the 
-    m_shooter.velocityPID(m_setpoint, m_tolerance);
+    m_shooter.velocityPID(m_setpoint);
     if( cmdTimer.hasElapsed(m_indexerDelay)){
       // Turn on the conveyor motor after the delay has been meet.
       m_indexer.testIndexDriving(m_indexerSpeed, m_indexerSpeed, m_indexerSpeed);
@@ -96,7 +96,7 @@ public class ShooterPIDTuning extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_shooter.stopmotor();
+    m_shooter.stopMotor();
     m_indexer.testIndexDriving(0, 0, 0);
   }
 

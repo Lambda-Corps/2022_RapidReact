@@ -93,7 +93,7 @@ public class TestIntakeIndexerAndShooter extends CommandBase {
   public void end(boolean interrupted) {
     m_indexer.testIndexDriving(0, 0, 0);
     m_intake.stopIntakeMotor();
-    m_shooter.test_shooter_percent(0);
+    m_shooter.stopMotor();
   }
 
   // Returns true when the command should end.
