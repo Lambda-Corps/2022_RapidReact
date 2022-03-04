@@ -3,18 +3,26 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.*;
 
+import java.net.PortUnreachableException;
+
 public class Vision extends SubsystemBase {
-  PhotonCamera m_camera;
+  int LIMELIGHTPIPELINE = 0;
+  int HD3000PIPELINE = 0;
+
+  PhotonCamera m_HD3000 = new PhotonCamera("lifecam");
+  PhotonCamera m_limelight = new PhotonCamera("eagletron");
 
   ShuffleboardTab m_visionTab;
-  NetworkTableEntry m_tx, m_ty, m_ta, m_bestTarget, targetPitch, targetYaw, targetRange, targetCount, targetType;
+  NetworkTableEntry m_tx, m_ty, m_ta, m_bestTarget, targetPitch, targetYaw, targetRange, targetCount, targetType, cargoTarget, hubTarget;
   PhotonTrackedTarget m_target;
 
   double pitch, yaw, area;
@@ -22,27 +30,62 @@ public class Vision extends SubsystemBase {
   private boolean hasTargets;
 
   public Vision() {
-    m_camera = new PhotonCamera("eagletron");
-    
-    m_visionTab = Shuffleboard.getTab("Vision");
-    m_visionTab.addBoolean("Target Found", this::getTargetStatus);
+      m_limelight.setPipelineIndex(LIMELIGHTPIPELINE);
+      m_HD3000.setPipelineIndex(HD3000PIPELINE);
 
-    targetType = m_visionTab.add("Target Type", " ").getEntry();
+      // double ballcamDiagFOV = 75.0; // degrees
+      // double shootercamDiagFOV = 75.0; // degrees
+      // Transform2d ballcameraToRobot = new Transform2d(new Translation2d(0.0, 0.0), new Rotation2d()); // meters
+      // Transform2d shootercameraToRobot = new Transform2d(new Translation2d(0.0, 0.0), new Rotation2d()); // meters
+      // double maxLEDRange = 20;          // meters
+      // int ballcamResolutionWidth = 640;     // pixels
+      // int ballcamResolutionHeight = 480;    // pixels
+      // double ballminTargetArea = 10;        // square pixels
+      // int shootercamResolutionWidth = 640;     // pixels
+      // int shootercamResolutionHeight = 480;    // pixels
+      // double shooterminTargetArea = 10;        // square pixels
+    
+    NetworkTableInstance.getDefault().getTable("photonvision").getEntry("version").setValue("v2022.1.4");
+    
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Drive");
+    cargoTarget = table.getEntry("BallTarget");
+    hubTarget = table.getEntry("HighTarget");
   }
 
   @Override
   public void periodic() {
+    getCargoTargetStatus();
+    getHighTargetStatus();
   }
 
-  private boolean getTargetStatus() {
-    var result = m_camera.getLatestResult();
+  private boolean getHighTargetStatus() {
+    var result = m_limelight.getLatestResult();
      hasTargets = result.hasTargets();
+     hubTarget.setBoolean(hasTargets);
     return hasTargets;
   }
 
-  public double[] getTargetRange() {
+  private boolean getCargoTargetStatus() {
+    var result = m_HD3000.getLatestResult();
+     hasTargets = result.hasTargets();
+     cargoTarget.setBoolean(hasTargets);
+    return hasTargets;
+  }
+
+  public double[] getHubTargetRange() {
     double[] range = {0,0};
-    var result = m_camera.getLatestResult();
+    var result = m_limelight.getLatestResult();
+    if (hasTargets == true) {
+      range[0] = PhotonUtils.calculateDistanceToTargetMeters(CAMERA_HEIGHT_METERS, TARGET_HEIGHT_METERS, CAMERA_PITCH_RADIANS, Units.degreesToRadians(result.getBestTarget().getPitch()));
+      range[1] = result.getBestTarget().getYaw();
+    }
+
+    return range;
+  }
+
+  public double[] getCargoTargetRange() {
+    double[] range = {0,0};
+    var result = m_HD3000.getLatestResult();
     if (hasTargets == true) {
       range[0] = PhotonUtils.calculateDistanceToTargetMeters(CAMERA_HEIGHT_METERS, TARGET_HEIGHT_METERS, CAMERA_PITCH_RADIANS, Units.degreesToRadians(result.getBestTarget().getPitch()));
       range[1] = result.getBestTarget().getYaw();
@@ -55,20 +98,15 @@ public class Vision extends SubsystemBase {
     int pipelineIndex;
     String allianceColor;
     if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-      pipelineIndex = 0;
+      pipelineIndex = 1;
       allianceColor = "Blue Ball";
       targetType.setString(allianceColor);
-      m_camera.setPipelineIndex(pipelineIndex);
+      m_HD3000.setPipelineIndex(pipelineIndex);
     }else if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
-      pipelineIndex = 1;
+      pipelineIndex = 0;
       allianceColor = "Red Ball";
       targetType.setString(allianceColor);
-      m_camera.setPipelineIndex(pipelineIndex);
+      m_HD3000.setPipelineIndex(pipelineIndex);
     }
-  }
-
-  public void targetMode(int targetIndex) {
-    m_camera.setPipelineIndex(targetIndex);
-    targetType.setString("Hub");
   }
 }
