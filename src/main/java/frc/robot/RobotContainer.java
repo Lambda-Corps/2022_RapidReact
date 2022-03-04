@@ -4,18 +4,12 @@
 
 package frc.robot;
 
-<<<<<<< Updated upstream
 import java.util.Map;
 
 import edu.wpi.first.cscore.HttpCamera;
-=======
-import com.ctre.phoenix.music.Orchestra;
-
->>>>>>> Stashed changes
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,7 +27,6 @@ import frc.robot.commands.default_commands.IndexerDefaultCommand;
 import frc.robot.commands.drivetrain.DriveMM;
 import frc.robot.commands.drivetrain.TurnToAngle;
 import frc.robot.commands.shooter.ShooterPIDTuning;
-import frc.robot.commands.Play_Eye_of_the_tiger;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
@@ -52,12 +45,7 @@ public class RobotContainer {
   Indexer m_indexer;
   Intake m_intake;
   Shooter m_shooter;
-<<<<<<< Updated upstream
   LEDsubsystem m_ledsubsystem;
-=======
-  Orchestra m_orchestra;
-
->>>>>>> Stashed changes
   // OI
   XboxController m_driver_controller;
 
@@ -68,11 +56,7 @@ public class RobotContainer {
     m_indexer = new Indexer();
     m_intake = new Intake();
     m_shooter = new Shooter();
-<<<<<<< Updated upstream
     m_ledsubsystem = new LEDsubsystem();
-=======
-    m_orchestra = new Orchestra();
->>>>>>> Stashed changes
 
     m_driveTrain.setDefaultCommand(new DriveTrainDefaultCommand(m_driveTrain, m_driver_controller));
     m_indexer.setDefaultCommand(new IndexerDefaultCommand(m_indexer));
@@ -80,23 +64,6 @@ public class RobotContainer {
     // Build up the driver's heads up display
     buildShuffleboard();
 
-<<<<<<< Updated upstream
-=======
-    Shuffleboard.getTab("Default Drive Tab").add("DriveForSeconds", new DriveForSecondsFromShuffleboard(m_driveTrain))
-                                            .withPosition(4, 1)
-                                            .withSize(2, 1);         
-    Shuffleboard.getTab("Drive MM Testing").add(new DriveMM(m_driveTrain, 0));
-    Shuffleboard.getTab("Combined Test").add(new TestIntakeIndexerAndShooter(m_indexer, m_intake, m_shooter)).withPosition(0, 1).withSize(2, 1);
-    Shuffleboard.getTab("Combined Test").add(new SetForwardLimit(m_intake)).withPosition(0, 3).withSize(2, 1);
-    Shuffleboard.getTab("Arm Drive Testing").add("Test Arm Drive", new ArmDriveTest(m_intake)).withPosition(0, 1);
-    Shuffleboard.getTab("Arm MM Testing").add("ReSet Intake Arm", new SetArm(m_intake)).withPosition(0, 3).withSize(2, 1);
-    Shuffleboard.getTab("Arm MM Testing").add("Extend Intake", new ArmMM(m_intake, Intake.INTAKE_ARM_EXTEND)).withPosition(0, 0).withSize(2,1);
-    Shuffleboard.getTab("Arm MM Testing").add("Retract Intake", new ArmMM(m_intake, Intake.INTAKE_ARM_RETRACT)).withPosition(2,0).withSize(2,1);
-    Shuffleboard.getTab("Arm MM Testing").add(new ResetIntakeArmEncoder(m_intake)).withPosition(0, 2).withSize(2, 1);
-    Shuffleboard.getTab("ShooterPID").add("Shoot" , new ShooterPIDTuning(m_shooter, m_indexer)).withPosition(0, 3);
-    Shuffleboard.getTab("Orchestra").add("Play Music", new Play_Eye_of_the_tiger(m_orchestra)).withPosition(1,1);
-    // SmartDashboard.getNumber("Target Angle", 0);
->>>>>>> Stashed changes
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -180,5 +147,9 @@ public class RobotContainer {
 
 
 
+  }
+
+  public void buildDriverTestTab(){
+    
   }
 }
