@@ -6,10 +6,6 @@ package frc.robot;
 
 import java.util.Map;
 
-import javax.swing.text.PlainDocument;
-
-import com.ctre.phoenix.music.Orchestra;
-
 import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -19,7 +15,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.Play_Eye_of_the_tiger;
 import frc.robot.commands.Indexer.EjectBalls;
 import frc.robot.commands.Indexer.TestIntakeIndexerAndShooter;
 import frc.robot.commands.Intake.ArmMM;
@@ -30,7 +25,6 @@ import frc.robot.commands.Intake.SetArm;
 import frc.robot.commands.Intake.SetForwardLimit;
 import frc.robot.commands.default_commands.DriveTrainDefaultCommand;
 import frc.robot.commands.default_commands.IndexerDefaultCommand;
-import frc.robot.commands.drivetrain.DriveForSecondsFromShuffleboard;
 import frc.robot.commands.drivetrain.DriveMM;
 import frc.robot.commands.drivetrain.TurnToAngle;
 import frc.robot.commands.shooter.Shoot;
@@ -61,7 +55,7 @@ public class RobotContainer {
 
   // OI
   XboxController m_driver_controller, m_partner_controller;
-  JoystickButton m_d_a, m_d_b, m_d_rb, m_d_lb, m_d_rs, m_d_ls, m_p_a, m_p_b, m_p_rb, m_d_sel, m_p_x, m_d_y;
+  JoystickButton m_d_a, m_d_b, m_d_rb, m_d_lb, m_d_rs, m_d_ls, m_p_a, m_p_b, m_p_rb, m_d_sel, m_p_start, m_d_y;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -86,7 +80,7 @@ public class RobotContainer {
     m_p_a = new JoystickButton(m_partner_controller, XboxController.Button.kA.value);
     m_p_b = new JoystickButton(m_partner_controller, XboxController.Button.kB.value);
     m_p_rb = new JoystickButton(m_partner_controller, XboxController.Button.kRightBumper.value);
-    m_p_x = new JoystickButton(m_partner_controller, XboxController.Button.kX.value);
+    m_p_start = new JoystickButton(m_partner_controller, XboxController.Button.kStart.value);
 
     m_driveTrain.setDefaultCommand(new DriveTrainDefaultCommand(m_driveTrain, m_driver_controller));
     m_indexer.setDefaultCommand(new IndexerDefaultCommand(m_indexer));
@@ -105,6 +99,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    // Driver Bindings
     m_d_a.whenHeld(new DriveWithVisionClose(m_driveTrain, m_vision));
     m_d_b.whenHeld(new DriveWithVisionFar(m_driveTrain, m_vision));
     m_d_rb.whenHeld(new PrintCommand("Driving Inverted"));
@@ -113,11 +108,12 @@ public class RobotContainer {
     m_d_rs.whenPressed(new PrintCommand("Climber Up"));
     m_d_ls.whenPressed(new PrintCommand("Climber Down"));
     m_d_y.whenPressed(new PrintCommand("Climber Cancelled"));
-    
+
+    // Partner Bindings
     m_p_a.whenPressed(new Shoot/*Long Shot*/()); 
     m_p_b.whenPressed(new Shoot/*Short Shot*/());
     m_p_rb.whileHeld(new EjectBalls(m_indexer));
-    m_p_x.whenPressed(new ResetIntakeArmEncoder(m_intake));
+    m_p_start.whenPressed(new ResetIntakeArmEncoder(m_intake));
   }
 
   /**
