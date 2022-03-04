@@ -39,13 +39,18 @@ public class DriveTrainDefaultCommand extends CommandBase {
     public void execute() {
         double turn, forward;
         if(Robot.isSimulation()){
-            turn = m_driverController.getRawAxis(0); // Right X
+            turn = m_driverController.getRawAxis(DRIVER_RIGHT_AXIS); // Right X
             forward  = -m_driverController.getRawAxis(DRIVER_LEFT_AXIS); // Left Y
         }
         else {
             // Axises are inverted, negate them so positive is forward
             turn = m_driverController.getRawAxis(DRIVER_RIGHT_AXIS); // Right X
             forward  = -m_driverController.getRawAxis(DRIVER_LEFT_AXIS); // Left Y
+        }
+
+        if (m_driverController.getRightBumper()) {
+            // flip controls activated
+            forward = -forward;
         }
 
         m_driveTrain.teleop_drive(forward, turn);
