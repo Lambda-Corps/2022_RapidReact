@@ -4,19 +4,21 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.Constants.*;
+import static frc.robot.Constants.PID_PRIMARY;
+import static frc.robot.Constants.SHOOTER_FX;
+import static frc.robot.Constants.kGains_CloseShot;
+import static frc.robot.Constants.kGains_MidTarmac;
+import static frc.robot.Constants.kGains_ShooterGains;
+import static frc.robot.Constants.kGains_TarmacLine;
+import static frc.robot.Constants.kSlot_CloseShot;
+import static frc.robot.Constants.kSlot_MidTarmac;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
-import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
   public enum ShotDistance {
@@ -86,6 +88,10 @@ public class Shooter extends SubsystemBase {
   }
   public void velocityPID(double m_setpoint){
     m_Shooter.set(ControlMode.Velocity, m_setpoint);
+  }
+
+  public void velocityPID(){
+    m_Shooter.set(ControlMode.Velocity, m_shooter_set_point);)
   }
   public void configureVelocityPID(double kp, double ki, double kd, double kf) {
     m_Shooter.selectProfileSlot(kSlot_CloseShot, PID_PRIMARY);
