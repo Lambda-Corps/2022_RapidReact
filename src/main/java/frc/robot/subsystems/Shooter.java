@@ -21,7 +21,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
-  public enum ShotDistance {
+  public static enum ShotDistance {
     MidTarmac, ClosestShot, TarmacLine
   }
   private final WPI_TalonFX m_Shooter;

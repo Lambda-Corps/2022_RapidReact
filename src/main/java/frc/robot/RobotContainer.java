@@ -16,10 +16,15 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.Play_Eye_of_the_tiger;
+import frc.robot.commands.climber.HighBarClimb;
+import frc.robot.commands.climber.LowBarClimb;
+import frc.robot.commands.climber.TestClimberDown;
+import frc.robot.commands.climber.TestClimberUp;
 import frc.robot.commands.Indexer.EjectBalls;
 import frc.robot.commands.Indexer.TestIntakeIndexerAndShooter;
 import frc.robot.commands.Intake.ArmMM;
@@ -28,6 +33,10 @@ import frc.robot.commands.Intake.DropIntakeAndCollectBalls;
 import frc.robot.commands.Intake.ResetIntakeArmEncoder;
 import frc.robot.commands.Intake.SetArm;
 import frc.robot.commands.Intake.SetForwardLimit;
+import frc.robot.commands.autonomous.fourBall;
+import frc.robot.commands.autonomous.oneBall;
+import frc.robot.commands.autonomous.twoBallLeft;
+import frc.robot.commands.autonomous.twoBallRight;
 import frc.robot.commands.default_commands.DriveTrainDefaultCommand;
 import frc.robot.commands.default_commands.IndexerDefaultCommand;
 import frc.robot.commands.drivetrain.DriveForSecondsFromShuffleboard;
@@ -37,6 +46,7 @@ import frc.robot.commands.shooter.Shoot;
 import frc.robot.commands.shooter.ShooterPIDTuning;
 import frc.robot.commands.vision.DriveWithVisionClose;
 import frc.robot.commands.vision.DriveWithVisionFar;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
@@ -58,13 +68,21 @@ public class RobotContainer {
   Shooter m_shooter;
   LEDsubsystem m_ledsubsystem;
   Vision m_vision;
+  Climber m_climber;
 
   // OI
   XboxController m_driver_controller, m_partner_controller;
   JoystickButton m_d_a, m_d_b, m_d_rb, m_d_lb, m_d_rs, m_d_ls, m_p_a, m_p_b, m_p_rb, m_d_sel, m_p_x, m_d_y;
+  //auto chooser
+  private SendableChooser<Command> m_auto_chooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    m_auto_chooser = new SendableChooser<Command>();
+    m_auto_chooser.addOption("1 ball", new oneBall(m_driveTrain, m_shooter, m_intake, m_indexer));
+    m_auto_chooser.addOption("Left Tarmac, 2 ball", new twoBallLeft(m_driveTrain, m_shooter, m_intake, m_indexer));
+    m_auto_chooser.addOption("Right Tarmac, 2 ball", new twoBallRight(m_driveTrain, m_shooter, m_intake, m_indexer));
+    m_auto_chooser.addOption("Bottom Left Tarmac, 4 ball", new fourBall(m_driveTrain, m_shooter, m_intake, m_indexer));
     m_driver_controller = new XboxController(0);
     m_partner_controller = new XboxController(1);
     m_driveTrain = new DriveTrain();
@@ -114,8 +132,8 @@ public class RobotContainer {
     m_d_ls.whenPressed(new PrintCommand("Climber Down"));
     m_d_y.whenPressed(new PrintCommand("Climber Cancelled"));
     
-    m_p_a.whenPressed(new Shoot/*Long Shot*/()); 
-    m_p_b.whenPressed(new Shoot/*Short Shot*/());
+    // m_p_a.whenPressed(new Shoot/*Long Shot*/()); 
+    // m_p_b.whenPressed(new Shoot/*Short Shot*/());
     m_p_rb.whileHeld(new EjectBalls(m_indexer));
     m_p_x.whenPressed(new ResetIntakeArmEncoder(m_intake));
   }
@@ -145,6 +163,10 @@ public class RobotContainer {
     Shuffleboard.getTab("Intake").add(new CollectBalls(m_intake, m_indexer)).withPosition(0, 1).withSize(2, 1);
     Shuffleboard.getTab("Intake").add(new DropIntakeAndCollectBalls(m_intake, m_indexer)).withPosition(2, 1).withSize(2, 1);
     Shuffleboard.getTab("Intake").add(new EjectBalls(m_indexer)).withPosition(0, 3).withSize(2, 1);
+    Shuffleboard.getTab("Climber").add("Climber Up", new TestClimberUp(m_climber)).withPosition(6, 1);
+    Shuffleboard.getTab("Climber").add("Climber Down", new TestClimberDown(m_climber)).withPosition(7, 1);
+    Shuffleboard.getTab("Climber").add("Low Bar Climb", new LowBarClimb(m_climber, m_driver_controller)).withPosition(8, 2);
+    Shuffleboard.getTab("Climber").add("High Bar Climb", new HighBarClimb(m_climber, m_driver_controller)).withPosition(8, 1);
   }
 
   private void buildDriverTab(){
@@ -189,7 +211,8 @@ public class RobotContainer {
     // Field
     driveTab.add("Field", m_driveTrain.getField()).withPosition(6, 3).withSize(4, 2).withWidget(BuiltInWidgets.kField);
 
-
+    //auto chooser
+    driveTab.add("Autonomous Chooser", m_auto_chooser).withWidget(BuiltInWidgets.kComboBoxChooser).withPosition(4, 4).withSize(2, 1);
 
   }
 

@@ -5,12 +5,13 @@
 package frc.robot.commands.autonomous;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants;
 import frc.robot.commands.Intake.ArmMM;
 import frc.robot.commands.Intake.DropIntakeAndCollectBalls;
 import frc.robot.commands.drivetrain.DriveMM;
 import frc.robot.commands.drivetrain.TurnToAngle;
-import frc.robot.commands.shooter.Shoot;
 import frc.robot.commands.shooter.Auto_Shooting_Sequence;
+import frc.robot.commands.shooter.Shoot;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
@@ -20,30 +21,35 @@ import frc.robot.subsystems.Shooter.ShotDistance;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class twoBallLeft extends SequentialCommandGroup {
-  /** Creates a new twoBallRight. */
+public class fourBall extends SequentialCommandGroup {
+  /** Creates a new fourBall. */
   DriveTrain m_drive_train;
   Shooter m_shooter;
   Intake m_intake;
   Indexer m_indexer;
-  public twoBallLeft(DriveTrain driveTrain, Shooter shooter, Intake intake, Indexer indexer) {
+  public fourBall(DriveTrain driveTrain, Shooter shooter, Intake intake, Indexer indexer) {
+    // Add your commands in the addCommands() call, e.g.
+    // addCommands(new FooCommand(), new BarCommand());
     m_drive_train = driveTrain;
     m_shooter = shooter;
     m_intake = intake;
     m_indexer = indexer;
-    // Add your commands in the addCommands() call, e.g.
-    // addCommands(new FooCommand(), new BarCommand());
-    //STARTING CONDITIONS: 1 ball in robot, front of the robot at edge of tarmac, directly in front of the ball
-    //                       on the left side of the tarmac
+    //STARTING CONDITIONS: 
     addCommands(
       new DriveMM(m_drive_train, 40.44), //drive to the ball
       new DropIntakeAndCollectBalls(m_intake, m_indexer),
       new ArmMM(m_intake, m_intake.INTAKE_ARM_RETRACT),
       new TurnToAngle(m_drive_train, 180), //turn around
-      new DriveMM(m_drive_train, 40.44),
-      new DriveMM(m_drive_train, 75), //drive up to fender, may need lowered a little
+      new DriveMM(m_drive_train, 115.44), //drive up to fender, may need lowered a little
       new TurnToAngle(m_drive_train, -30), //angle to be perpendicular to the hub fender
-      new Auto_Shooting_Sequence(m_shooter,m_intake, m_indexer, ShotDistance.ClosestShot)
+      new Auto_Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.ClosestShot),
+      new TurnToAngle(m_drive_train, 230), //turn to go towards terminal TODO adjust this
+      new DriveMM(m_drive_train, 300),  //TODO adjust this
+      new DropIntakeAndCollectBalls(m_intake, m_indexer),
+      new ArmMM(m_intake, m_intake.INTAKE_ARM_RETRACT),
+      new TurnToAngle(m_drive_train, -230),
+      new DriveMM(m_drive_train, 300),
+      new Auto_Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.ClosestShot)
     );
   }
 }

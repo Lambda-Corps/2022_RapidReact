@@ -39,6 +39,10 @@ public final class Constants {
 	public final static int INDEXER_INTAKE_MID = 1;
 	public final static int INDEXER_INTAKE_SHOOTER = 0;
 
+	//////////////// DIO CLIMBER /////////////////
+	public final static int REVERSE_LIMIT_SWITCH = 4;
+	public final static int FORWARD_LIMIT_SWITCH = 3;
+
     ///////////// Drive Train Values /////////////
     public final static double kControllerDeadband = .1;
     public final static int DRIVER_RIGHT_AXIS = 4;
