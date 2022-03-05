@@ -72,17 +72,13 @@ public class RobotContainer {
 
   // OI
   XboxController m_driver_controller, m_partner_controller;
-  JoystickButton m_d_a, m_d_b, m_d_rb, m_d_lb, m_d_rs, m_d_ls, m_p_a, m_p_b, m_p_rb, m_d_sel, m_p_x, m_d_y;
+  JoystickButton m_d_a, m_d_b, m_d_rb, m_d_lb, m_d_rs, m_d_ls, m_p_a, m_p_b, m_p_rb, m_d_sel, m_p_x, m_d_y,
+                 m_p_lb, m_p_rs, m_p_ls, m_p_start;
   //auto chooser
   private SendableChooser<Command> m_auto_chooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    m_auto_chooser = new SendableChooser<Command>();
-    m_auto_chooser.addOption("1 ball", new oneBall(m_driveTrain, m_shooter, m_intake, m_indexer));
-    m_auto_chooser.addOption("Left Tarmac, 2 ball", new twoBallLeft(m_driveTrain, m_shooter, m_intake, m_indexer));
-    m_auto_chooser.addOption("Right Tarmac, 2 ball", new twoBallRight(m_driveTrain, m_shooter, m_intake, m_indexer));
-    m_auto_chooser.addOption("Bottom Left Tarmac, 4 ball", new fourBall(m_driveTrain, m_shooter, m_intake, m_indexer));
     m_driver_controller = new XboxController(0);
     m_partner_controller = new XboxController(1);
     m_driveTrain = new DriveTrain();
@@ -91,6 +87,7 @@ public class RobotContainer {
     m_shooter = new Shooter();
     m_ledsubsystem = new LEDsubsystem();
     m_vision = new Vision();
+    m_climber = new Climber();
 
     // Joystick Buttons
     m_d_a = new JoystickButton(m_driver_controller, XboxController.Button.kA.value);
@@ -212,6 +209,11 @@ public class RobotContainer {
     driveTab.add("Field", m_driveTrain.getField()).withPosition(6, 3).withSize(4, 2).withWidget(BuiltInWidgets.kField);
 
     //auto chooser
+    m_auto_chooser = new SendableChooser<Command>();
+    m_auto_chooser.addOption("1 ball", new oneBall(m_driveTrain, m_shooter, m_intake, m_indexer));
+    m_auto_chooser.addOption("Left Tarmac, 2 ball", new twoBallLeft(m_driveTrain, m_shooter, m_intake, m_indexer));
+    m_auto_chooser.addOption("Right Tarmac, 2 ball", new twoBallRight(m_driveTrain, m_shooter, m_intake, m_indexer));
+    m_auto_chooser.addOption("Bottom Left Tarmac, 4 ball", new fourBall(m_driveTrain, m_shooter, m_intake, m_indexer));
     driveTab.add("Autonomous Chooser", m_auto_chooser).withWidget(BuiltInWidgets.kComboBoxChooser).withPosition(4, 4).withSize(2, 1);
 
   }

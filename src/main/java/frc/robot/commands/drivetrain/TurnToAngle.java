@@ -23,25 +23,25 @@ public class TurnToAngle extends CommandBase {
   private double m_start_time;
   int arclengthTicks;
   int STABLE_ITERATIONS_BEFORE_FINISHED = 5;
-  public final ShuffleboardTab turnMMTab;
-  private double m_turn_kP, m_kI, m_kD;
-  private NetworkTableEntry m_turnkPEntry, m_kIEntry, m_kDEntry, m_arclengthEntry, m_iterationEntry, m_drivedurationEntry, m_arclengthticksEntry;
+  // public final ShuffleboardTab turnMMTab;
+  // private double m_turn_kP, m_kI, m_kD;
+  // private NetworkTableEntry m_turnkPEntry, m_kIEntry, m_kDEntry, m_arclengthEntry, m_iterationEntry, m_drivedurationEntry, m_arclengthticksEntry;
   /** Creates a new TurnToAngle. */
   public TurnToAngle(DriveTrain driveTrain, double angle) {
     m_driveTrain = driveTrain;
     arclengthDegrees = angle;
-    turnMMTab = Shuffleboard.getTab("Turn MM Testing");
-    m_turnkPEntry = turnMMTab.add("kP", 0 )               .withPosition(1, 0).getEntry();
-    m_kIEntry = turnMMTab.add("kI", 0 )                   .withPosition(2, 0).getEntry();
-    m_kDEntry = turnMMTab.add("kD", 0 )                   .withPosition(3, 0).getEntry();
-    m_arclengthEntry = turnMMTab.add("target degrees", 0) .withPosition(4, 0).getEntry();
-    m_iterationEntry = turnMMTab.add("Finish Iter.", 5 )  .withPosition(5, 0).getEntry();
-    m_drivedurationEntry = turnMMTab.add("Run Time", 0)   .withPosition(6, 0).getEntry();
+    // turnMMTab = Shuffleboard.getTab("Turn MM Testing");
+    // m_turnkPEntry = turnMMTab.add("kP", 0 )               .withPosition(1, 0).getEntry();
+    // m_kIEntry = turnMMTab.add("kI", 0 )                   .withPosition(2, 0).getEntry();
+    // m_kDEntry = turnMMTab.add("kD", 0 )                   .withPosition(3, 0).getEntry();
+    // m_arclengthEntry = turnMMTab.add("target degrees", 0) .withPosition(4, 0).getEntry();
+    // m_iterationEntry = turnMMTab.add("Finish Iter.", 5 )  .withPosition(5, 0).getEntry();
+    // m_drivedurationEntry = turnMMTab.add("Run Time", 0)   .withPosition(6, 0).getEntry();
     
-    m_arclengthticksEntry = turnMMTab.add("Calc Ticks", 0).withPosition(3, 1).withSize(1, 1).getEntry();
-    turnMMTab.addNumber("Gyro Read", m_driveTrain::getRawAngle)              .withPosition(0,1);
-    turnMMTab.addNumber("Left Encoder", m_driveTrain::getLeftEncoderValue)  .withPosition(1, 1);
-    turnMMTab.addNumber("Right Encoder", m_driveTrain::getRightEncoderValue).withPosition(2,1);
+    // m_arclengthticksEntry = turnMMTab.add("Calc Ticks", 0).withPosition(3, 1).withSize(1, 1).getEntry();
+    // turnMMTab.addNumber("Gyro Read", m_driveTrain::getRawAngle)              .withPosition(0,1);
+    // turnMMTab.addNumber("Left Encoder", m_driveTrain::getLeftEncoderValue)  .withPosition(1, 1);
+    // turnMMTab.addNumber("Right Encoder", m_driveTrain::getRightEncoderValue).withPosition(2,1);
     
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_driveTrain);
@@ -50,21 +50,21 @@ public class TurnToAngle extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    arclengthDegrees = m_arclengthEntry.getDouble(0);
+    //arclengthDegrees = m_arclengthEntry.getDouble(0);
     //see 2020 or 2019 code for explanation on these calculations
     arclengthTicks = (int) (arclengthDegrees * 1108.23 * 0.2291); 
     // ^^^ arc length in ticks = degrees to turn * ticks per 1 inch * degrees per 1 inch
-    m_arclengthticksEntry.forceSetDouble(arclengthTicks);
-    m_turn_kP = m_turnkPEntry.getDouble(0.0);
-    m_kI = m_kIEntry.getDouble(0.0);
-    m_kD = m_kDEntry.getDouble(0.0);
-    STABLE_ITERATIONS_BEFORE_FINISHED = (int) m_iterationEntry.getDouble(5.0);
-    m_start_time = Timer.getFPGATimestamp();
+    // m_arclengthticksEntry.forceSetDouble(arclengthTicks);
+    // m_turn_kP = m_turnkPEntry.getDouble(0.0);
+    // m_kI = m_kIEntry.getDouble(0.0);
+    // m_kD = m_kDEntry.getDouble(0.0);
+    // STABLE_ITERATIONS_BEFORE_FINISHED = (int) m_iterationEntry.getDouble(5.0);
+    // m_start_time = Timer.getFPGATimestamp();
     count = 0;
-    m_driveTrain.reset_turn_PID_values(m_turn_kP, m_kI, m_kD);
+    // m_driveTrain.reset_turn_PID_values(m_turn_kP, m_kI, m_kD);
     m_driveTrain.setEncodersToZero();
     m_driveTrain.motionMagicStartConfigsTurn();
-    arclengthDegrees = SmartDashboard.getNumber("Arc Length in Degrees", 0);
+    //arclengthDegrees = SmartDashboard.getNumber("Arc Length in Degrees", 0);
     //speed = SmartDashboard.getNumber("Speed", 0);
     currentAngle = m_driveTrain.m_gyro.getAngle();
     // arclengthDegrees = currentAngle + arclengthDegrees;
@@ -98,8 +98,8 @@ public class TurnToAngle extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     //m_driveTrain.motionMagicEndConfigsTurn();
-    double drive_duration = Timer.getFPGATimestamp() - m_start_time;
-    m_drivedurationEntry.setDouble(drive_duration);
+    //double drive_duration = Timer.getFPGATimestamp() - m_start_time;
+    //m_drivedurationEntry.setDouble(drive_duration);
     m_driveTrain.teleop_drive(0, 0);
     m_driveTrain.motion_magic_end_config_turn();
     m_driveTrain.enableMotorSafety();

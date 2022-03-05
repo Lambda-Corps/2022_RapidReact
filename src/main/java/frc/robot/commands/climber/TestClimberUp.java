@@ -22,7 +22,7 @@ public class TestClimberUp extends CommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
     m_climber = climber;
 
-    addRequirements(climber);
+    addRequirements(m_climber);
 
     ShuffleboardTab climberTab = Shuffleboard.getTab("Climber");
     m_raiseSpeed = climberTab.add("Climber Raise Speed", 0).withPosition(1, 2).withSize(1,1).getEntry();
