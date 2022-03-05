@@ -32,7 +32,7 @@ public class Intake extends SubsystemBase {
 
   //positions
   public static final int INTAKE_ARM_RETRACT = 0; //intake fully vertical/up
-  public static final int INTAKE_ARM_EXTEND = 1525; //intake down to grab ball (currently has temporary value)
+  public static final int INTAKE_ARM_EXTEND = 1550; //intake down to grab ball (currently has temporary value)
 
   final double DOWN_FEEDFORWARD = .2;
   final double UP_FEEDFORWARD = -.3;
@@ -70,7 +70,7 @@ public class Intake extends SubsystemBase {
   private final int ARM_SLOT_UP   = 1;
   private final int ARM_SLOT_HOLD = 2;
 
-  private final double INTAKE_WHEEL_SPEEDS = .8;
+  private final double INTAKE_WHEEL_SPEEDS = 1;
 
   public Intake() {
     m_faults = new Faults();

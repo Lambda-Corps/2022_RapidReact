@@ -29,7 +29,8 @@ public class Shoot extends CommandBase {
     m_shooter = shooter;
     m_indexer = indexer;
     m_distance = distance;
-
+    m_runTime = 6;
+    m_indexerDelay = 3;
     cmdTimer = new Timer(); // used to delay the conveyor if necessary
     cmdTimer.start();
     
@@ -42,6 +43,7 @@ public class Shoot extends CommandBase {
   public void initialize() {
         // Grab the relevant values for the PID control from Shuffleboard and set the 
     m_shooter.setShotDistance(m_distance);
+    m_shooter.setProfileSlot();
     cmdTimer.reset();
     cmdTimer.start();
   }

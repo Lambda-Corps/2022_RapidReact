@@ -28,7 +28,7 @@ public class Vision extends SubsystemBase {
 
   double pitch, yaw, area;
 
-  private boolean hasTargets;
+  private boolean m_hasTargets = false;
 
   public Vision() {
       m_limelight.setPipelineIndex(LIMELIGHTPIPELINE);
@@ -55,28 +55,30 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
-    getCargoTargetStatus();
-    getHighTargetStatus();
+    // getCargoTargetStatus();
+    // getHighTargetStatus();
   }
 
   private boolean getHighTargetStatus() {
-    var result = m_limelight.getLatestResult();
-     hasTargets = result.hasTargets();
-     hubTarget.setBoolean(hasTargets);
-    return hasTargets;
+    // var result = m_limelight.getLatestResult();
+    //  hasTargets = result.hasTargets();
+    //  hubTarget.setBoolean(hasTargets);
+    // return hasTargets;
+    return false;
   }
 
   private boolean getCargoTargetStatus() {
-    var result = m_HD3000.getLatestResult();
-     hasTargets = result.hasTargets();
-     cargoTarget.setBoolean(hasTargets);
-    return hasTargets;
+    // var result = m_HD3000.getLatestResult();
+    //  hasTargets = result.hasTargets();
+    //  cargoTarget.setBoolean(hasTargets);
+    // return hasTargets;
+    return false;
   }
 
   public double[] getHubTargetRange() {
     double[] range = {0,0};
     var result = m_limelight.getLatestResult();
-    if (hasTargets == true) {
+    if (m_hasTargets == true) {
       range[0] = PhotonUtils.calculateDistanceToTargetMeters(CAMERA_HEIGHT_METERS, TARGET_HEIGHT_METERS, CAMERA_PITCH_RADIANS, Units.degreesToRadians(result.getBestTarget().getPitch()));
       range[1] = result.getBestTarget().getYaw();
     }
@@ -87,7 +89,7 @@ public class Vision extends SubsystemBase {
   public double getCargoTargetYaw() {
     double Yaw = 0;
     var result = m_HD3000.getLatestResult();
-    if (hasTargets == true) {
+    if (m_hasTargets == true) {
       Yaw = result.getBestTarget().getYaw();
     }
 

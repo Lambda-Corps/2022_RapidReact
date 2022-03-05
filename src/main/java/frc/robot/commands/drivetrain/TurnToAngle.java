@@ -4,7 +4,9 @@
 
 package frc.robot.commands.drivetrain;
 
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -24,24 +26,26 @@ public class TurnToAngle extends CommandBase {
   int arclengthTicks;
   int STABLE_ITERATIONS_BEFORE_FINISHED = 5;
   // public final ShuffleboardTab turnMMTab;
-  // private double m_turn_kP, m_kI, m_kD;
-  // private NetworkTableEntry m_turnkPEntry, m_kIEntry, m_kDEntry, m_arclengthEntry, m_iterationEntry, m_drivedurationEntry, m_arclengthticksEntry;
+  private double m_turn_kP, m_kI, m_kD;
+  private NetworkTableEntry m_turnkPEntry, m_kIEntry, m_kDEntry, m_arclengthEntry, m_iterationEntry, m_drivedurationEntry, m_arclengthticksEntry;
   /** Creates a new TurnToAngle. */
   public TurnToAngle(DriveTrain driveTrain, double angle) {
     m_driveTrain = driveTrain;
     arclengthDegrees = angle;
+    NetworkTable driveTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Drive MM Testing");
+    m_turnkPEntry = driveTab.getEntry("kP_drive");
+    m_kIEntry = driveTab.getEntry("kI");
+    m_kDEntry = driveTab.getEntry("kD");
+    //m_kFEntry = driveTab.getEntry("kF");
+    m_iterationEntry = driveTab.getEntry("Finish Iter.");
+    m_arclengthEntry = driveTab.getEntry("target degrees");
+    m_arclengthticksEntry = driveTab.getEntry("Calc Ticks");
+    m_drivedurationEntry = driveTab.getEntry("Run Time");
+    m_kIEntry = driveTab.getEntry("kI");
     // turnMMTab = Shuffleboard.getTab("Turn MM Testing");
-    // m_turnkPEntry = turnMMTab.add("kP", 0 )               .withPosition(1, 0).getEntry();
-    // m_kIEntry = turnMMTab.add("kI", 0 )                   .withPosition(2, 0).getEntry();
-    // m_kDEntry = turnMMTab.add("kD", 0 )                   .withPosition(3, 0).getEntry();
-    // m_arclengthEntry = turnMMTab.add("target degrees", 0) .withPosition(4, 0).getEntry();
-    // m_iterationEntry = turnMMTab.add("Finish Iter.", 5 )  .withPosition(5, 0).getEntry();
-    // m_drivedurationEntry = turnMMTab.add("Run Time", 0)   .withPosition(6, 0).getEntry();
     
-    // m_arclengthticksEntry = turnMMTab.add("Calc Ticks", 0).withPosition(3, 1).withSize(1, 1).getEntry();
-    // turnMMTab.addNumber("Gyro Read", m_driveTrain::getRawAngle)              .withPosition(0,1);
-    // turnMMTab.addNumber("Left Encoder", m_driveTrain::getLeftEncoderValue)  .withPosition(1, 1);
-    // turnMMTab.addNumber("Right Encoder", m_driveTrain::getRightEncoderValue).withPosition(2,1);
+    
+    
     
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_driveTrain);

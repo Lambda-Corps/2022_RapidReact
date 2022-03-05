@@ -243,7 +243,7 @@ public class RobotContainer {
     // Field
     driveTab.add("Field", m_driveTrain.getField()).withPosition(6, 3).withSize(4, 2).withWidget(BuiltInWidgets.kField);
 
-    //auto chooser
+    // //auto chooser
     m_auto_chooser = new SendableChooser<Command>();
     m_auto_chooser.addOption("1 ball", new oneBall(m_driveTrain, m_shooter, m_intake, m_indexer));
     m_auto_chooser.addOption("Left Tarmac, 2 ball", new twoBallLeft(m_driveTrain, m_shooter, m_intake, m_indexer));
@@ -254,7 +254,25 @@ public class RobotContainer {
   }
 
   public void buildDriverTestTab(){
+    ShuffleboardTab driveMMTab = Shuffleboard.getTab("Drive MM Testing");
+    driveMMTab.add("kP_drive", 0.3 ).withPosition(1, 0).getEntry();
+    driveMMTab.add("kI", 0 ).withPosition(2, 0).getEntry();
+    driveMMTab.add("kD", 0 ).withPosition(3, 0).getEntry();
+    driveMMTab.add("kF", 0.1 ).withPosition(0, 0).getEntry();
+    driveMMTab.add("stable iteration before finishing", 5 ).withPosition(0, 1).getEntry();
+    driveMMTab.add("target position", -50).withPosition(4, 0).getEntry();
+    driveMMTab.add("target ticks", 0).getEntry();
+    // driveMMTab.addNumber("Left Encoder", m_driveTrain::getLeftEncoderValue).withPosition(1, 1);
+    // driveMMTab.addNumber("Right Encoder", m_driveTrain::getRightEncoderValue).withPosition(2,1);
+    driveMMTab.add("drive duration", 0).withPosition(6, 0).getEntry();
+    driveMMTab.add("count_ok", 0).getEntry();
     
+    //turn
+    driveMMTab.add("target degrees", 0) .withPosition(4, 1).getEntry();
+    driveMMTab.add("Finish Iter.", 5 )  .withPosition(5, 1).getEntry();
+    driveMMTab.add("Run Time", 0)   .withPosition(6, 1).getEntry();
+    driveMMTab.add("Calc Ticks", 0).withPosition(3, 1).withSize(1, 1).getEntry();
+    driveMMTab.addNumber("Gyro Read", m_driveTrain::getRawAngle)              .withPosition(2,1);
   }
 
   public void buildShooterTab(){

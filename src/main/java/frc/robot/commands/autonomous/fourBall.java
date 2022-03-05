@@ -41,13 +41,13 @@ public class fourBall extends SequentialCommandGroup {
       new ArmMM(m_intake, m_intake.INTAKE_ARM_RETRACT),
       new TurnToAngle(m_drive_train, 180), //turn around
       new DriveMM(m_drive_train, 115.44), //drive up to fender, may need lowered a little
-      new TurnToAngle(m_drive_train, -30), //angle to be perpendicular to the hub fender
+      new TurnToAngle(m_drive_train, 30), //angle to be perpendicular to the hub fender
       new Auto_Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.ClosestShot),
-      new TurnToAngle(m_drive_train, 230), //turn to go towards terminal TODO adjust this
+      new TurnToAngle(m_drive_train, -230), //turn to go towards terminal TODO adjust this
       new DriveMM(m_drive_train, 300),  //TODO adjust this
       new DropIntakeAndCollectBalls(m_intake, m_indexer),
       new ArmMM(m_intake, m_intake.INTAKE_ARM_RETRACT),
-      new TurnToAngle(m_drive_train, -230),
+      new TurnToAngle(m_drive_train, 230),
       new DriveMM(m_drive_train, 300),
       new Auto_Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.ClosestShot)
     );

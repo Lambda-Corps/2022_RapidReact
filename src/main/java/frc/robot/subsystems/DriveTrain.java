@@ -29,6 +29,7 @@ import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
@@ -60,11 +61,12 @@ import frc.robot.Robot;
 import frc.robot.commands.drivetrain.UpdateDriveLimiters;
 
 public class DriveTrain extends SubsystemBase {
-	private final double MAX_TELEOP_DRIVE_SPEED = .8;
+	private final double MAX_TELEOP_DRIVE_SPEED = .65;
 	// TalonFX's for the drivetrain
 	// Right side is inverted here to drive forward
-	WPI_TalonFX m_left_leader, m_right_leader, m_left_follower, m_right_follower;
-	
+	//WPI_TalonFX m_left_leader, m_right_leader, m_left_follower, m_right_follower;
+	WPI_TalonFX m_left_leader, m_right_leader;//, m_left_follower, m_right_follower;
+
 	// Variables to hold the invert types for the talons
 	TalonFXInvertType m_left_invert, m_right_invert;
 	
@@ -99,9 +101,9 @@ public class DriveTrain extends SubsystemBase {
  	public DriveTrain() {
     	m_gyro = new AHRS(SPI.Port.kMXP);
     	m_left_leader = new WPI_TalonFX(LEFT_TALON_LEADER);
-		m_left_follower = new  WPI_TalonFX(LEFT_TALON_FOLLOWER);
+		//m_left_follower = new  WPI_TalonFX(LEFT_TALON_FOLLOWER);
     	m_right_leader = new WPI_TalonFX(RIGHT_TALON_LEADER);
-		m_right_follower = new WPI_TalonFX(RIGHT_TALON_FOLLOWER);
+		//m_right_follower = new WPI_TalonFX(RIGHT_TALON_FOLLOWER);
 
     	/** Invert Directions for Left and Right */
     	m_left_invert = TalonFXInvertType.CounterClockwise; //Same as invert = "false"
@@ -112,12 +114,12 @@ public class DriveTrain extends SubsystemBase {
     	TalonFXConfiguration _rightConfig = new TalonFXConfiguration();
 
 		// Set follower talons to default configs, and then follow their leaders
-		m_left_follower.configAllSettings(_leftConfig);
-		m_right_follower.configAllSettings(_rightConfig);
-		m_left_follower.follow(m_left_leader);
-		m_left_follower.setInverted(InvertType.FollowMaster);
-		m_right_follower.follow(m_right_leader);
-		m_right_follower.setInverted(InvertType.FollowMaster);
+		// m_left_follower.configAllSettings(_leftConfig);
+		// m_right_follower.configAllSettings(_rightConfig);
+		// m_left_follower.follow(m_left_leader);
+		// m_left_follower.setInverted(InvertType.FollowMaster);
+		// m_right_follower.follow(m_right_leader);
+		// m_right_follower.setInverted(InvertType.FollowMaster);
 
     		/* Set Neutral Mode */
 		m_left_leader.setNeutralMode(NeutralMode.Brake);
@@ -180,7 +182,9 @@ public class DriveTrain extends SubsystemBase {
    		 /* APPLY the config settings */
 		m_left_leader.configAllSettings(_leftConfig);
 		m_right_leader.configAllSettings(_rightConfig);
-		
+		m_left_leader.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 35, 40, 1.0), 0);
+		m_right_leader.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 35, 40, 1.0), 0);
+
 		/* Set status frame periods */
 		// Leader Talons need faster updates 
 		m_right_leader.setStatusFramePeriod(StatusFrame.Status_12_Feedback1, 20, kTimeoutMs);
@@ -188,10 +192,10 @@ public class DriveTrain extends SubsystemBase {
 		m_left_leader.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, kTimeoutMs);		//Used remotely by right Talon, speed up
 		// Followers can slow down certain status messages to reduce the can bus usage, per CTRE:
 		// "Motor controllers that are followers can set Status 1 and Status 2 to 255ms(max) using setStatusFramePeriod."
-		m_right_follower.setStatusFramePeriod(StatusFrame.Status_1_General, 255);
-		m_right_follower.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255);
-		m_left_follower.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255);
-		m_left_follower.setStatusFramePeriod(StatusFrame.Status_1_General, 255);
+		// m_right_follower.setStatusFramePeriod(StatusFrame.Status_1_General, 255);
+		// m_right_follower.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255);
+		// m_left_follower.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255);
+		// m_left_follower.setStatusFramePeriod(StatusFrame.Status_1_General, 255);
 
 		setEncodersToZero();
 
@@ -253,10 +257,10 @@ public class DriveTrain extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		m_odometry.update(m_gyro.getRotation2d(),
-                      nativeUnitsToDistanceMeters(m_left_leader.getSelectedSensorPosition()),
-                      nativeUnitsToDistanceMeters(m_right_leader.getSelectedSensorPosition()));
-   		m_2dField.setRobotPose(m_odometry.getPoseMeters());
+		// m_odometry.update(m_gyro.getRotation2d(),
+        //               nativeUnitsToDistanceMeters(m_left_leader.getSelectedSensorPosition()),
+        //               nativeUnitsToDistanceMeters(m_right_leader.getSelectedSensorPosition()));
+   		// m_2dField.setRobotPose(m_odometry.getPoseMeters());
 	}
 
   	/* Zero all sensors used */
@@ -296,6 +300,11 @@ public class DriveTrain extends SubsystemBase {
 		/* Outside deadband */
 		return value;
   	}
+
+	public void tank_drive_straight(double speed){
+		m_right_leader.set(ControlMode.PercentOutput, speed);
+		m_left_leader.set(ControlMode.PercentOutput, speed);
+	}
 
 	public void teleop_drive(double forward, double turn){
 		forward = deadband(forward);
@@ -353,7 +362,7 @@ public class DriveTrain extends SubsystemBase {
   	}
 
 	public boolean motionMagicDrive(double target_position) {
-		double tolerance = 25;
+		double tolerance = 100;
 		
 		m_left_leader.set(ControlMode.MotionMagic, target_position);
 			m_right_leader.set(ControlMode.MotionMagic, target_position);
@@ -386,7 +395,7 @@ public class DriveTrain extends SubsystemBase {
 		m_left_leader.selectProfileSlot(kSlot_Distanc, PID_PRIMARY);
 		m_right_leader.selectProfileSlot(kSlot_Distanc, PID_PRIMARY);
 	
-		if(isForward){
+		if(isForward == true){
 			m_left_leader.config_kF(kSlot_Distanc, kGains_Driving.kF);
 			m_right_leader.config_kF(kSlot_Distanc, kGains_Driving.kF);
 		} else{

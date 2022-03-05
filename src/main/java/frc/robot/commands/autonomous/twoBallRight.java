@@ -39,11 +39,11 @@ public class twoBallRight extends SequentialCommandGroup {
     //                       on the right side of the tarmac
     addCommands(
       new ArmMM(m_intake, Intake.INTAKE_ARM_EXTEND),
-      new ParallelCommandGroup(new CollectBalls(m_intake, m_indexer), new DriveMM(m_drive_train, 40.44)),
+      new ParallelCommandGroup(new CollectBalls(m_intake, m_indexer).withTimeout(3), new DriveMM(m_drive_train, 40.44)),
       new ArmMM(m_intake, m_intake.INTAKE_ARM_RETRACT),
       new TurnToAngle(m_drive_train, 180), //turn around
       new DriveMM(m_drive_train, 40.44),
-      new TurnToAngle(m_drive_train, 30), //angle to be perpendicular to the hub fender
+      new TurnToAngle(m_drive_train, -30), //angle to be perpendicular to the hub fender
       new DriveMM(m_drive_train, 70), //drive to fender
       new Shoot(m_shooter, m_indexer, ShotDistance.ClosestShot)
     );

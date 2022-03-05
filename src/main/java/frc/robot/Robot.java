@@ -47,7 +47,7 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run();
 
     // Update the network tables values to be corrected faster than the 10Hz default rate
-    NetworkTableInstance.getDefault().flush();
+    //NetworkTableInstance.getDefault().flush();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

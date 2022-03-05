@@ -6,6 +6,7 @@ package frc.robot.commands.autonomous;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.drivetrain.DriveMM;
+import frc.robot.commands.drivetrain.TurnToAngle;
 import frc.robot.commands.shooter.Shoot;
 import frc.robot.commands.shooter.Auto_Shooting_Sequence;
 import frc.robot.subsystems.DriveTrain;
@@ -34,7 +35,8 @@ public class oneBall extends SequentialCommandGroup {
     //ball placed inside indexer, robot placed 19 inches away from hub fender
     addCommands(
       new Shoot(m_shooter, m_indexer, ShotDistance.ClosestShot),
-      new DriveMM(m_drive_train, -25)
+      new TurnToAngle(m_drive_train, 350),
+      new DriveMM(m_drive_train, -50)//DriveMM(m_drive_train, 50)
     );
   }
 }

@@ -29,9 +29,9 @@ public class Shooter extends SubsystemBase {
   private int m_shooter_set_point;
 
   //10% is 1918
-  private final int SHOOTER_SETPOINT_TARMAC_LINE   = 7672, //40%
-                    SHOOTER_SETPOINT_CLOSESHOT   = 5754,   //30%
-                    SHOOTER_SETPOINT_MIDTARMAC = 6713;     //35%
+  private final int SHOOTER_SETPOINT_TARMAC_LINE   = 8000, //40%
+                    SHOOTER_SETPOINT_CLOSESHOT   = 6700,   //30%
+                    SHOOTER_SETPOINT_MIDTARMAC = 6760;     //35%
     
   /** Creates a new Shooter. */
   public Shooter() {
@@ -78,6 +78,7 @@ public class Shooter extends SubsystemBase {
     shooterConfig.primaryPID.selectedFeedbackSensor = TalonFXFeedbackDevice.IntegratedSensor.toFeedbackDevice();
 
     m_Shooter.configAllSettings(shooterConfig);
+    m_Shooter.selectProfileSlot(kSlot_CloseShot, 0);
 
     m_Shooter.setInverted(true);
 
@@ -88,9 +89,13 @@ public class Shooter extends SubsystemBase {
     m_Shooter.set(ControlMode.PercentOutput, 0);
   }
   public void velocityPID(double setpoint){
-    m_Shooter.set(ControlMode.Velocity, setpoint);
+    m_Shooter.set(ControlMode.Velocity, m_shooter_set_point);
   }
 
+  public void setProfileSlot(){
+    m_Shooter.selectProfileSlot(kSlot_CloseShot, PID_PRIMARY);
+
+  }
   public void configureVelocityPID(double kp, double ki, double kd, double kf) {
     m_Shooter.selectProfileSlot(kSlot_CloseShot, PID_PRIMARY);
     m_Shooter.config_kP(kSlot_CloseShot, kp);
