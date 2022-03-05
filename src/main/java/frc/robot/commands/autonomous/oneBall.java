@@ -33,8 +33,8 @@ public class oneBall extends SequentialCommandGroup {
     //STARTING CONDITIONS: 
     //ball placed inside indexer, robot placed 19 inches away from hub fender
     addCommands(
-      new Auto_Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.ClosestShot),
-      new DriveMM(m_drive_train, 25)
+      new Shoot(m_shooter, m_indexer, ShotDistance.ClosestShot),
+      new DriveMM(m_drive_train, -25)
     );
   }
 }

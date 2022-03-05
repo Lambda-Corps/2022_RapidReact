@@ -4,8 +4,10 @@
 
 package frc.robot.commands.autonomous;
 
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.Intake.ArmMM;
+import frc.robot.commands.Intake.CollectBalls;
 import frc.robot.commands.Intake.DropIntakeAndCollectBalls;
 import frc.robot.commands.drivetrain.DriveMM;
 import frc.robot.commands.drivetrain.TurnToAngle;
@@ -36,14 +38,13 @@ public class twoBallLeft extends SequentialCommandGroup {
     //STARTING CONDITIONS: 1 ball in robot, front of the robot at edge of tarmac, directly in front of the ball
     //                       on the left side of the tarmac
     addCommands(
-      new DriveMM(m_drive_train, 40.44), //drive to the ball
-      new DropIntakeAndCollectBalls(m_intake, m_indexer),
+      new ArmMM(m_intake, Intake.INTAKE_ARM_EXTEND),
+      new ParallelCommandGroup(new CollectBalls(m_intake, m_indexer), new DriveMM(m_drive_train, 40.44)),
       new ArmMM(m_intake, m_intake.INTAKE_ARM_RETRACT),
       new TurnToAngle(m_drive_train, 180), //turn around
-      new DriveMM(m_drive_train, 40.44),
-      new DriveMM(m_drive_train, 75), //drive up to fender, may need lowered a little
+      new DriveMM(m_drive_train, 115.44), //drive up to fender, may need lowered a little
       new TurnToAngle(m_drive_train, -30), //angle to be perpendicular to the hub fender
-      new Auto_Shooting_Sequence(m_shooter,m_intake, m_indexer, ShotDistance.ClosestShot)
+      new Shoot(m_shooter,m_indexer, ShotDistance.ClosestShot)
     );
   }
 }

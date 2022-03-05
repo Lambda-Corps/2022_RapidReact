@@ -59,6 +59,7 @@ public class ShooterPIDTuning extends CommandBase {
     m_indexerSpeedEntry = m_myTab.add("Indexer Speed", .8).withPosition(0, 1).getEntry();
     m_indexderDelayEntry = m_myTab.add("Indexer Delay", 2).withPosition(1, 1).getEntry();
     m_runTimeEntry = m_myTab.add("runtime", 0).withPosition(2, 1).getEntry();
+    m_myTab.addBoolean("At Setpoint", m_shooter::isUpToSpeed);
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_shooter, m_indexer);
   }

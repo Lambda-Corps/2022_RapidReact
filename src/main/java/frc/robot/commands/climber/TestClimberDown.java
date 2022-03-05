@@ -24,14 +24,14 @@ public class TestClimberDown extends CommandBase {
 
     addRequirements(climber);
 
-    ShuffleboardTab climberTab = Shuffleboard.getTab("Climber");
-    m_lowerSpeed = climberTab.add("Climber Lower Speed", 0).withPosition(2, 2).withSize(1,1).getEntry();
+    //ShuffleboardTab climberTab = Shuffleboard.getTab("Climber");
+    //m_lowerSpeed = -1; //climberTab.add("Climber Lower Speed", -1).withPosition(2, 2).withSize(1,1).getEntry();
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_speed = m_lowerSpeed.getDouble(0);
+    m_speed = -1; //m_lowerSpeed.getDouble(0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

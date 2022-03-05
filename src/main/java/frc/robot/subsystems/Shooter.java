@@ -28,9 +28,10 @@ public class Shooter extends SubsystemBase {
   private final TalonFXConfiguration shooterConfig;
   private int m_shooter_set_point;
 
-  private final int SHOOTER_SETPOINT_TARMAC_LINE   = 4000,
-                    SHOOTER_SETPOINT_CLOSESHOT   = 4000, 
-                    SHOOTER_SETPOINT_MIDTARMAC = 4000;
+  //10% is 1918
+  private final int SHOOTER_SETPOINT_TARMAC_LINE   = 7672, //40%
+                    SHOOTER_SETPOINT_CLOSESHOT   = 5754,   //30%
+                    SHOOTER_SETPOINT_MIDTARMAC = 6713;     //35%
     
   /** Creates a new Shooter. */
   public Shooter() {
@@ -78,7 +79,7 @@ public class Shooter extends SubsystemBase {
 
     m_Shooter.configAllSettings(shooterConfig);
 
-    m_Shooter.setInverted(false);
+    m_Shooter.setInverted(true);
 
     m_shooter_set_point = SHOOTER_SETPOINT_CLOSESHOT;
     // Default to the initiation line

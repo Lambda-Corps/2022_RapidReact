@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
+import org.photonvision.common.hardware.VisionLEDMode;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
@@ -107,5 +108,13 @@ public class Vision extends SubsystemBase {
       targetType.setString(allianceColor);
       m_HD3000.setPipelineIndex(pipelineIndex);
     }
+  }
+
+  public void setLEDon() {
+    m_limelight.setLED(VisionLEDMode.kOn);
+  }
+
+  public void setLEDoff() {
+    m_limelight.setLED(VisionLEDMode.kOff);
   }
 }

@@ -4,33 +4,69 @@
 
 package frc.robot.commands.shooter;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Shooter.ShotDistance;
 
 public class Shoot extends CommandBase {
-  /** Creates a new Shoot. */
-  Shooter m_shooter;
-  public Shoot(Shooter shooter) {
-    // Use addRequirements() here to declare subsystem dependencies.
+  private double m_setpoint, m_indexerSpeed, m_indexerDelay, m_runTime;
+  private Timer cmdTimer;
+
+  private final Shooter m_shooter;
+  private final Indexer m_indexer;
+  private final ShotDistance m_distance;
+  // private final NetworkTableEntry m_kpEntry, m_kiEntry, m_kdEntry, m_kfEntry, m_spEntry,m_indexerSpeedEntry, m_indexderDelayEntry, m_runTimeEntry;
+  /**
+   * Creates a new PIDTuningCommand.
+   */
+  /** Creates a new ShooterPIDTuning. */
+  public Shoot(Shooter shooter, Indexer indexer, ShotDistance distance) {
     m_shooter = shooter;
-    addRequirements(m_shooter);
+    m_indexer = indexer;
+    m_distance = distance;
+
+    cmdTimer = new Timer(); // used to delay the conveyor if necessary
+    cmdTimer.start();
+    
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(m_shooter, m_indexer);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+        // Grab the relevant values for the PID control from Shuffleboard and set the 
+    m_shooter.setShotDistance(m_distance);
+    cmdTimer.reset();
+    cmdTimer.start();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    // Drive the shooter motors, as well as the conveyor to start the 
+    m_shooter.velocityPID(m_setpoint);
+    if( cmdTimer.hasElapsed(m_indexerDelay)){
+      // Turn on the conveyor motor after the delay has been meet.
+      m_indexer.shootBalls();
+    }
+  }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_shooter.stopMotor();
+    m_indexer.stopMotors();
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return cmdTimer.hasElapsed(m_runTime);
   }
 }

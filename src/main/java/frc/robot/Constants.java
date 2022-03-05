@@ -98,10 +98,10 @@ public final class Constants {
 	public final static Gains kGains_IntakeDown =	  new Gains(2.69,  0.0,  0.0, 0.341,   100,  1.0 );
 	public final static Gains kGains_IntakeUp =  	  new Gains(0.299, 0.0,  0.0, 1.023,	200,  1.0 );
 	public final static Gains kGains_IntakeHold = 	  new Gains(8.000, 0.0,  40,  0.0,		300,  1.0 );
-	public final static Gains kGains_CloseShot =      new Gains(4.800, 0.0,  0.0, 0.341,    100,  1.0);
-	public final static Gains kGains_MidTarmac =      new Gains(4.800, 0.0,  0.0, 0.341,    200,  1.0);
-	public final static Gains kGains_TarmacLine =     new Gains(4.800, 0.0,  0.0, 0.341,    300,  1.0);
-	public final static Gains kGains_ShooterGains =   new Gains(4.800, 0.0,  0.0, 0.341,    400,  1.0);
+	public final static Gains kGains_CloseShot =      new Gains(0.050, 0.0,  0.0, 0.0533,    100,  1.0);
+	public final static Gains kGains_MidTarmac =      new Gains(1.000, 0.0,  0.0, 0.0533,    200,  1.0);
+	public final static Gains kGains_TarmacLine =     new Gains(1.000, 0.0,  0.0, 0.0533,    300,  1.0);
+	public final static Gains kGains_ShooterGains =   new Gains(1.000, 0.0,  0.0, 0.0533,    400,  1.0);
 
 	/** ---- Flat constants, you should not need to change these ---- */
 	/* We allow either a 0 or 1 when selecting an ordinal for remote devices [You can have up to 2 devices assigned remotely to a talon/victor] */

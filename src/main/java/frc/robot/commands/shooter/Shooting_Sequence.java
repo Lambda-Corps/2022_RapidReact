@@ -30,6 +30,7 @@ public class Shooting_Sequence extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
+      new SetShooterDistance(m_shooter, distance),
       new StartShooterWheel(m_shooter),
       new WaitUntilCommand(m_shooter::isUpToSpeed),
       new ShootBallsTilEmptyOrThreeSeconds(m_indexer),
