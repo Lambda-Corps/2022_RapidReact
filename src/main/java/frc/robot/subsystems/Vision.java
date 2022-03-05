@@ -83,15 +83,14 @@ public class Vision extends SubsystemBase {
     return range;
   }
 
-  public double[] getCargoTargetRange() {
-    double[] range = {0,0};
+  public double getCargoTargetYaw() {
+    double Yaw = 0;
     var result = m_HD3000.getLatestResult();
     if (hasTargets == true) {
-      range[0] = PhotonUtils.calculateDistanceToTargetMeters(CAMERA_HEIGHT_METERS, TARGET_HEIGHT_METERS, CAMERA_PITCH_RADIANS, Units.degreesToRadians(result.getBestTarget().getPitch()));
-      range[1] = result.getBestTarget().getYaw();
+      Yaw = result.getBestTarget().getYaw();
     }
 
-    return range;
+   return Yaw;
   }
 
   public void setTeamPipeline() {

@@ -3,7 +3,6 @@ package frc.robot.commands.vision;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Vision;
-import static frc.robot.Constants.*;
 
 public class DriveWithVision extends CommandBase {
   /** Creates a new VisionAlign. */

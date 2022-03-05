@@ -30,6 +30,7 @@ import frc.robot.commands.drivetrain.DriveMM;
 import frc.robot.commands.drivetrain.TurnToAngle;
 import frc.robot.commands.shooter.Shoot;
 import frc.robot.commands.shooter.ShooterPIDTuning;
+import frc.robot.commands.vision.AimAtCargo;
 import frc.robot.commands.vision.DriveWithVision;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Indexer;
@@ -37,6 +38,8 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LEDsubsystem;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Vision;
+import frc.robot.utils.GamepadAxisButton;
+
 import static frc.robot.Constants.*;
 
 /**
@@ -57,6 +60,7 @@ public class RobotContainer {
   // OI
   XboxController m_driver_controller, m_partner_controller;
   JoystickButton m_d_a, m_d_b, m_d_rb, m_d_lb, m_d_rs, m_d_ls, m_p_a, m_p_b, m_p_rb, m_d_sel, m_p_start, m_d_y;
+  GamepadAxisButton m_d_rt;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -77,6 +81,7 @@ public class RobotContainer {
     m_d_lb = new JoystickButton(m_driver_controller, XboxController.Button.kLeftBumper.value);
     m_d_ls = new JoystickButton(m_driver_controller, XboxController.Button.kLeftStick.value);
     m_d_rs = new JoystickButton(m_driver_controller, XboxController.Button.kRightStick.value);
+    m_d_rt = new GamepadAxisButton(m_driver_controller, 3);
     m_d_sel = new JoystickButton(m_driver_controller, XboxController.Button.kBack.value);
     m_p_a = new JoystickButton(m_partner_controller, XboxController.Button.kA.value);
     m_p_b = new JoystickButton(m_partner_controller, XboxController.Button.kB.value);
@@ -103,6 +108,7 @@ public class RobotContainer {
     // Driver Bindings
     m_d_a.whileHeld(new DriveWithVision(m_driveTrain, m_vision, TARGET_DISTANCE_CLOSE));
     m_d_b.whileHeld(new DriveWithVision(m_driveTrain, m_vision, TARGET_DISTANCE_FAR));
+    m_d_rt.whileHeld(new AimAtCargo(m_vision, m_driveTrain, m_driver_controller));
     m_d_rb.whenHeld(new PrintCommand("Driving Inverted"));
     m_d_lb.whenPressed(new DropIntakeAndCollectBalls(m_intake, m_indexer));
     m_d_lb.whenReleased(new ArmMM(m_intake, Intake.INTAKE_ARM_RETRACT));
