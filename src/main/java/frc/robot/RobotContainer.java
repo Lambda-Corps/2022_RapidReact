@@ -117,8 +117,6 @@ public class RobotContainer {
     m_d_y.whenPressed(new PrintCommand("Climber Cancelled"));
 
     // Partner Bindings
-    m_p_a.whenPressed(new Shoot/*Long Shot*/()); 
-    m_p_b.whenPressed(new Shoot/*Short Shot*/());
     m_p_rb.whileHeld(new EjectBalls(m_indexer));
     m_p_start.whenPressed(new ResetIntakeArmEncoder(m_intake));
   }
