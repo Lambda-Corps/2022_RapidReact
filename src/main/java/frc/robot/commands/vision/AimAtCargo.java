@@ -1,42 +1,46 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot.commands.vision;
 
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Vision;
 import static frc.robot.Constants.*;
 
-public class DriveWithVisionFar extends CommandBase {
-  /** Creates a new VisionAlign. */
-  DriveTrain m_driveTrain;
+public class AimAtCargo extends CommandBase {
+  /** Creates a new AimAtCargo. */
   Vision m_vision;
+  DriveTrain m_driveTrain;
+  XboxController m_drive_remote;
 
-  public DriveWithVisionFar(DriveTrain driveTrain, Vision vision) {
-    m_vision = vision;
+  public AimAtCargo(Vision vision, DriveTrain driveTrain, XboxController driverRemote) {
     m_driveTrain = driveTrain;
+    m_vision = vision;
+    m_drive_remote = driverRemote;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(driveTrain, vision);
+    addRequirements(vision, driveTrain);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     m_driveTrain.resetVisionPidController();
-
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double[] range = m_vision.getTargetRange();
-    m_driveTrain.visionDrive(range[0], range[1], TAREGET_DISTANCE_CLOSE);
+    double forward = m_drive_remote.getRawAxis(DRIVER_RIGHT_AXIS);
+    m_driveTrain.cargoAim(m_vision.getCargoTargetYaw(), forward);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    m_driveTrain.teleop_drive(0, 0);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

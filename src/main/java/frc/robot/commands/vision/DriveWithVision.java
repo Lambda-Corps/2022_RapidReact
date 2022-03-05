@@ -3,16 +3,18 @@ package frc.robot.commands.vision;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Vision;
-import static frc.robot.Constants.*;
 
-public class DriveWithVisionClose extends CommandBase {
+public class DriveWithVision extends CommandBase {
   /** Creates a new VisionAlign. */
   DriveTrain m_driveTrain;
   Vision m_vision;
+  double m_targetDistance;
 
-  public DriveWithVisionClose(DriveTrain driveTrain, Vision vision) {
+  public DriveWithVision(DriveTrain driveTrain, Vision vision, double targetDistance) {
     m_vision = vision;
     m_driveTrain = driveTrain;
+
+    m_targetDistance = targetDistance;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(driveTrain, vision);
@@ -28,8 +30,8 @@ public class DriveWithVisionClose extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double[] range = m_vision.getTargetRange();
-    m_driveTrain.visionDrive(range[0], range[1], TAREGET_DISTANCE_CLOSE);
+    double[] range = m_vision.getHubTargetRange();
+    m_driveTrain.visionDrive(range[0], range[1], m_targetDistance);
   }
 
   // Called once the command ends or is interrupted.

@@ -1,14 +1,9 @@
 package frc.robot.subsystems;
-
-import java.util.List;
-
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -16,6 +11,8 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.*;
+
+import java.net.PortUnreachableException;
 
 public class Vision extends SubsystemBase {
   int LIMELIGHTPIPELINE = 0;
@@ -25,7 +22,7 @@ public class Vision extends SubsystemBase {
   PhotonCamera m_limelight = new PhotonCamera("eagletron");
 
   ShuffleboardTab m_visionTab;
-  NetworkTableEntry m_tx, m_ty, m_ta, m_bestTarget, targetPitch, targetYaw, targetRange, targetCount, targetType;
+  NetworkTableEntry m_tx, m_ty, m_ta, m_bestTarget, targetPitch, targetYaw, targetRange, targetCount, targetType, cargoTarget, hubTarget;
   PhotonTrackedTarget m_target;
 
   double pitch, yaw, area;
@@ -49,25 +46,33 @@ public class Vision extends SubsystemBase {
       // double shooterminTargetArea = 10;        // square pixels
     
     NetworkTableInstance.getDefault().getTable("photonvision").getEntry("version").setValue("v2022.1.4");
+    
+    NetworkTable table = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Drive");
+    cargoTarget = table.getEntry("BallTarget");
+    hubTarget = table.getEntry("HighTarget");
   }
 
   @Override
   public void periodic() {
+    getCargoTargetStatus();
+    getHighTargetStatus();
   }
 
   private boolean getHighTargetStatus() {
     var result = m_limelight.getLatestResult();
      hasTargets = result.hasTargets();
+     hubTarget.setBoolean(hasTargets);
     return hasTargets;
   }
 
-  private boolean getCargoTargetStatus(){
+  private boolean getCargoTargetStatus() {
     var result = m_HD3000.getLatestResult();
      hasTargets = result.hasTargets();
+     cargoTarget.setBoolean(hasTargets);
     return hasTargets;
   }
 
-  public double[] getTargetRange() {
+  public double[] getHubTargetRange() {
     double[] range = {0,0};
     var result = m_limelight.getLatestResult();
     if (hasTargets == true) {
@@ -78,24 +83,29 @@ public class Vision extends SubsystemBase {
     return range;
   }
 
+  public double getCargoTargetYaw() {
+    double Yaw = 0;
+    var result = m_HD3000.getLatestResult();
+    if (hasTargets == true) {
+      Yaw = result.getBestTarget().getYaw();
+    }
+
+   return Yaw;
+  }
+
   public void setTeamPipeline() {
     int pipelineIndex;
     String allianceColor;
     if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
-      pipelineIndex = 0;
+      pipelineIndex = 1;
       allianceColor = "Blue Ball";
       targetType.setString(allianceColor);
       m_HD3000.setPipelineIndex(pipelineIndex);
     }else if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
-      pipelineIndex = 1;
+      pipelineIndex = 0;
       allianceColor = "Red Ball";
       targetType.setString(allianceColor);
       m_HD3000.setPipelineIndex(pipelineIndex);
     }
-  }
-
-  public void targetMode(int targetIndex) {
-    m_limelight.setPipelineIndex(targetIndex);
-    targetType.setString("Hub");
   }
 }

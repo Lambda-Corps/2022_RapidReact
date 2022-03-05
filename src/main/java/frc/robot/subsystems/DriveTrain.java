@@ -48,11 +48,10 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -668,6 +667,19 @@ public class DriveTrain extends SubsystemBase {
 		if (range > 0) {
 			forwardspeed = -m_speedPidController.calculate(range, goalInMeters);
 			turnspeed = -m_turnPidController.calculate(yaw, 0);
+		}
+
+		teleop_drive(forwardspeed, turnspeed);
+	}
+
+	public void cargoAim(double yaw, double forward) {
+		double forwardspeed = forward;
+		double turnspeed = 0;
+
+		if (yaw != 0) {
+			turnspeed = -m_turnPidController.calculate(yaw, 0);
+		}else {
+			turnspeed = 0;
 		}
 
 		teleop_drive(forwardspeed, turnspeed);

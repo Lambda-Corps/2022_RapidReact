@@ -4,11 +4,10 @@
 
 package frc.robot;
 
+import static frc.robot.Constants.TARGET_DISTANCE_CLOSE;
+import static frc.robot.Constants.TARGET_DISTANCE_FAR;
+
 import java.util.Map;
-
-import javax.swing.text.PlainDocument;
-
-import com.ctre.phoenix.music.Orchestra;
 
 import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -20,11 +19,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.Play_Eye_of_the_tiger;
-import frc.robot.commands.climber.HighBarClimb;
-import frc.robot.commands.climber.LowBarClimb;
-import frc.robot.commands.climber.TestClimberDown;
-import frc.robot.commands.climber.TestClimberUp;
 import frc.robot.commands.Indexer.EjectBalls;
 import frc.robot.commands.Indexer.TestIntakeIndexerAndShooter;
 import frc.robot.commands.Intake.ArmMM;
@@ -37,15 +31,17 @@ import frc.robot.commands.autonomous.fourBall;
 import frc.robot.commands.autonomous.oneBall;
 import frc.robot.commands.autonomous.twoBallLeft;
 import frc.robot.commands.autonomous.twoBallRight;
+import frc.robot.commands.climber.HighBarClimb;
+import frc.robot.commands.climber.LowBarClimb;
+import frc.robot.commands.climber.TestClimberDown;
+import frc.robot.commands.climber.TestClimberUp;
 import frc.robot.commands.default_commands.DriveTrainDefaultCommand;
 import frc.robot.commands.default_commands.IndexerDefaultCommand;
-import frc.robot.commands.drivetrain.DriveForSecondsFromShuffleboard;
 import frc.robot.commands.drivetrain.DriveMM;
 import frc.robot.commands.drivetrain.TurnToAngle;
-import frc.robot.commands.shooter.Shoot;
 import frc.robot.commands.shooter.ShooterPIDTuning;
-import frc.robot.commands.vision.DriveWithVisionClose;
-import frc.robot.commands.vision.DriveWithVisionFar;
+import frc.robot.commands.vision.AimAtCargo;
+import frc.robot.commands.vision.DriveWithVision;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Indexer;
@@ -53,6 +49,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.LEDsubsystem;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Vision;
+import frc.robot.utils.GamepadAxisButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -76,6 +73,7 @@ public class RobotContainer {
                  m_p_lb, m_p_rs, m_p_ls, m_p_start;
   //auto chooser
   private SendableChooser<Command> m_auto_chooser;
+  GamepadAxisButton m_d_rt;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -97,11 +95,12 @@ public class RobotContainer {
     m_d_lb = new JoystickButton(m_driver_controller, XboxController.Button.kLeftBumper.value);
     m_d_ls = new JoystickButton(m_driver_controller, XboxController.Button.kLeftStick.value);
     m_d_rs = new JoystickButton(m_driver_controller, XboxController.Button.kRightStick.value);
+    m_d_rt = new GamepadAxisButton(m_driver_controller, 3);
     m_d_sel = new JoystickButton(m_driver_controller, XboxController.Button.kBack.value);
     m_p_a = new JoystickButton(m_partner_controller, XboxController.Button.kA.value);
     m_p_b = new JoystickButton(m_partner_controller, XboxController.Button.kB.value);
     m_p_rb = new JoystickButton(m_partner_controller, XboxController.Button.kRightBumper.value);
-    m_p_x = new JoystickButton(m_partner_controller, XboxController.Button.kX.value);
+    m_p_start = new JoystickButton(m_partner_controller, XboxController.Button.kStart.value);
 
     m_driveTrain.setDefaultCommand(new DriveTrainDefaultCommand(m_driveTrain, m_driver_controller));
     m_indexer.setDefaultCommand(new IndexerDefaultCommand(m_indexer));
@@ -120,19 +119,20 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    m_d_a.whenHeld(new DriveWithVisionClose(m_driveTrain, m_vision));
-    m_d_b.whenHeld(new DriveWithVisionFar(m_driveTrain, m_vision));
+    // Driver Bindings
+    m_d_a.whileHeld(new DriveWithVision(m_driveTrain, m_vision, TARGET_DISTANCE_CLOSE));
+    m_d_b.whileHeld(new DriveWithVision(m_driveTrain, m_vision, TARGET_DISTANCE_FAR));
+    m_d_rt.whileHeld(new AimAtCargo(m_vision, m_driveTrain, m_driver_controller));
     m_d_rb.whenHeld(new PrintCommand("Driving Inverted"));
     m_d_lb.whenPressed(new DropIntakeAndCollectBalls(m_intake, m_indexer));
     m_d_lb.whenReleased(new ArmMM(m_intake, Intake.INTAKE_ARM_RETRACT));
     m_d_rs.whenPressed(new PrintCommand("Climber Up"));
     m_d_ls.whenPressed(new PrintCommand("Climber Down"));
     m_d_y.whenPressed(new PrintCommand("Climber Cancelled"));
-    
-    // m_p_a.whenPressed(new Shoot/*Long Shot*/()); 
-    // m_p_b.whenPressed(new Shoot/*Short Shot*/());
+
+    // Partner Bindings
     m_p_rb.whileHeld(new EjectBalls(m_indexer));
-    m_p_x.whenPressed(new ResetIntakeArmEncoder(m_intake));
+    m_p_start.whenPressed(new ResetIntakeArmEncoder(m_intake));
   }
 
   /**
@@ -142,7 +142,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return new PrintCommand("Auto");
+    return m_auto_chooser.getSelected();
   }
   
   private void buildShuffleboard(){
@@ -171,9 +171,9 @@ public class RobotContainer {
 
     // The drive tab is roughly 9 x 5 (columns x rows)
     // Camera can be 4 x 4, gyro 
-    driveTab.add("Cargo Cam", new HttpCamera("Cargo Photon", "http://10.50.24.11:5800"))
-                                            .withWidget(BuiltInWidgets.kCameraStream).withPosition(0, 0)
-                                            .withSize(4, 4);
+    // driveTab.add("Cargo Cam", new HttpCamera("Cargo Photon", "http://10.50.24.11:5800"))
+    //                                         .withWidget(BuiltInWidgets.kCameraStream).withPosition(0, 0)
+    //                                         .withSize(4, 4);
     // Add heading and outputs to the driver views
     driveTab.add("Gyro", m_driveTrain.getGyro()).withPosition(4, 0).withWidget(BuiltInWidgets.kGyro);
     driveTab.add("Left Output", 0).withSize(1, 1).withPosition(4, 2).withWidget(BuiltInWidgets.kDial)

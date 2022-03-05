@@ -55,7 +55,8 @@ public final class Constants {
 	public final static double CAMERA_HEIGHT_METERS = 0.9144;
 	public final static double CAMERA_PITCH_RADIANS = 0.785398;
 	public final static double TARGET_HEIGHT_METERS = 2.64;
-	public final static double TAREGET_DISTANCE_CLOSE = 2.17805;
+	public final static double TARGET_DISTANCE_CLOSE = 0.6096;
+	public final static double TARGET_DISTANCE_FAR = 2.15265;
 
     //////////// Talon Specific Values ///////////
     /**

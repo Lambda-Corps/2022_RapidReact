@@ -13,7 +13,7 @@ import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Shooter;
 
 public class ShooterPIDTuning extends CommandBase {
-  private double m_setpoint, m_tolerance, m_indexerSpeed, m_indexerDelay, m_runTime;
+  private double m_setpoint, m_indexerSpeed, m_indexerDelay, m_runTime;
   private Timer cmdTimer;
 
   private final Shooter m_shooter;

@@ -95,7 +95,6 @@ public class Intake extends SubsystemBase {
     m_armMotor.configMotionCruiseVelocity(300, 0);
     m_armMotor.configMotionAcceleration(300, 0);
 
-    // TODO set the limits
     //current limits?
     //m_armMotor.configPeakCurrentLimit(0);
     //m_armMotor.configContinuousCurrentLimit(amps);
