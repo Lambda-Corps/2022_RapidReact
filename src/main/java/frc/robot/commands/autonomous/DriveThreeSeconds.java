@@ -6,7 +6,6 @@ package frc.robot.commands.autonomous;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.commands.drivetrain.DriveMM;
 import frc.robot.subsystems.DriveTrain;
 
 public class DriveThreeSeconds extends CommandBase {

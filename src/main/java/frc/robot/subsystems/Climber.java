@@ -4,17 +4,19 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import static frc.robot.Constants.CLIMER_SRX;
+import static frc.robot.Constants.FORWARD_LIMIT_SWITCH;
+import static frc.robot.Constants.REVERSE_LIMIT_SWITCH;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.Faults;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-import static frc.robot.Constants.*;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
   /** Creates a new Climber. */
@@ -26,19 +28,17 @@ public class Climber extends SubsystemBase {
   DigitalInput m_reverseLimitSwitch;
   DigitalInput m_forwardLimitSwitch;
 
-  private boolean m_limitReached;
+  // private boolean m_limitReached;
 
   //Soft Limits
   private final int CLIMBER_REVERSE_SOFT_LIMIT = 0;
   private final int CLIMBER_FORWARD_SOFT_LIMIT = 24300; 
 
   //Max Climber Speed
-  private final double MAX_CLIMBER_SPEED = 1; //TODO: get proper max climber speed
+  private final double MAX_CLIMBER_SPEED = 1; 
 
   public Climber() {
     m_faults = new Faults();
-
-    m_limitReached = false;
 
     m_climberMotor = new TalonSRX(CLIMER_SRX);
     m_climberMotor.configFactoryDefault();

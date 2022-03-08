@@ -8,11 +8,9 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.Intake.ArmMM;
 import frc.robot.commands.Intake.CollectBalls;
-import frc.robot.commands.Intake.DropIntakeAndCollectBalls;
 import frc.robot.commands.drivetrain.DriveMM;
 import frc.robot.commands.drivetrain.TurnToAngle;
 import frc.robot.commands.shooter.Shoot;
-import frc.robot.commands.shooter.Auto_Shooting_Sequence;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
@@ -40,7 +38,7 @@ public class twoBallLeft extends SequentialCommandGroup {
     addCommands(
       new ArmMM(m_intake, Intake.INTAKE_ARM_EXTEND),
       new ParallelCommandGroup(new CollectBalls(m_intake, m_indexer).withTimeout(3), new DriveMM(m_drive_train, 40.44)),
-      new ArmMM(m_intake, m_intake.INTAKE_ARM_RETRACT),
+      new ArmMM(m_intake, Intake.INTAKE_ARM_RETRACT),
       new TurnToAngle(m_drive_train, 180), //turn around
       new DriveMM(m_drive_train, 115.44), //drive up to fender, may need lowered a little
       new TurnToAngle(m_drive_train, 30), //angle to be perpendicular to the hub fender
