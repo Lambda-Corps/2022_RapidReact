@@ -4,17 +4,14 @@
 
 package frc.robot.commands.shooter;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShotDistance;
 
 public class Shoot extends CommandBase {
-  private double m_setpoint, m_indexerSpeed, m_indexerDelay, m_runTime;
+  private double m_setpoint, m_indexerDelay, m_runTime;
   private Timer cmdTimer;
 
   private final Shooter m_shooter;

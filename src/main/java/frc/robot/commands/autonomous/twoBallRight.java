@@ -40,7 +40,7 @@ public class twoBallRight extends SequentialCommandGroup {
     addCommands(
       new ArmMM(m_intake, Intake.INTAKE_ARM_EXTEND),
       new ParallelCommandGroup(new CollectBalls(m_intake, m_indexer).withTimeout(3), new DriveMM(m_drive_train, 40.44)),
-      new ArmMM(m_intake, m_intake.INTAKE_ARM_RETRACT),
+      new ArmMM(m_intake, Intake.INTAKE_ARM_RETRACT),
       new TurnToAngle(m_drive_train, 180), //turn around
       new DriveMM(m_drive_train, 40.44),
       new TurnToAngle(m_drive_train, -30), //angle to be perpendicular to the hub fender

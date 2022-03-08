@@ -1,19 +1,20 @@
 package frc.robot.subsystems;
+import static frc.robot.Constants.CAMERA_HEIGHT_METERS;
+import static frc.robot.Constants.CAMERA_PITCH_RADIANS;
+import static frc.robot.Constants.TARGET_HEIGHT_METERS;
+
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 import org.photonvision.common.hardware.VisionLEDMode;
 import org.photonvision.targeting.PhotonTrackedTarget;
+
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.Constants.*;
-
-import java.net.PortUnreachableException;
 
 public class Vision extends SubsystemBase {
   int LIMELIGHTPIPELINE = 0;
@@ -55,8 +56,8 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // getCargoTargetStatus();
-    // getHighTargetStatus();
+    getCargoTargetStatus();
+    getHighTargetStatus();
   }
 
   private boolean getHighTargetStatus() {
