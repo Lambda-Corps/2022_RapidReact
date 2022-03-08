@@ -31,7 +31,7 @@ public class TurnToAngle extends CommandBase {
     //arclengthDegrees = m_arclengthEntry.getDouble(0);
     //see 2020 or 2019 code for explanation on these calculations
     m_count = 0;
-    m_driveTrain.motionMagicStartConfigsTurn();
+    m_driveTrain.motionMagicStartConfigsTurn((m_arc_length_ticks < 0), m_arc_length_ticks);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

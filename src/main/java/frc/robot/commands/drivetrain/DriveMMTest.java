@@ -55,7 +55,7 @@ public class DriveMMTest extends CommandBase {
     count = 0;
     m_driveTrain.setEncodersToZero();
     m_driveTrain.reset_drive_PID_values(m_drive_kP, m_kI, m_kD);
-    m_driveTrain.motion_magic_start_config_drive(m_targetTicks >= 0);
+    m_driveTrain.motion_magic_start_config_drive(m_targetTicks >= 0, m_targetTicks);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

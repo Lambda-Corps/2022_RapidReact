@@ -34,7 +34,7 @@ public class DriveMM extends CommandBase {
   @Override
   public void initialize() {
     count = 0;
-    m_driveTrain.motion_magic_start_config_drive(m_targetPosition >= 0);
+    m_driveTrain.motion_magic_start_config_drive(m_targetPosition >= 0, m_targetPosition);
     
   }
 

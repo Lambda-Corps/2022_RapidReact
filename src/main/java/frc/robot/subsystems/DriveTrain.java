@@ -92,6 +92,10 @@ public class DriveTrain extends SubsystemBase {
 	PIDController m_speedPidController, m_turnPidController;
 	double visionDrivekP, visionDrivekD, visionTurnkP, visionTurnkD;
 
+	// Motion Magic Setpoints for each side of the motor
+	private double m_left_setpoint, m_right_setpoint;
+	private boolean m_isCCWTurn;
+
   	/** Creates a new DriveTrain. */
  	public DriveTrain() {
     	m_gyro = new AHRS(SPI.Port.kMXP);
@@ -169,17 +173,7 @@ public class DriveTrain extends SubsystemBase {
 		_rightConfig.slot1.integralZone = kGains_Turning.kIzone;
 		_rightConfig.slot1.closedLoopPeakOutput = kGains_Turning.kPeakOutput;
 			
-		/* 1ms per loop.  PID loop can be slowed down if need be.
-		 * For example,
-		 * - if sensor updates are too slow
-		 * - sensor deltas are very small per update, so derivative error never gets large enough to be useful.
-		 * - sensor movement is very slow causing the derivative error to be near zero.
-		 */
-		int closedLoopTimeMs = 1;
-		_rightConfig.slot0.closedLoopPeriod = closedLoopTimeMs;
-		_rightConfig.slot1.closedLoopPeriod = closedLoopTimeMs;
-		_rightConfig.slot2.closedLoopPeriod = closedLoopTimeMs;
-   		_rightConfig.slot3.closedLoopPeriod = closedLoopTimeMs;
+		
 		
 		   /* FPID Gains for turn servo */
 		/* FPID for Distance */
@@ -204,10 +198,20 @@ public class DriveTrain extends SubsystemBase {
 		 * - sensor deltas are very small per update, so derivative error never gets large enough to be useful.
 		 * - sensor movement is very slow causing the derivative error to be near zero.
 		 */
+
+		int closedLoopTimeMs = 1;
+		_rightConfig.slot0.closedLoopPeriod = closedLoopTimeMs;
+		_rightConfig.slot1.closedLoopPeriod = closedLoopTimeMs;
+		_rightConfig.slot2.closedLoopPeriod = closedLoopTimeMs;
+   		_rightConfig.slot3.closedLoopPeriod = closedLoopTimeMs;
+		_rightConfig.slot0.allowableClosedloopError = 25;
+		_rightConfig.slot1.allowableClosedloopError = 25;
 		_leftConfig.slot0.closedLoopPeriod = closedLoopTimeMs;
 		_leftConfig.slot1.closedLoopPeriod = closedLoopTimeMs;
 		_leftConfig.slot2.closedLoopPeriod = closedLoopTimeMs;
    		_leftConfig.slot3.closedLoopPeriod = closedLoopTimeMs;
+		_leftConfig.slot0.allowableClosedloopError = 25;
+		_leftConfig.slot1.allowableClosedloopError = 25;
 
 		// _rightConfig.openloopRamp = kOpenLoopRamp;
 		// _leftConfig.openloopRamp = kOpenLoopRamp;
@@ -398,29 +402,33 @@ public class DriveTrain extends SubsystemBase {
   	}
 
 	public boolean motionMagicDrive(double target_position) {
-		double tolerance = 100;
+		double tolerance = 25;
 		
-			m_left_leader.set(ControlMode.MotionMagic, target_position);
-			m_right_leader.set(ControlMode.MotionMagic, target_position);
+		m_left_leader.set(ControlMode.MotionMagic, m_left_setpoint);
+		m_right_leader.set(ControlMode.MotionMagic, m_right_setpoint);
+		// m_left_leader.set(ControlMode.MotionMagic, target_position);
+		// m_right_leader.set(ControlMode.MotionMagic, target_position);
 	
-			double currentPos_L = m_left_leader.getSelectedSensorPosition();
-			double currentPos_R = m_right_leader.getSelectedSensorPosition();
+		double currentPos_L = m_left_leader.getSelectedSensorPosition();
+		double currentPos_R = m_right_leader.getSelectedSensorPosition();
 	
-			return Math.abs(currentPos_L - target_position) < tolerance && (currentPos_R - target_position) < tolerance;
-	  }
+		return Math.abs(currentPos_L - m_left_setpoint) < tolerance && Math.abs(currentPos_R - m_right_setpoint) < tolerance;
+	}
 
   	public boolean motionMagicTurn(double arcTicks){
-		  double tolerance = 500; 
-		  m_left_leader.set(ControlMode.MotionMagic, arcTicks);
-		  m_right_leader.set(ControlMode.MotionMagic, -arcTicks);
-		  double currentLeftPos =  Math.abs(m_left_leader.getSelectedSensorPosition());
-		  double currentRightPos = Math.abs(m_right_leader.getSelectedSensorPosition());
-		  double targetTicks = Math.abs(arcTicks);
-		return (targetTicks - currentLeftPos) < tolerance && (targetTicks - currentRightPos) < tolerance;
-	  }
+		double tolerance = 25; 
+		m_left_leader.set(ControlMode.MotionMagic, m_left_setpoint);
+		m_right_leader.set(ControlMode.MotionMagic, m_right_setpoint);
+		double currentLeftPos =  m_left_leader.getSelectedSensorPosition();
+		double currentRightPos = m_right_leader.getSelectedSensorPosition();
+		 
+		return Math.abs(m_left_setpoint - currentLeftPos) < tolerance && Math.abs(m_right_setpoint - currentRightPos) < tolerance;
+	}
 
-	public void motion_magic_start_config_drive(boolean isForward){
-		setEncodersToZero();
+	public void motion_magic_start_config_drive(boolean isForward, double lengthInTicks){
+		// setEncodersToZero();
+		m_left_setpoint = m_left_leader.getSelectedSensorPosition() + lengthInTicks;
+		m_right_setpoint = m_right_leader.getSelectedSensorPosition() + lengthInTicks;
 
 		m_left_leader.configMotionCruiseVelocity(8318,kTimeoutMs);
 		m_left_leader.configMotionAcceleration(8318, kTimeoutMs); //cruise velocity / 2, so will take 2 seconds
@@ -440,13 +448,27 @@ public class DriveTrain extends SubsystemBase {
 		// }
 	}
 
-	public void motionMagicStartConfigsTurn(){
+	public void motionMagicStartConfigsTurn(boolean isCCWturn, double lengthInTicks){
+		m_isCCWTurn = isCCWturn;
+
 		m_left_leader.selectProfileSlot(kSlot_Turning, PID_PRIMARY);
 		m_right_leader.selectProfileSlot(kSlot_Turning, PID_PRIMARY);
 		m_left_leader.configMotionCruiseVelocity(16636, kTimeoutMs);
 		m_left_leader.configMotionAcceleration(8318, kTimeoutMs);
 		m_right_leader.configMotionCruiseVelocity(16636, kTimeoutMs);
 		m_right_leader.configMotionAcceleration(8318, kTimeoutMs);
+	
+		if( m_isCCWTurn ){
+			// length in Ticks is negative
+			m_left_setpoint = m_left_leader.getSelectedSensorPosition() + lengthInTicks;
+			m_right_setpoint = m_right_leader.getSelectedSensorPosition() - lengthInTicks;
+			// m_left_leader.config_kF(kSlot_Turning, kGains_Turning.kF * -1);
+		}
+		else {
+			m_left_setpoint = m_left_leader.getSelectedSensorPosition() + lengthInTicks;
+			m_right_setpoint = m_right_leader.getSelectedSensorPosition() - lengthInTicks;
+			// m_right_leader.config_kF(kSlot_Turning, kGains_Turning.kF * -1);
+		}
 	}
 
 	public void motion_magic_end_config_turn(){
@@ -716,5 +738,17 @@ public class DriveTrain extends SubsystemBase {
 		}
 
 		teleop_drive(forwardspeed, turnspeed);
+	}
+
+	public double getAverageClosedLoopError(){
+		return (m_right_leader.getClosedLoopError() + m_left_leader.getClosedLoopError()) / 2;
+	}
+
+	public double getRightSetPoint(){
+		return m_right_setpoint;
+	}
+
+	public double getLeftSetPoint(){
+		return m_left_setpoint;
 	}
 }

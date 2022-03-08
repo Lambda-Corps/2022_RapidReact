@@ -261,6 +261,8 @@ public class RobotContainer {
     driveMMTab.addNumber("Right Encoder", m_driveTrain::getRightEncoderValue).withPosition(2, 1);
     driveMMTab.addNumber("Gyro Read", m_driveTrain::getRawAngle)             .withPosition(3, 1);
     driveMMTab.add("Run Time", 0)                                            .withPosition(4, 1);
+    driveMMTab.addNumber("Left SP", m_driveTrain::getLeftSetPoint).withPosition(5, 1).withSize(1, 1);
+    driveMMTab.addNumber("Right SP", m_driveTrain::getRightSetPoint).withPosition(6, 1).withSize(1, 1);
    
     // Drive limiters on row 3
     driveMMTab.add("Forward Limiter", 2.5).withPosition(0, 2);
@@ -270,15 +272,13 @@ public class RobotContainer {
 
     // Drive commands on row 4
     driveMMTab.add("Drive MM 100", new DriveMM(m_driveTrain, 100))        .withPosition(0, 3).withSize(2, 1);
-    driveMMTab.add("DriveTest MM 100", new DriveMMTest(m_driveTrain, 100)).withPosition(2, 3).withSize(2, 1);
-    driveMMTab.add("Drive MM -100", new DriveMM(m_driveTrain, -100))      .withPosition(4, 3).withSize(2, 1);
-    driveMMTab.add("DriveTest MM -100", new DriveMMTest(m_driveTrain, -100))  .withPosition(6, 3).withSize(2, 1);
+    driveMMTab.add("Drive MM -100", new DriveMM(m_driveTrain, -100))      .withPosition(2, 3).withSize(2, 1);
+    driveMMTab.add("DriveTest MM -100", new DriveMMTest(m_driveTrain, 0))  .withPosition(4, 3).withSize(2, 1);
 
     // Turn commands on row 5
     driveMMTab.add("Turn MM 90", new TurnToAngle(m_driveTrain, 90))          .withPosition(0, 4).withSize(2, 1);
-    driveMMTab.add("TurnTest MM 90", new TurnToAngleTest(m_driveTrain, 90))  .withPosition(2, 4).withSize(2, 1);
-    driveMMTab.add("Turn MM -90", new TurnToAngle(m_driveTrain, -90))        .withPosition(4, 4).withSize(2, 1);
-    driveMMTab.add("TurnTest MM -90", new TurnToAngleTest(m_driveTrain, -90)).withPosition(6, 4).withSize(2, 1);
+    driveMMTab.add("Turn MM -90", new TurnToAngle(m_driveTrain, -90))        .withPosition(2, 4).withSize(2, 1);
+    driveMMTab.add("TurnTest MM 90", new TurnToAngleTest(m_driveTrain, 0))  .withPosition(4, 4).withSize(2, 1);
   }
 
   public void buildShooterTab(){

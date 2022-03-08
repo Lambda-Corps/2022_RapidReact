@@ -48,11 +48,8 @@ public class TurnToAngleTest extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    //arclengthDegrees = m_arclengthEntry.getDouble(0);
-    //see 2020 or 2019 code for explanation on these calculations
     m_arcLengthticks = m_arclengthEntry.getDouble(0) * kEncoderTicksPerDegree;
-    // ^^^ arc length in ticks = degrees to turn * ticks per 1 inch * degrees per 1 inch
-    m_arclengthticksEntry.forceSetDouble(m_arcLengthticks);
+    m_arclengthticksEntry.setDouble(m_arcLengthticks);
     m_turn_kP = m_turnkPEntry.getDouble(0.0);
     m_kI = m_kIEntry.getDouble(0.0);
     m_kD = m_kDEntry.getDouble(0.0);
@@ -60,10 +57,7 @@ public class TurnToAngleTest extends CommandBase {
     m_start_time = Timer.getFPGATimestamp();
     count = 0;
     m_driveTrain.reset_turn_PID_values(m_turn_kP, m_kI, m_kD);
-    m_driveTrain.setEncodersToZero();
-    m_driveTrain.motionMagicStartConfigsTurn();
-    currentAngle = m_driveTrain.m_gyro.getAngle();
-    m_target_angle = currentAngle + m_target_angle;
+    m_driveTrain.motionMagicStartConfigsTurn((m_arcLengthticks < 0), m_arcLengthticks);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -75,16 +69,6 @@ public class TurnToAngleTest extends CommandBase {
     } else {
       count = 0;
     }
-
-    currentAngle = m_driveTrain.m_gyro.getAngle();
-    // if (Math.abs(arclengthDegrees - currentAngle) < tolerance){
-    //   m_driveTrain.teleop_drive(0, 0);
-    //   isDone = true;
-    // } else if (currentAngle < arclengthDegrees){
-    //   m_driveTrain.teleop_drive(0, speed);
-    // } else if (currentAngle > arclengthDegrees){
-    //   m_driveTrain.teleop_drive(0, -speed);
-    // }
   }
 
   // Called once the command ends or is interrupted.
