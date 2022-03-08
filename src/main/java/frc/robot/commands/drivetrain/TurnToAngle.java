@@ -4,48 +4,22 @@
 
 package frc.robot.commands.drivetrain;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import static frc.robot.Constants.kEncoderTicksPerDegree;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 
 public class TurnToAngle extends CommandBase {
   DriveTrain m_driveTrain;
-  public static double currentAngle;
-  double arclengthDegrees;
-  boolean isDone = false;
   double tolerance;
-  double speed;
-  int count;
-  private double m_start_time;
-  int arclengthTicks;
+  double m_arc_length_ticks;
   int STABLE_ITERATIONS_BEFORE_FINISHED = 5;
-  // public final ShuffleboardTab turnMMTab;
-  private double m_turn_kP, m_kI, m_kD;
-  private NetworkTableEntry m_turnkPEntry, m_kIEntry, m_kDEntry, m_arclengthEntry, m_iterationEntry, m_drivedurationEntry, m_arclengthticksEntry;
+  double m_count = 0;
+
   /** Creates a new TurnToAngle. */
   public TurnToAngle(DriveTrain driveTrain, double angle) {
     m_driveTrain = driveTrain;
-    arclengthDegrees = angle;
-    NetworkTable driveTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Drive MM Testing");
-    m_turnkPEntry = driveTab.getEntry("kP_drive");
-    m_kIEntry = driveTab.getEntry("kI");
-    m_kDEntry = driveTab.getEntry("kD");
-    //m_kFEntry = driveTab.getEntry("kF");
-    m_iterationEntry = driveTab.getEntry("Finish Iter.");
-    m_arclengthEntry = driveTab.getEntry("target degrees");
-    m_arclengthticksEntry = driveTab.getEntry("Calc Ticks");
-    m_drivedurationEntry = driveTab.getEntry("Run Time");
-    m_kIEntry = driveTab.getEntry("kI");
-    // turnMMTab = Shuffleboard.getTab("Turn MM Testing");
-    
-    
-    
+    m_arc_length_ticks = angle * kEncoderTicksPerDegree;
     
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_driveTrain);
@@ -56,38 +30,21 @@ public class TurnToAngle extends CommandBase {
   public void initialize() {
     //arclengthDegrees = m_arclengthEntry.getDouble(0);
     //see 2020 or 2019 code for explanation on these calculations
-    arclengthTicks = (int) (arclengthDegrees * 1108.23 * 0.2291); 
-    // ^^^ arc length in ticks = degrees to turn * ticks per 1 inch * degrees per 1 inch
-    // m_arclengthticksEntry.forceSetDouble(arclengthTicks);
-    // m_turn_kP = m_turnkPEntry.getDouble(0.0);
-    // m_kI = m_kIEntry.getDouble(0.0);
-    // m_kD = m_kDEntry.getDouble(0.0);
-    // STABLE_ITERATIONS_BEFORE_FINISHED = (int) m_iterationEntry.getDouble(5.0);
-    // m_start_time = Timer.getFPGATimestamp();
-    count = 0;
-    // m_driveTrain.reset_turn_PID_values(m_turn_kP, m_kI, m_kD);
-    m_driveTrain.setEncodersToZero();
+    m_count = 0;
     m_driveTrain.motionMagicStartConfigsTurn();
-    //arclengthDegrees = SmartDashboard.getNumber("Arc Length in Degrees", 0);
-    //speed = SmartDashboard.getNumber("Speed", 0);
-    currentAngle = m_driveTrain.m_gyro.getAngle();
-    // arclengthDegrees = currentAngle + arclengthDegrees;
-    m_driveTrain.disableMotorSafety();
-    isDone = false;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     //m_driveTrain.feedWatchdog(); is this needed?
-    if (m_driveTrain.motionMagicTurn(arclengthTicks)){
-      count++;
+    if (m_driveTrain.motionMagicTurn(m_arc_length_ticks)){
+      m_count++;
     } else {
-      count = 0;
+      m_count = 0;
     }
     // m_countokEntry.setDouble(count);
 
-    currentAngle = m_driveTrain.m_gyro.getAngle();
     // if (Math.abs(arclengthDegrees - currentAngle) < tolerance){
     //   m_driveTrain.teleop_drive(0, 0);
     //   isDone = true;
@@ -106,13 +63,11 @@ public class TurnToAngle extends CommandBase {
     //m_drivedurationEntry.setDouble(drive_duration);
     m_driveTrain.teleop_drive(0, 0);
     m_driveTrain.motion_magic_end_config_turn();
-    m_driveTrain.enableMotorSafety();
-    isDone = true;
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return count >= STABLE_ITERATIONS_BEFORE_FINISHED;
+    return m_count >= STABLE_ITERATIONS_BEFORE_FINISHED;
   }
 }

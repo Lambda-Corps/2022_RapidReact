@@ -71,8 +71,17 @@ public final class Constants {
 	 * Drive the robot in counter clockwise rotations and measure the units per rotation.
 	 * Take the average of the two.
 	 */
+	public static final int kCountsPerRev = 2048;    // Encoder counts per revolution of the motor shaft.
+	public static final double kSensorGearRatio = 10.71; // Gear ratio is the ratio between the *encoder* and the wheels. On the AndyMark
+														// drivetrain, encoders mount 1:1 with the gearbox shaft.
+	public static final double kGearRatio = 10.71;   // Switch kSensorGearRatio to this gear ratio if encoder is on the motor instead
+														// of on the gearbox.
+	public static final double kWheelRadiusInches = 3.0;
+	public static final int k100msPerSecond = 10;
 	public final static int kEncoderUnitsPerRotation = 88554;
-	public final static int kEncoderTicksPerInch = 1074;
+	public final static double kEncoderTicksPerDegree = kEncoderUnitsPerRotation / 360;
+	public static final double kEncoderTicksPerInch = (kCountsPerRev * kGearRatio) / (2 * Math.PI * kWheelRadiusInches);
+
     /**
 	 * Set to zero to skip waiting for confirmation.
 	 * Set to nonzero to wait and report to DS if action fails.
@@ -93,15 +102,15 @@ public final class Constants {
      * Not all set of Gains are used in this project and may be removed as desired.
      * 	
 	 * 	                                    			  		 kP      kI   kD   kF        Iz    PeakOut */
-	public final static Gains kGains_Turning =   	  new Gains(0.15,   0.0,  0.0, 0.003699, 200,  1.0 );
+	public final static Gains kGains_Turning =   	  new Gains(0.3,   0.0,  0.0, 0.1, 200,  1.0 );
 	public final static Gains kGains_Driving =   	  new Gains(0.3,   0.0,  0.0, 0.1, 100,  1.0 );
 	public final static Gains kGains_IntakeDown =	  new Gains(2.69,  0.0,  0.0, 0.341,   100,  1.0 );
 	public final static Gains kGains_IntakeUp =  	  new Gains(0.299, 0.0,  0.0, 1.023,	200,  1.0 );
 	public final static Gains kGains_IntakeHold = 	  new Gains(8.000, 0.0,  40,  0.0,		300,  1.0 );
-	public final static Gains kGains_CloseShot =      new Gains(1.00, 0.0,  0.0, 0.0533,    100,  1.0);
-	public final static Gains kGains_MidTarmac =      new Gains(1.00, 0.0,  0.0, 0.0533,    200,  1.0);
-	public final static Gains kGains_TarmacLine =     new Gains(1.00, 0.0,  0.0, 0.0533,    300,  1.0);
-	public final static Gains kGains_ShooterGains =   new Gains(1.00, 0.0,  0.0, 0.0533,    400,  1.0);
+	public final static Gains kGains_CloseShot =      new Gains(1.00, 0.0,  10.0, 0.0533,    100,  1.0);
+	public final static Gains kGains_MidTarmac =      new Gains(1.00, 0.0,  10.0, 0.0533,    200,  1.0);
+	public final static Gains kGains_TarmacLine =     new Gains(1.00, 0.0,  10.0, 0.0533,    300,  1.0);
+	public final static Gains kGains_ShooterGains =   new Gains(1.00, 0.0,  10.0, 0.0533,    400,  1.0);
 
 	/** ---- Flat constants, you should not need to change these ---- */
 	/* We allow either a 0 or 1 when selecting an ordinal for remote devices [You can have up to 2 devices assigned remotely to a talon/victor] */
@@ -116,7 +125,7 @@ public final class Constants {
 	public final static int SLOT_2 = 2;
 	public final static int SLOT_3 = 3;
 	/* ---- Named slots, used to clarify code ---- */
-	public final static int kSlot_Distanc = SLOT_0;
+	public final static int kSlot_DriveMM = SLOT_0;
 	public final static int kSlot_Turning = SLOT_1;
 	public final static int kSlot_Velocit = SLOT_2;
 	public final static int kSlot_MotProf = SLOT_3;
@@ -126,13 +135,7 @@ public final class Constants {
 	public final static int kSlot_MidTarmac  = SLOT_2;
 	public final static int kSlot_TarmacLine = SLOT_3;
 
-	public static final int kCountsPerRev = 2048;    // Encoder counts per revolution of the motor shaft.
-	public static final double kSensorGearRatio = 10.71; // Gear ratio is the ratio between the *encoder* and the wheels. On the AndyMark
-														// drivetrain, encoders mount 1:1 with the gearbox shaft.
-	public static final double kGearRatio = 10.71;   // Switch kSensorGearRatio to this gear ratio if encoder is on the motor instead
-														// of on the gearbox.
-	public static final double kWheelRadiusInches = 3.25;
-	public static final int k100msPerSecond = 10;
+
 
 	public static boolean kGyroReversed = true;
 

@@ -35,7 +35,6 @@ public class oneBall extends SequentialCommandGroup {
     //ball placed inside indexer, robot placed 19 inches away from hub fender
     addCommands(
       new Shoot(m_shooter, m_indexer, ShotDistance.ClosestShot),
-      new TurnToAngle(m_drive_train, 350),
       new DriveMM(m_drive_train, -50)//DriveMM(m_drive_train, 50)
     );
   }

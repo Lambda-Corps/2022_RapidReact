@@ -45,7 +45,10 @@ import frc.robot.commands.combined.StopShooterAndIndexerMotors;
 import frc.robot.commands.default_commands.DriveTrainDefaultCommand;
 import frc.robot.commands.default_commands.IndexerDefaultCommand;
 import frc.robot.commands.drivetrain.DriveMM;
+import frc.robot.commands.drivetrain.DriveMMTest;
 import frc.robot.commands.drivetrain.TurnToAngle;
+import frc.robot.commands.drivetrain.TurnToAngleTest;
+import frc.robot.commands.drivetrain.UpdateDriveLimiters;
 import frc.robot.commands.shooter.CancelShooter;
 import frc.robot.commands.shooter.SetShooterDistance;
 import frc.robot.commands.shooter.Shoot;
@@ -180,25 +183,24 @@ public class RobotContainer {
   
   private void buildShuffleboard(){
     buildDriverTab();
-
+    buildDriverTestTab();
     buildShooterTab();
 
-    Shuffleboard.getTab("Drive MM Testing").add(new DriveMM(m_driveTrain, 0));
-    Shuffleboard.getTab("Combined Test").add(new TestIntakeIndexerAndShooter(m_indexer, m_intake, m_shooter)).withPosition(0, 1).withSize(2, 1);
-    Shuffleboard.getTab("Combined Test").add(new SetForwardLimit(m_intake)).withPosition(0, 3).withSize(2, 1);
-    Shuffleboard.getTab("Arm MM Testing").add("ReSet Intake Arm", new SetArm(m_intake)).withPosition(0, 3).withSize(2, 1);
-    Shuffleboard.getTab("Intake").add("Extend Intake", new ArmMM(m_intake, Intake.INTAKE_ARM_EXTEND)).withPosition(0, 2).withSize(2,1);
-    Shuffleboard.getTab("Intake").add("Retract Intake", new ArmMM(m_intake, Intake.INTAKE_ARM_RETRACT)).withPosition(2,2).withSize(2,1);
-    Shuffleboard.getTab("Arm MM Testing").add(new ResetIntakeArmEncoder(m_intake)).withPosition(0, 2).withSize(2, 1);
-    Shuffleboard.getTab("ShooterPID").add("Shoot" , new ShooterPIDTuning(m_shooter, m_indexer)).withPosition(0, 3);
-    Shuffleboard.getTab("Turn MM Testing").add("Turn MM", new TurnToAngle(m_driveTrain, 0)).withPosition(0, 3).withSize(2, 1);
-    Shuffleboard.getTab("Intake").add(new CollectBalls(m_intake, m_indexer)).withPosition(0, 1).withSize(2, 1);
-    Shuffleboard.getTab("Intake").add(new DropIntakeAndCollectBalls(m_intake, m_indexer)).withPosition(2, 1).withSize(2, 1);
-    Shuffleboard.getTab("Intake").add(new EjectBalls(m_indexer)).withPosition(0, 3).withSize(2, 1);
-    Shuffleboard.getTab("Climber").add("Climber Up", new TestClimberUp(m_climber)).withPosition(6, 1);
-    Shuffleboard.getTab("Climber").add("Climber Down", new TestClimberDown(m_climber)).withPosition(7, 1);
-    Shuffleboard.getTab("Climber").add("Low Bar Climb", new LowBarClimb(m_climber, m_driver_controller)).withPosition(8, 2);
-    Shuffleboard.getTab("Climber").add("High Bar Climb", new HighBarClimb(m_climber, m_driver_controller)).withPosition(8, 1);
+    // Shuffleboard.getTab("Combined Test").add(new TestIntakeIndexerAndShooter(m_indexer, m_intake, m_shooter)).withPosition(0, 1).withSize(2, 1);
+    // Shuffleboard.getTab("Combined Test").add(new SetForwardLimit(m_intake)).withPosition(0, 3).withSize(2, 1);
+    // Shuffleboard.getTab("Arm MM Testing").add("ReSet Intake Arm", new SetArm(m_intake)).withPosition(0, 3).withSize(2, 1);
+    // Shuffleboard.getTab("Intake").add("Extend Intake", new ArmMM(m_intake, Intake.INTAKE_ARM_EXTEND)).withPosition(0, 2).withSize(2,1);
+    // Shuffleboard.getTab("Intake").add("Retract Intake", new ArmMM(m_intake, Intake.INTAKE_ARM_RETRACT)).withPosition(2,2).withSize(2,1);
+    // Shuffleboard.getTab("Arm MM Testing").add(new ResetIntakeArmEncoder(m_intake)).withPosition(0, 2).withSize(2, 1);
+    // Shuffleboard.getTab("ShooterPID").add("Shoot" , new ShooterPIDTuning(m_shooter, m_indexer)).withPosition(0, 3);
+    // Shuffleboard.getTab("Turn MM Testing").add("Turn MM", new TurnToAngle(m_driveTrain, 0)).withPosition(0, 3).withSize(2, 1);
+    // Shuffleboard.getTab("Intake").add(new CollectBalls(m_intake, m_indexer)).withPosition(0, 1).withSize(2, 1);
+    // Shuffleboard.getTab("Intake").add(new DropIntakeAndCollectBalls(m_intake, m_indexer)).withPosition(2, 1).withSize(2, 1);
+    // Shuffleboard.getTab("Intake").add(new EjectBalls(m_indexer)).withPosition(0, 3).withSize(2, 1);
+    // Shuffleboard.getTab("Climber").add("Climber Up", new TestClimberUp(m_climber)).withPosition(6, 1);
+    // Shuffleboard.getTab("Climber").add("Climber Down", new TestClimberDown(m_climber)).withPosition(7, 1);
+    // Shuffleboard.getTab("Climber").add("Low Bar Climb", new LowBarClimb(m_climber, m_driver_controller)).withPosition(8, 2);
+    // Shuffleboard.getTab("Climber").add("High Bar Climb", new HighBarClimb(m_climber, m_driver_controller)).withPosition(8, 1);
   }
 
   private void buildDriverTab(){
@@ -241,7 +243,7 @@ public class RobotContainer {
     driveTab.add("Clm. Rev Soft", false).withSize(1, 1).withPosition(9, 2).withWidget(BuiltInWidgets.kBooleanBox);
 
     // Field
-    driveTab.add("Field", m_driveTrain.getField()).withPosition(6, 3).withSize(4, 2).withWidget(BuiltInWidgets.kField);
+    // driveTab.add("Field", m_driveTrain.getField()).withPosition(6, 3).withSize(4, 2).withWidget(BuiltInWidgets.kField);
 
     // //auto chooser
     m_auto_chooser = new SendableChooser<Command>();
@@ -254,25 +256,40 @@ public class RobotContainer {
   }
 
   public void buildDriverTestTab(){
-    ShuffleboardTab driveMMTab = Shuffleboard.getTab("Drive MM Testing");
-    driveMMTab.add("kP_drive", 0.3 ).withPosition(1, 0).getEntry();
-    driveMMTab.add("kI", 0 ).withPosition(2, 0).getEntry();
-    driveMMTab.add("kD", 0 ).withPosition(3, 0).getEntry();
-    driveMMTab.add("kF", 0.1 ).withPosition(0, 0).getEntry();
-    driveMMTab.add("stable iteration before finishing", 5 ).withPosition(0, 1).getEntry();
-    driveMMTab.add("target position", -50).withPosition(4, 0).getEntry();
-    driveMMTab.add("target ticks", 0).getEntry();
-    // driveMMTab.addNumber("Left Encoder", m_driveTrain::getLeftEncoderValue).withPosition(1, 1);
-    // driveMMTab.addNumber("Right Encoder", m_driveTrain::getRightEncoderValue).withPosition(2,1);
-    driveMMTab.add("drive duration", 0).withPosition(6, 0).getEntry();
-    driveMMTab.add("count_ok", 0).getEntry();
-    
-    //turn
-    driveMMTab.add("target degrees", 0) .withPosition(4, 1).getEntry();
-    driveMMTab.add("Finish Iter.", 5 )  .withPosition(5, 1).getEntry();
-    driveMMTab.add("Run Time", 0)   .withPosition(6, 1).getEntry();
-    driveMMTab.add("Calc Ticks", 0).withPosition(3, 1).withSize(1, 1).getEntry();
-    driveMMTab.addNumber("Gyro Read", m_driveTrain::getRawAngle)              .withPosition(2,1);
+    ShuffleboardTab driveMMTab = Shuffleboard.getTab("Drive Testing");
+    // Configuration Values on row 1
+    driveMMTab.add("kF", 0.1 )              .withPosition(0, 0).getEntry();
+    driveMMTab.add("kP", 0.3 )              .withPosition(1, 0).getEntry();
+    driveMMTab.add("kI", 0 )                .withPosition(2, 0).getEntry();
+    driveMMTab.add("kD", 0 )                .withPosition(3, 0).getEntry();
+    driveMMTab.add("Tgt. Inches", 0)        .withPosition(4, 0).getEntry();
+    driveMMTab.add("Tgt. Degrees", 0)       .withPosition(5, 0).getEntry();
+    driveMMTab.add("Finish Iterations", 5 ) .withPosition(6, 0).getEntry();
+
+    // Result Values on row 2
+    driveMMTab.add("Tgt. Ticks", 0)                                          .withPosition(0, 1);
+    driveMMTab.addNumber("Left Encoder", m_driveTrain::getLeftEncoderValue)  .withPosition(1, 1);
+    driveMMTab.addNumber("Right Encoder", m_driveTrain::getRightEncoderValue).withPosition(2, 1);
+    driveMMTab.addNumber("Gyro Read", m_driveTrain::getRawAngle)             .withPosition(3, 1);
+    driveMMTab.add("Run Time", 0)                                            .withPosition(4, 1);
+   
+    // Drive limiters on row 3
+    driveMMTab.add("Forward Limiter", 2.5).withPosition(0, 2);
+    driveMMTab.add("Rotation Limiter", 2.5).withPosition(1, 2);
+    driveMMTab.add("Drive Max", .7).withPosition(2, 2);
+    driveMMTab.add("Update Limits", new UpdateDriveLimiters(m_driveTrain)).withPosition(3, 2).withSize(2, 1);
+
+    // Drive commands on row 4
+    driveMMTab.add("Drive MM 100", new DriveMM(m_driveTrain, 100))        .withPosition(0, 3).withSize(2, 1);
+    driveMMTab.add("DriveTest MM 100", new DriveMMTest(m_driveTrain, 100)).withPosition(2, 3).withSize(2, 1);
+    driveMMTab.add("Drive MM -100", new DriveMM(m_driveTrain, -100))      .withPosition(4, 3).withSize(2, 1);
+    driveMMTab.add("DriveTest MM -100", new DriveMMTest(m_driveTrain, -100))  .withPosition(6, 3).withSize(2, 1);
+
+    // Turn commands on row 5
+    driveMMTab.add("Turn MM 90", new TurnToAngle(m_driveTrain, 90))          .withPosition(0, 4).withSize(2, 1);
+    driveMMTab.add("TurnTest MM 90", new TurnToAngleTest(m_driveTrain, 90))  .withPosition(2, 4).withSize(2, 1);
+    driveMMTab.add("Turn MM -90", new TurnToAngle(m_driveTrain, -90))        .withPosition(4, 4).withSize(2, 1);
+    driveMMTab.add("TurnTest MM -90", new TurnToAngleTest(m_driveTrain, -90)).withPosition(6, 4).withSize(2, 1);
   }
 
   public void buildShooterTab(){

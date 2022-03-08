@@ -18,7 +18,7 @@ import static frc.robot.Constants.kGains_Turning;
 import static frc.robot.Constants.kGearRatio;
 import static frc.robot.Constants.kNeutralDeadband;
 import static frc.robot.Constants.kSensorGearRatio;
-import static frc.robot.Constants.kSlot_Distanc;
+import static frc.robot.Constants.kSlot_DriveMM;
 import static frc.robot.Constants.kSlot_Turning;
 import static frc.robot.Constants.kTimeoutMs;
 import static frc.robot.Constants.kTurnTravelUnitsPerRotation;
@@ -61,11 +61,11 @@ import frc.robot.Robot;
 import frc.robot.commands.drivetrain.UpdateDriveLimiters;
 
 public class DriveTrain extends SubsystemBase {
-	private final double MAX_TELEOP_DRIVE_SPEED = .65;
+	private final double MAX_TELEOP_DRIVE_SPEED = .75;
 	// TalonFX's for the drivetrain
 	// Right side is inverted here to drive forward
-	//WPI_TalonFX m_left_leader, m_right_leader, m_left_follower, m_right_follower;
-	WPI_TalonFX m_left_leader, m_right_leader;//, m_left_follower, m_right_follower;
+	WPI_TalonFX m_left_leader, m_right_leader, m_left_follower, m_right_follower;
+	// WPI_TalonFX m_left_leader, m_right_leader;//, m_left_follower, m_right_follower;
 
 	// Variables to hold the invert types for the talons
 	TalonFXInvertType m_left_invert, m_right_invert;
@@ -91,7 +91,7 @@ public class DriveTrain extends SubsystemBase {
 	// RateLimiters to try to keep from tipping over
 	SlewRateLimiter m_forward_limiter, m_rotation_limiter;
 	private double m_drive_absMax;
-	NetworkTableEntry m_left_output, m_right_output, m_forward_rate, m_rotation_rate, m_drive_max;
+	NetworkTableEntry m_left_output, m_right_output, m_forward_rate, m_rotation_rate, m_drive_max_entry;
 
 	/////////// Vision PID Controllers ///////////
 	PIDController m_speedPidController, m_turnPidController;
@@ -101,9 +101,9 @@ public class DriveTrain extends SubsystemBase {
  	public DriveTrain() {
     	m_gyro = new AHRS(SPI.Port.kMXP);
     	m_left_leader = new WPI_TalonFX(LEFT_TALON_LEADER);
-		//m_left_follower = new  WPI_TalonFX(LEFT_TALON_FOLLOWER);
+		m_left_follower = new  WPI_TalonFX(LEFT_TALON_FOLLOWER);
     	m_right_leader = new WPI_TalonFX(RIGHT_TALON_LEADER);
-		//m_right_follower = new WPI_TalonFX(RIGHT_TALON_FOLLOWER);
+		m_right_follower = new WPI_TalonFX(RIGHT_TALON_FOLLOWER);
 
     	/** Invert Directions for Left and Right */
     	m_left_invert = TalonFXInvertType.CounterClockwise; //Same as invert = "false"
@@ -114,12 +114,12 @@ public class DriveTrain extends SubsystemBase {
     	TalonFXConfiguration _rightConfig = new TalonFXConfiguration();
 
 		// Set follower talons to default configs, and then follow their leaders
-		// m_left_follower.configAllSettings(_leftConfig);
-		// m_right_follower.configAllSettings(_rightConfig);
-		// m_left_follower.follow(m_left_leader);
-		// m_left_follower.setInverted(InvertType.FollowMaster);
-		// m_right_follower.follow(m_right_leader);
-		// m_right_follower.setInverted(InvertType.FollowMaster);
+		m_left_follower.configAllSettings(_leftConfig);
+		m_right_follower.configAllSettings(_rightConfig);
+		m_left_follower.follow(m_left_leader);
+		m_left_follower.setInverted(InvertType.FollowMaster);
+		m_right_follower.follow(m_right_leader);
+		m_right_follower.setInverted(InvertType.FollowMaster);
 
     		/* Set Neutral Mode */
 		m_left_leader.setNeutralMode(NeutralMode.Brake);
@@ -136,13 +136,14 @@ public class DriveTrain extends SubsystemBase {
 		 * FeedbackDevice is implemented for configSensorTerm
 		 */
 		_leftConfig.primaryPID.selectedFeedbackSensor = TalonFXFeedbackDevice.IntegratedSensor.toFeedbackDevice(); //Local Feedback Source
+		_rightConfig.primaryPID.selectedFeedbackSensor = TalonFXFeedbackDevice.IntegratedSensor.toFeedbackDevice();
 
-		/* Configure the Remote (Left) Talon's selected sensor as a remote sensor for the right Talon */
-		_rightConfig.remoteFilter1.remoteSensorDeviceID = m_left_leader.getDeviceID(); //Device ID of Remote Source
-		_rightConfig.remoteFilter1.remoteSensorSource = RemoteSensorSource.TalonFX_SelectedSensor; //Remote Source Type
+		// /* Configure the Remote (Left) Talon's selected sensor as a remote sensor for the right Talon */
+		// _rightConfig.remoteFilter1.remoteSensorDeviceID = m_left_leader.getDeviceID(); //Device ID of Remote Source
+		// _rightConfig.remoteFilter1.remoteSensorSource = RemoteSensorSource.TalonFX_SelectedSensor; //Remote Source Type
 		
-		/* Setup difference signal to be used for turn when performing Drive Straight with encoders */
-		setRobotTurnConfigs(m_right_invert, _rightConfig);
+		// /* Setup difference signal to be used for turn when performing Drive Straight with encoders */
+		// setRobotTurnConfigs(m_right_invert, _rightConfig);
 
 		/* Config the neutral deadband. */
 		_leftConfig.neutralDeadband = kNeutralDeadband;
@@ -158,6 +159,14 @@ public class DriveTrain extends SubsystemBase {
 
 		/* FPID Gains for turn servo */
 		/* FPID for Distance */
+		_rightConfig.slot0.kF = kGains_Driving.kF;
+		_rightConfig.slot0.kP = kGains_Driving.kP;
+		_rightConfig.slot0.kI = kGains_Driving.kI;
+		_rightConfig.slot0.kD = kGains_Driving.kD;
+		_rightConfig.slot0.integralZone = kGains_Driving.kIzone;
+		_rightConfig.slot0.closedLoopPeakOutput = kGains_Driving.kPeakOutput;
+
+
 		_rightConfig.slot1.kF = kGains_Turning.kF;
 		_rightConfig.slot1.kP = kGains_Turning.kP;
 		_rightConfig.slot1.kI = kGains_Turning.kI;
@@ -176,6 +185,34 @@ public class DriveTrain extends SubsystemBase {
 		_rightConfig.slot1.closedLoopPeriod = closedLoopTimeMs;
 		_rightConfig.slot2.closedLoopPeriod = closedLoopTimeMs;
    		_rightConfig.slot3.closedLoopPeriod = closedLoopTimeMs;
+		
+		   /* FPID Gains for turn servo */
+		/* FPID for Distance */
+		_leftConfig.slot0.kF = kGains_Driving.kF;
+		_leftConfig.slot0.kP = kGains_Driving.kP;
+		_leftConfig.slot0.kI = kGains_Driving.kI;
+		_leftConfig.slot0.kD = kGains_Driving.kD;
+		_leftConfig.slot0.integralZone = kGains_Driving.kIzone;
+		_leftConfig.slot0.closedLoopPeakOutput = kGains_Driving.kPeakOutput;
+
+
+		_leftConfig.slot1.kF = kGains_Turning.kF;
+		_leftConfig.slot1.kP = kGains_Turning.kP;
+		_leftConfig.slot1.kI = kGains_Turning.kI;
+		_leftConfig.slot1.kD = kGains_Turning.kD;
+		_leftConfig.slot1.integralZone = kGains_Turning.kIzone;
+		_leftConfig.slot1.closedLoopPeakOutput = kGains_Turning.kPeakOutput;
+			
+		/* 1ms per loop.  PID loop can be slowed down if need be.
+		 * For example,
+		 * - if sensor updates are too slow
+		 * - sensor deltas are very small per update, so derivative error never gets large enough to be useful.
+		 * - sensor movement is very slow causing the derivative error to be near zero.
+		 */
+		_leftConfig.slot0.closedLoopPeriod = closedLoopTimeMs;
+		_leftConfig.slot1.closedLoopPeriod = closedLoopTimeMs;
+		_leftConfig.slot2.closedLoopPeriod = closedLoopTimeMs;
+   		_leftConfig.slot3.closedLoopPeriod = closedLoopTimeMs;
 
 		// _rightConfig.openloopRamp = kOpenLoopRamp;
 		// _leftConfig.openloopRamp = kOpenLoopRamp;
@@ -192,12 +229,17 @@ public class DriveTrain extends SubsystemBase {
 		m_left_leader.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 5, kTimeoutMs);		//Used remotely by right Talon, speed up
 		// Followers can slow down certain status messages to reduce the can bus usage, per CTRE:
 		// "Motor controllers that are followers can set Status 1 and Status 2 to 255ms(max) using setStatusFramePeriod."
-		// m_right_follower.setStatusFramePeriod(StatusFrame.Status_1_General, 255);
-		// m_right_follower.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255);
-		// m_left_follower.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255);
-		// m_left_follower.setStatusFramePeriod(StatusFrame.Status_1_General, 255);
+		m_right_follower.setStatusFramePeriod(StatusFrame.Status_1_General, 255);
+		m_right_follower.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255);
+		m_left_follower.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255);
+		m_left_follower.setStatusFramePeriod(StatusFrame.Status_1_General, 255);
 
-		setEncodersToZero();
+		// setEncodersToZero();
+		m_right_leader.setSelectedSensorPosition(0);
+		m_left_leader.setSelectedSensorPosition(0);
+
+		m_right_leader.configAllSettings(_rightConfig);
+		m_left_leader.configAllSettings(_leftConfig);
 
 		/// Odometry Tracker objects
 		m_2dField = new Field2d();
@@ -212,7 +254,7 @@ public class DriveTrain extends SubsystemBase {
 			  DCMotor.getFalcon500(2), // 2 Falcon 500s on each side of the drivetrain.
 			  kGearRatio, // Standard AndyMark Gearing reduction.
 			  2.1, // MOI of 2.1 kg m^2 (from CAD model).
-			  26.5, // Mass of the robot is 26.5 kg.
+			  55.3, // Mass of the robot is 26.5 kg.
 			  Units.inchesToMeters(kWheelRadiusInches), // Robot uses 3" radius (6" diameter) wheels.
 			  0.546, // Distance between wheels is _ meters.
 	  
@@ -235,20 +277,19 @@ public class DriveTrain extends SubsystemBase {
 		  } // end of constructor code for the simulation
 
 		  // Setup the drive train limiting test variables
-		  // Default the slew rate limiters to 1/3 of a second from 0 -> full
+		  // Default the slew rate 3 meters per second
 		  m_forward_limiter = new SlewRateLimiter(3);
 		  m_rotation_limiter = new SlewRateLimiter(3);
 		  m_drive_absMax = MAX_TELEOP_DRIVE_SPEED;
-		  // Setup Shuffleboard tuning
-		  ShuffleboardTab tab = Shuffleboard.getTab("Drive Testing");
-		  m_forward_rate = tab.add("Forward Limiter", 3).withSize(1, 1).withPosition(0, 0).getEntry();
-		  m_rotation_rate = tab.add("RotationLimiter", 3).withSize(1, 1).withPosition(1, 0).getEntry();
-		  m_drive_max = tab.add("Drive Max (abs)", m_drive_absMax).withSize(1, 1).withPosition(2, 0).getEntry();
-		  tab.add("Reset Limits", new UpdateDriveLimiters(this)).withSize(3, 1).withPosition(2, 1);
 		  
 		  NetworkTable driveTable = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Drive");
 		  m_left_output =  driveTable.getEntry("Left Output");
 		  m_right_output = driveTable.getEntry("Right Output");
+		  NetworkTable driveTestable = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Drive Testing");
+
+		  m_drive_max_entry = driveTestable.getEntry("Drive Max");
+		  m_forward_rate = driveTestable.getEntry("Forward Limiter");
+		  m_rotation_rate = driveTestable.getEntry("Rotation Limiter");
 		  m_gyro.reset();
 
 		  m_speedPidController = new PIDController(visionDrivekD, 0, visionDrivekD);
@@ -257,10 +298,10 @@ public class DriveTrain extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		// m_odometry.update(m_gyro.getRotation2d(),
-        //               nativeUnitsToDistanceMeters(m_left_leader.getSelectedSensorPosition()),
-        //               nativeUnitsToDistanceMeters(m_right_leader.getSelectedSensorPosition()));
-   		// m_2dField.setRobotPose(m_odometry.getPoseMeters());
+		m_odometry.update(m_gyro.getRotation2d(),
+                      nativeUnitsToDistanceMeters(m_left_leader.getSelectedSensorPosition()),
+                      nativeUnitsToDistanceMeters(m_right_leader.getSelectedSensorPosition()));
+   		m_2dField.setRobotPose(m_odometry.getPoseMeters());
 	}
 
   	/* Zero all sensors used */
@@ -268,7 +309,7 @@ public class DriveTrain extends SubsystemBase {
 		m_left_leader.getSensorCollection().setIntegratedSensorPosition(0.0, kTimeoutMs);
 		m_right_leader.getSensorCollection().setIntegratedSensorPosition(0.0, kTimeoutMs);
 	}
-	
+
 	/** Deadband 5 percent, used on the gamepad */
 	private double deadband(double value) {
 		/* Upper deadband */
@@ -364,7 +405,7 @@ public class DriveTrain extends SubsystemBase {
 	public boolean motionMagicDrive(double target_position) {
 		double tolerance = 100;
 		
-		m_left_leader.set(ControlMode.MotionMagic, target_position);
+			m_left_leader.set(ControlMode.MotionMagic, target_position);
 			m_right_leader.set(ControlMode.MotionMagic, target_position);
 	
 			double currentPos_L = m_left_leader.getSelectedSensorPosition();
@@ -373,13 +414,13 @@ public class DriveTrain extends SubsystemBase {
 			return Math.abs(currentPos_L - target_position) < tolerance && (currentPos_R - target_position) < tolerance;
 	  }
 
-  	public boolean motionMagicTurn(int arcTicks){
+  	public boolean motionMagicTurn(double arcTicks){
 		  double tolerance = 500; 
 		  m_left_leader.set(ControlMode.MotionMagic, arcTicks);
 		  m_right_leader.set(ControlMode.MotionMagic, -arcTicks);
-		  int currentLeftPos = (int) Math.abs(m_left_leader.getSelectedSensorPosition());
-		  int currentRightPos = (int) Math.abs(m_right_leader.getSelectedSensorPosition());
-		  int targetTicks = Math.abs(arcTicks);
+		  double currentLeftPos =  Math.abs(m_left_leader.getSelectedSensorPosition());
+		  double currentRightPos = Math.abs(m_right_leader.getSelectedSensorPosition());
+		  double targetTicks = Math.abs(arcTicks);
 		return (targetTicks - currentLeftPos) < tolerance && (targetTicks - currentRightPos) < tolerance;
 	  }
 
@@ -392,16 +433,16 @@ public class DriveTrain extends SubsystemBase {
 		m_right_leader.configMotionAcceleration(8318, kTimeoutMs);
 		
 		//set up talon to use DriveMM slots
-		m_left_leader.selectProfileSlot(kSlot_Distanc, PID_PRIMARY);
-		m_right_leader.selectProfileSlot(kSlot_Distanc, PID_PRIMARY);
+		m_left_leader.selectProfileSlot(kSlot_DriveMM, PID_PRIMARY);
+		m_right_leader.selectProfileSlot(kSlot_DriveMM, PID_PRIMARY);
 	
-		if(isForward == true){
-			m_left_leader.config_kF(kSlot_Distanc, kGains_Driving.kF);
-			m_right_leader.config_kF(kSlot_Distanc, kGains_Driving.kF);
-		} else{
-			m_left_leader.config_kF(kSlot_Distanc, kGains_Driving.kF * -1);
-			m_right_leader.config_kF(kSlot_Distanc, kGains_Driving.kF * -1);
-		}
+		// if(isForward == true){
+		// 	m_left_leader.config_kF(kSlot_DriveMM, kGains_Driving.kF);
+		// 	m_right_leader.config_kF(kSlot_DriveMM, kGains_Driving.kF);
+		// } else{
+		// 	m_left_leader.config_kF(kSlot_DriveMM, kGains_Driving.kF * -1);
+		// 	m_right_leader.config_kF(kSlot_DriveMM, kGains_Driving.kF * -1);
+		// }
 	}
 
 	public void motionMagicStartConfigsTurn(){
@@ -413,23 +454,11 @@ public class DriveTrain extends SubsystemBase {
 		m_right_leader.configMotionAcceleration(8318, kTimeoutMs);
 	}
 
-	public void disableMotorSafety(){
-		// m_safety_drive.setSafetyEnabled(false);
-	}
-	
-	public void enableMotorSafety(){
-		// m_safety_drive.setSafetyEnabled(true);
-	}
-
-	public void feedWatchdog(){
-		// m_safety_drive.feed();
-	}
-
 	public void motion_magic_end_config_turn(){
-		m_left_leader.configMotionCruiseVelocity(16636, kTimeoutMs);
-		m_left_leader.configMotionAcceleration(8318, kTimeoutMs);
-		m_right_leader.configMotionCruiseVelocity(16636, kTimeoutMs);
-		m_right_leader.configMotionAcceleration(8318, kTimeoutMs);
+		// m_left_leader.configMotionCruiseVelocity(16636, kTimeoutMs);
+		// m_left_leader.configMotionAcceleration(8318, kTimeoutMs);
+		// m_right_leader.configMotionCruiseVelocity(16636, kTimeoutMs);
+		// m_right_leader.configMotionAcceleration(8318, kTimeoutMs);
 	}
 	
 	public double getLeftEncoderValue(){
@@ -441,13 +470,13 @@ public class DriveTrain extends SubsystemBase {
 	}
 
 	public void reset_drive_PID_values(double kP, double kI, double kD) {
-		m_left_leader.config_kP(kSlot_Distanc, kP);
-		m_left_leader.config_kI(kSlot_Distanc, kI);
-		m_left_leader.config_kD(kSlot_Distanc, kD);
+		m_left_leader.config_kP(kSlot_DriveMM, kP);
+		m_left_leader.config_kI(kSlot_DriveMM, kI);
+		m_left_leader.config_kD(kSlot_DriveMM, kD);
 		
-		m_right_leader.config_kP(kSlot_Distanc, kP);
-		m_right_leader.config_kI(kSlot_Distanc, kI);
-		m_right_leader.config_kD(kSlot_Distanc, kD); 
+		m_right_leader.config_kP(kSlot_DriveMM, kP);
+		m_right_leader.config_kI(kSlot_DriveMM, kI);
+		m_right_leader.config_kD(kSlot_DriveMM, kD); 
 	
 	}
 
@@ -643,9 +672,9 @@ public class DriveTrain extends SubsystemBase {
 	}
 
 	public void updateDriveLimiters() {
-		m_drive_absMax = m_drive_max.getDouble(m_drive_absMax);
-		m_forward_limiter = new SlewRateLimiter(m_forward_rate.getDouble(3));
-		m_rotation_limiter = new SlewRateLimiter(m_rotation_rate.getDouble(3));
+		m_drive_absMax = m_drive_max_entry.getDouble(0);
+		m_forward_limiter = new SlewRateLimiter(m_forward_rate.getDouble(0));
+		m_rotation_limiter = new SlewRateLimiter(m_rotation_rate.getDouble(0));
 	}
 
 	public double getHeading(){
