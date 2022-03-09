@@ -156,8 +156,6 @@ public class DriveTrain extends SubsystemBase {
 		_rightConfig.peakOutputForward = +1.0;
 		_rightConfig.peakOutputReverse = -1.0;
 
-		/* FPID Gains for turn servo */
-		/* FPID for Distance */
 		_rightConfig.slot0.kF = kGains_Driving.kF;
 		_rightConfig.slot0.kP = kGains_Driving.kP;
 		_rightConfig.slot0.kI = kGains_Driving.kI;
@@ -165,25 +163,19 @@ public class DriveTrain extends SubsystemBase {
 		_rightConfig.slot0.integralZone = kGains_Driving.kIzone;
 		_rightConfig.slot0.closedLoopPeakOutput = kGains_Driving.kPeakOutput;
 
-
 		_rightConfig.slot1.kF = kGains_Turning.kF;
 		_rightConfig.slot1.kP = kGains_Turning.kP;
 		_rightConfig.slot1.kI = kGains_Turning.kI;
 		_rightConfig.slot1.kD = kGains_Turning.kD;
 		_rightConfig.slot1.integralZone = kGains_Turning.kIzone;
 		_rightConfig.slot1.closedLoopPeakOutput = kGains_Turning.kPeakOutput;
-			
 		
-		
-		   /* FPID Gains for turn servo */
-		/* FPID for Distance */
 		_leftConfig.slot0.kF = kGains_Driving.kF;
 		_leftConfig.slot0.kP = kGains_Driving.kP;
 		_leftConfig.slot0.kI = kGains_Driving.kI;
 		_leftConfig.slot0.kD = kGains_Driving.kD;
 		_leftConfig.slot0.integralZone = kGains_Driving.kIzone;
 		_leftConfig.slot0.closedLoopPeakOutput = kGains_Driving.kPeakOutput;
-
 
 		_leftConfig.slot1.kF = kGains_Turning.kF;
 		_leftConfig.slot1.kP = kGains_Turning.kP;
@@ -242,7 +234,6 @@ public class DriveTrain extends SubsystemBase {
 
 		/// Odometry Tracker objects
 		m_2dField = new Field2d();
-		SmartDashboard.putData(m_2dField);
 		m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
 
 		// Code for simulation within the DriveTrain Constructor
