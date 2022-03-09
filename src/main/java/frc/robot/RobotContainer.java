@@ -217,9 +217,10 @@ public class RobotContainer {
     // Add Intake Sensors and Ball Count
     driveTab.add("Ball Count",0).withSize(1, 1).withPosition(6, 0).withWidget(BuiltInWidgets.kDial)
                               .withProperties(Map.of("Min", 0, "Max", 2));
-    driveTab.add("ShootBreak", false).withSize(1, 1).withPosition(7, 0).withWidget(BuiltInWidgets.kBooleanBox);
-    driveTab.add("MidBreak", false).withSize(1, 1).withPosition(8, 0).withWidget(BuiltInWidgets.kBooleanBox);
-    driveTab.add("IntakeBreak", false).withSize(1, 1).withPosition(9, 0).withWidget(BuiltInWidgets.kBooleanBox);
+    driveTab.add("Ball Count Test", 0).withSize(1, 1).withPosition(7, 0);  
+    // driveTab.add("ShootBreak", false).withSize(1, 1).withPosition(7, 0).withWidget(BuiltInWidgets.kBooleanBox);
+    // driveTab.add("MidBreak", false).withSize(1, 1).withPosition(8, 0).withWidget(BuiltInWidgets.kBooleanBox);
+    // driveTab.add("IntakeBreak", false).withSize(1, 1).withPosition(9, 0).withWidget(BuiltInWidgets.kBooleanBox);
     // Add Intake Limits
     driveTab.add("Int. Fwd Hard", false).withSize(1, 1).withPosition(6, 1).withWidget(BuiltInWidgets.kBooleanBox);
     driveTab.add("Int. Fwd Soft", false).withSize(1, 1).withPosition(7, 1).withWidget(BuiltInWidgets.kBooleanBox);
@@ -232,7 +233,7 @@ public class RobotContainer {
     driveTab.add("Clm. Rev Soft", false).withSize(1, 1).withPosition(9, 2).withWidget(BuiltInWidgets.kBooleanBox);
 
     // Field
-    // driveTab.add("Field", m_driveTrain.getField()).withPosition(6, 3).withSize(4, 2).withWidget(BuiltInWidgets.kField);
+    driveTab.add("Field", m_driveTrain.getField()).withPosition(6, 3).withSize(4, 2).withWidget(BuiltInWidgets.kField);
 
     // //auto chooser
     m_auto_chooser = new SendableChooser<Command>();
@@ -273,12 +274,12 @@ public class RobotContainer {
     // Drive commands on row 4
     driveMMTab.add("Drive MM 100", new DriveMM(m_driveTrain, 100))        .withPosition(0, 3).withSize(2, 1);
     driveMMTab.add("Drive MM -100", new DriveMM(m_driveTrain, -100))      .withPosition(2, 3).withSize(2, 1);
-    driveMMTab.add("DriveTest MM -100", new DriveMMTest(m_driveTrain, 0))  .withPosition(4, 3).withSize(2, 1);
+    driveMMTab.add("Drive MM Test", new DriveMMTest(m_driveTrain, 0))     .withPosition(4, 3).withSize(2, 1);
 
     // Turn commands on row 5
     driveMMTab.add("Turn MM 90", new TurnToAngle(m_driveTrain, 90))          .withPosition(0, 4).withSize(2, 1);
     driveMMTab.add("Turn MM -90", new TurnToAngle(m_driveTrain, -90))        .withPosition(2, 4).withSize(2, 1);
-    driveMMTab.add("TurnTest MM 90", new TurnToAngleTest(m_driveTrain, 0))  .withPosition(4, 4).withSize(2, 1);
+    driveMMTab.add("Turn MM Test", new TurnToAngleTest(m_driveTrain, 0))     .withPosition(4, 4).withSize(2, 1);
   }
 
   public void buildShooterTab(){

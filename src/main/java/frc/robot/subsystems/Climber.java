@@ -57,12 +57,12 @@ public class Climber extends SubsystemBase {
 
     m_climberMotor.setSelectedSensorPosition(0);
 
-    ShuffleboardTab climberTab = Shuffleboard.getTab("Climber");
-    climberTab.addNumber("Encoder", this::getRelativeEncoder).withPosition(1, 1);
-    climberTab.addBoolean("Forward Limit", this::forwardLimitSwitchTriggered).withPosition(2,1);
-    climberTab.addBoolean("Reverse Limit", this::reverseLimitSwitchTriggered).withPosition(3,1);
-    climberTab.addBoolean("Soft Forward Limit", this::getClimberSoftForwardLimit).withPosition(4,1);
-    climberTab.addBoolean("Soft Reverse Limit", this::getClimberSoftReverseLimit).withPosition(5,1);
+    // ShuffleboardTab climberTab = Shuffleboard.getTab("Climber");
+    // climberTab.addNumber("Encoder", this::getRelativeEncoder).withPosition(1, 1);
+    // climberTab.addBoolean("Forward Limit", this::forwardLimitSwitchTriggered).withPosition(2,1);
+    // climberTab.addBoolean("Reverse Limit", this::reverseLimitSwitchTriggered).withPosition(3,1);
+    // climberTab.addBoolean("Soft Forward Limit", this::getClimberSoftForwardLimit).withPosition(4,1);
+    // climberTab.addBoolean("Soft Reverse Limit", this::getClimberSoftReverseLimit).withPosition(5,1);
   }
 
   @Override

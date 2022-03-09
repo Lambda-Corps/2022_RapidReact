@@ -354,7 +354,7 @@ public class DriveTrain extends SubsystemBase {
 		turn = clamp_drive(turn);
 
 		//forward = -m_forward_limiter.calculate(forward) * m_drive_absMax;
-		if(forward != 0) {
+		if(forward != 0 || turn != 0) {
 			forward = m_forward_limiter.calculate(forward) * m_drive_absMax;
 			turn = m_rotation_limiter.calculate(turn) * m_drive_absMax;
 		}
@@ -426,13 +426,12 @@ public class DriveTrain extends SubsystemBase {
 	}
 
 	public void motion_magic_start_config_drive(boolean isForward, double lengthInTicks){
-		// setEncodersToZero();
 		m_left_setpoint = m_left_leader.getSelectedSensorPosition() + lengthInTicks;
 		m_right_setpoint = m_right_leader.getSelectedSensorPosition() + lengthInTicks;
 
-		m_left_leader.configMotionCruiseVelocity(8318,kTimeoutMs);
+		m_left_leader.configMotionCruiseVelocity(16636,kTimeoutMs);
 		m_left_leader.configMotionAcceleration(8318, kTimeoutMs); //cruise velocity / 2, so will take 2 seconds
-		m_right_leader.configMotionCruiseVelocity(8318,kTimeoutMs);
+		m_right_leader.configMotionCruiseVelocity(16636,kTimeoutMs);
 		m_right_leader.configMotionAcceleration(8318, kTimeoutMs);
 		
 		//set up talon to use DriveMM slots
@@ -449,7 +448,6 @@ public class DriveTrain extends SubsystemBase {
 	}
 
 	public void motionMagicStartConfigsTurn(boolean isCCWturn, double lengthInTicks){
-		m_isCCWTurn = isCCWturn;
 
 		m_left_leader.selectProfileSlot(kSlot_Turning, PID_PRIMARY);
 		m_right_leader.selectProfileSlot(kSlot_Turning, PID_PRIMARY);
@@ -458,17 +456,9 @@ public class DriveTrain extends SubsystemBase {
 		m_right_leader.configMotionCruiseVelocity(16636, kTimeoutMs);
 		m_right_leader.configMotionAcceleration(8318, kTimeoutMs);
 	
-		if( m_isCCWTurn ){
-			// length in Ticks is negative
-			m_left_setpoint = m_left_leader.getSelectedSensorPosition() + lengthInTicks;
-			m_right_setpoint = m_right_leader.getSelectedSensorPosition() - lengthInTicks;
-			// m_left_leader.config_kF(kSlot_Turning, kGains_Turning.kF * -1);
-		}
-		else {
-			m_left_setpoint = m_left_leader.getSelectedSensorPosition() + lengthInTicks;
-			m_right_setpoint = m_right_leader.getSelectedSensorPosition() - lengthInTicks;
-			// m_right_leader.config_kF(kSlot_Turning, kGains_Turning.kF * -1);
-		}
+		// length in Ticks is negative
+		m_left_setpoint = m_left_leader.getSelectedSensorPosition() + lengthInTicks;
+		m_right_setpoint = m_right_leader.getSelectedSensorPosition() - lengthInTicks;
 	}
 
 	public void motion_magic_end_config_turn(){

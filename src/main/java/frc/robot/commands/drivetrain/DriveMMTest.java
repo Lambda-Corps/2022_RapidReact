@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 
+import static frc.robot.Constants.*;
+
 public class DriveMMTest extends CommandBase {
   /** Creates a new DriveMM. */
   DriveTrain m_driveTrain;
@@ -26,7 +28,7 @@ public class DriveMMTest extends CommandBase {
   public DriveMMTest(DriveTrain driveTrain, double targetInches) {
     m_driveTrain = driveTrain;
     m_targetPosition = targetInches;
-    NetworkTable driveTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Drive MM Testing");
+    NetworkTable driveTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Drive Testing");
 
     m_drivekPEntry = driveTab.getEntry("kP");
     m_kIEntry = driveTab.getEntry("kI");
@@ -44,16 +46,14 @@ public class DriveMMTest extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_kF = m_kFEntry.getDouble(0.003699);
+    m_kF = m_kFEntry.getDouble(0);
     m_drive_kP = m_drivekPEntry.getDouble(0.0);
     m_kI = m_kIEntry.getDouble(0.0);
     m_kD = m_kDEntry.getDouble(0.0);
     STABLE_ITERATIONS_BEFORE_FINISHED = (int) m_iterationEntry.getDouble(5.0);
-    //m_targetPosition = m_targetPosEntry.getDouble(0.0);
-    m_targetTicks = m_targetPosition * 1108.23;
+    m_targetTicks = m_targetPosEntry.getDouble(0) * kEncoderTicksPerInch;
     m_targetTicksEntry.forceSetDouble((int) m_targetTicks);
     count = 0;
-    m_driveTrain.setEncodersToZero();
     m_driveTrain.reset_drive_PID_values(m_drive_kP, m_kI, m_kD);
     m_driveTrain.motion_magic_start_config_drive(m_targetTicks >= 0, m_targetTicks);
   }

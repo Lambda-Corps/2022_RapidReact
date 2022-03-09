@@ -131,12 +131,12 @@ public class Intake extends SubsystemBase {
     //config closed loop error
     m_armMotor.configAllowableClosedloopError(0, 10, 0);
 
-    ShuffleboardTab armMMTab = Shuffleboard.getTab("Arm MM Testing");
-    armMMTab.addNumber("Encoder", this::getRelativeEncoder).withPosition(1, 1);
-    armMMTab.addBoolean("Integrated Forward", this::getArmIntegratedForwardLimit).withPosition(2, 1);
-    armMMTab.addBoolean("Integrated Reverse", this::getArmIntegratedReverseLimit).withPosition(3,1);
-    armMMTab.addBoolean("Soft Forward", this::getArmSoftForwardLimit).withPosition(4, 1);
-    armMMTab.addBoolean("Soft Reverse", this::getArmSoftReverseLimit).withPosition(5,1);
+    // ShuffleboardTab armMMTab = Shuffleboard.getTab("Arm MM Testing");
+    // armMMTab.addNumber("Encoder", this::getRelativeEncoder).withPosition(1, 1);
+    // armMMTab.addBoolean("Integrated Forward", this::getArmIntegratedForwardLimit).withPosition(2, 1);
+    // armMMTab.addBoolean("Integrated Reverse", this::getArmIntegratedReverseLimit).withPosition(3,1);
+    // armMMTab.addBoolean("Soft Forward", this::getArmSoftForwardLimit).withPosition(4, 1);
+    // armMMTab.addBoolean("Soft Reverse", this::getArmSoftReverseLimit).withPosition(5,1);
     m_armMotor.setSelectedSensorPosition(0);
     holdMotorPosition(0);
   }

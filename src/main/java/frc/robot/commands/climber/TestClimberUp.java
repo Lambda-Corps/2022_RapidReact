@@ -24,8 +24,8 @@ public class TestClimberUp extends CommandBase {
 
     addRequirements(m_climber);
 
-    ShuffleboardTab climberTab = Shuffleboard.getTab("Climber");
-    m_raiseSpeed = climberTab.add("Climber Raise Speed", 0).withPosition(1, 2).withSize(1,1).getEntry();
+    // ShuffleboardTab climberTab = Shuffleboard.getTab("Climber");
+    // m_raiseSpeed = climberTab.add("Climber Raise Speed", 0).withPosition(1, 2).withSize(1,1).getEntry();
   }
 
   // Called when the command is initially scheduled.
