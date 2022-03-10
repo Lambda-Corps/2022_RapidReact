@@ -36,6 +36,7 @@ import frc.robot.commands.climber.LowBarClimb;
 import frc.robot.commands.climber.LowBarRaise;
 import frc.robot.commands.climber.TestClimberDown;
 import frc.robot.commands.climber.TestClimberUp;
+import frc.robot.commands.climber.resetClimberToLimitSwitch;
 import frc.robot.commands.combined.StopShooterAndIndexerMotors;
 import frc.robot.commands.default_commands.DriveTrainDefaultCommand;
 import frc.robot.commands.default_commands.IndexerDefaultCommand;
@@ -207,6 +208,7 @@ public class RobotContainer {
     Shuffleboard.getTab("Climber").add("Climber Down", new TestClimberDown(m_climber)).withPosition(7, 1);
     Shuffleboard.getTab("Climber").add("Low Bar Climb", new LowBarClimb(m_climber, m_driver_controller)).withPosition(8, 2);
     Shuffleboard.getTab("Climber").add("High Bar Climb", new HighBarClimb(m_climber, m_driver_controller)).withPosition(8, 1);
+    Shuffleboard.getTab("Climber").add("Reset Climber", new resetClimberToLimitSwitch(m_climber)).withPosition(8, 3);
   }
 
   private void buildDriverTab(){
