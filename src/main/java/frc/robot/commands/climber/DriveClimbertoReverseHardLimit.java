@@ -4,56 +4,46 @@
 
 package frc.robot.commands.climber;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Climber;
 
-public class TestClimberUp extends CommandBase {
-  /** Creates a new TestClimber. */
+public class DriveClimbertoReverseHardLimit extends CommandBase {
+  private final double CLIMBER_DOWN_SPEED = -.7; // TODO set this after testing
 
   Climber m_climber;
-  NetworkTableEntry m_raiseSpeed;
-
-  double m_speed;
-
-  public TestClimberUp(Climber climber) {
+    /** Creates a new resetClimberToLimitSwitch. */
+  public DriveClimbertoReverseHardLimit(Climber climber) {
     // Use addRequirements() here to declare subsystem dependencies.
+
     m_climber = climber;
 
-    addRequirements(m_climber);
-
-    NetworkTable climberTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Climber");
-    //m_lowerSpeed = -1; 
-    m_raiseSpeed = climberTab.getEntry("ClimberUpSpeed");
+    addRequirements(climber);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    //if (!m_climber.forwardLimitSwitchTriggered()) {
-    //  m_climber.climberIsAtHighest();
-    //}
-
-    m_speed = m_raiseSpeed.getDouble(0);
+    if (!m_climber.reverseLimitSwitchTriggered() || !m_climber.forwardLimitSwitchTriggered()) {
+      m_climber.resetClimberPositionEncoder();
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_climber.setClimberMotor(m_speed);
+    m_climber.setClimberMotor(CLIMBER_DOWN_SPEED);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     m_climber.climberStopMotor();
+    m_climber.resetClimberMotorEncoder();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_climber.forwardLimitSwitchTriggered();
+    return m_climber.reverseLimitSwitchTriggered();
   }
 }

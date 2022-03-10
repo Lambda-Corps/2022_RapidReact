@@ -25,7 +25,9 @@ import frc.robot.commands.Indexer.EjectBalls;
 import frc.robot.commands.Indexer.ShootBallsTilEmptyOrThreeSeconds;
 import frc.robot.commands.Intake.ArmMM;
 import frc.robot.commands.Intake.DropIntakeAndCollectBalls;
+import frc.robot.commands.Intake.ResetArmLimitAndEncoder;
 import frc.robot.commands.Intake.ResetIntakeArmEncoder;
+import frc.robot.commands.Intake.TurnOffIntakeArm;
 import frc.robot.commands.autonomous.oneBall;
 import frc.robot.commands.autonomous.twoBallLeft;
 import frc.robot.commands.autonomous.twoBallRight;
@@ -36,7 +38,7 @@ import frc.robot.commands.climber.LowBarClimb;
 import frc.robot.commands.climber.LowBarRaise;
 import frc.robot.commands.climber.TestClimberDown;
 import frc.robot.commands.climber.TestClimberUp;
-import frc.robot.commands.climber.resetClimberToLimitSwitch;
+import frc.robot.commands.climber.DriveClimbertoReverseHardLimit;
 import frc.robot.commands.combined.StopShooterAndIndexerMotors;
 import frc.robot.commands.default_commands.DriveTrainDefaultCommand;
 import frc.robot.commands.default_commands.IndexerDefaultCommand;
@@ -169,7 +171,8 @@ public class RobotContainer {
 
     // Partner Bindings
     m_p_rb.whileHeld(new EjectBalls(m_indexer));
-    m_p_start.whenPressed(new ResetIntakeArmEncoder(m_intake));
+    m_p_start.whenPressed(new TurnOffIntakeArm(m_intake));
+    m_p_sel.whenPressed(new ResetArmLimitAndEncoder(m_intake));
     m_p_a.whenPressed(new Shoot(m_shooter, m_indexer, ShotDistance.ClosestShot));
     m_p_b.whenPressed(new Shoot(m_shooter, m_indexer, ShotDistance.MidTarmac));
     m_p_y.whenPressed(new Shoot(m_shooter, m_indexer, ShotDistance.TarmacLine));
@@ -192,6 +195,9 @@ public class RobotContainer {
     buildDriverTab();
     buildDriverTestTab();
     buildShooterTab();
+    buildIntakeTestTab();
+    buildClimberTestTab();
+    buildVisionTab();
 
     // Shuffleboard.getTab("Combined Test").add(new TestIntakeIndexerAndShooter(m_indexer, m_intake, m_shooter)).withPosition(0, 1).withSize(2, 1);
     // Shuffleboard.getTab("Combined Test").add(new SetForwardLimit(m_intake)).withPosition(0, 3).withSize(2, 1);
@@ -204,11 +210,7 @@ public class RobotContainer {
     // Shuffleboard.getTab("Intake").add(new CollectBalls(m_intake, m_indexer)).withPosition(0, 1).withSize(2, 1);
     // Shuffleboard.getTab("Intake").add(new DropIntakeAndCollectBalls(m_intake, m_indexer)).withPosition(2, 1).withSize(2, 1);
     // Shuffleboard.getTab("Intake").add(new EjectBalls(m_indexer)).withPosition(0, 3).withSize(2, 1);
-    Shuffleboard.getTab("Climber").add("Climber Up", new TestClimberUp(m_climber)).withPosition(6, 1);
-    Shuffleboard.getTab("Climber").add("Climber Down", new TestClimberDown(m_climber)).withPosition(7, 1);
-    Shuffleboard.getTab("Climber").add("Low Bar Climb", new LowBarClimb(m_climber, m_driver_controller)).withPosition(8, 2);
-    Shuffleboard.getTab("Climber").add("High Bar Climb", new HighBarClimb(m_climber, m_driver_controller)).withPosition(8, 1);
-    Shuffleboard.getTab("Climber").add("Reset Climber", new resetClimberToLimitSwitch(m_climber)).withPosition(8, 3);
+    
   }
 
   private void buildDriverTab(){
@@ -261,7 +263,6 @@ public class RobotContainer {
     m_auto_chooser.addOption("Right Tarmac, 2 ball", new twoBallRight(m_driveTrain, m_shooter, m_intake, m_indexer));
     //m_auto_chooser.addOption("Bottom Left Tarmac, 4 ball", new fourBall(m_driveTrain, m_shooter, m_intake, m_indexer));
     driveTab.add("Autonomous Chooser", m_auto_chooser).withWidget(BuiltInWidgets.kComboBoxChooser).withPosition(4, 4).withSize(2, 1);
-
   }
 
   public void buildDriverTestTab(){
@@ -308,5 +309,46 @@ public class RobotContainer {
     driveTab.add("WaitUntilCommand", new WaitUntilCommand(m_shooter::isUpToSpeed)).withPosition(4, 0).withSize(2, 1);
     driveTab.add("ShootBallsUntilEmpty", new ShootBallsTilEmptyOrThreeSeconds(m_indexer)).withPosition(6, 0).withSize(2, 1);
     driveTab.add("StopShooter", new StopShooterAndIndexerMotors(m_shooter, m_indexer)).withPosition(8, 0).withSize(2, 1);
+  }
+
+  private void buildIntakeTestTab(){
+    ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake");
+    intakeTab.add("ResetDriveSpeed", -.5).withPosition(0, 0).withSize(1, 1);
+
+    intakeTab.add("ResetArmLimitAndEncoder", new ResetArmLimitAndEncoder(m_intake)).withPosition(0, 1).withSize(2, 1);
+    intakeTab.add("TurnOffIntakeArm", new TurnOffIntakeArm(m_intake))              .withPosition(2, 1).withSize(2, 1);
+
+    intakeTab.add("RetractIntakeArm", new ArmMM(m_intake, Intake.INTAKE_ARM_RETRACT)).withPosition(0, 2).withSize(2, 1);
+    intakeTab.add("ExtendIntakeArm", new ArmMM(m_intake, Intake.INTAKE_ARM_EXTEND))  .withPosition(2, 2).withSize(2, 1);
+  }
+
+  private void buildClimberTestTab(){
+    ShuffleboardTab climberTab = Shuffleboard.getTab("Climber");
+    // Testing Information
+    climberTab.add("ClimberDownSpeed", -.7).withPosition(0, 0).withSize(1, 1);
+    climberTab.add("ClimberUpSpeed", 1)    .withPosition(1, 0).withSize(1, 1);
+
+    climberTab.addNumber("Encoder", m_climber::getRelativeEncoder)                    .withPosition(1, 1);
+    climberTab.addBoolean("Forward Limit", m_climber::forwardLimitSwitchTriggered)    .withPosition(2, 1);
+    climberTab.addBoolean("Reverse Limit", m_climber::reverseLimitSwitchTriggered)    .withPosition(3, 1);
+    climberTab.addBoolean("Soft Forward Limit", m_climber::getClimberSoftForwardLimit).withPosition(4, 1);
+    climberTab.addBoolean("Soft Reverse Limit", m_climber::getClimberSoftReverseLimit).withPosition(5, 1);
+    
+    // High bar raise
+    climberTab.add("Raise to MidRung", new HighBarRaise(m_climber, m_driver_controller)).withPosition(0, 2).withSize(2, 1);
+    climberTab.add("Raise to LowBar", new LowBarRaise(m_climber, m_driver_controller))  .withPosition(2, 2).withSize(2, 1);
+    climberTab.add("Cancel Climber", new CancelClimber(m_climber))                      .withPosition(4, 2).withSize(2, 1);
+    // climberTab.add("Lower Climber", new LowerToLimitOrTime(m_climber))                  .withPosition(6, 2).withSize(2, 1);
+    
+    climberTab.add("TestClimbDown", new TestClimberDown(m_climber))                     .withPosition(0, 3).withSize(2, 1);
+    climberTab.add("TestClimbUp", new TestClimberUp(m_climber))                         .withPosition(2, 3).withSize(2, 1);
+    climberTab.add("Reset to LowerLimit", new DriveClimbertoReverseHardLimit(m_climber)).withPosition(4, 3).withSize(2, 1);
+  }
+
+  private void buildVisionTab() {
+    ShuffleboardTab visionTab = Shuffleboard.getTab("Vision");
+
+    visionTab.add("LED on", new LEDon(m_vision)).withPosition(0, 0);
+    visionTab.add("LED off", new LEDoff(m_vision)).withPosition(0, 1);
   }
 }

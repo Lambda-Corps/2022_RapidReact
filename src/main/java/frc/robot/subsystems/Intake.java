@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 import static frc.robot.Constants.INTAKE_ARM_TALON;
+import static frc.robot.Constants.INTAKE_REVERSE_LIMIT;
 import static frc.robot.Constants.INTAKE_TALON;
 import static frc.robot.Constants.PID_PRIMARY;
 import static frc.robot.Constants.kGains_IntakeDown;
@@ -17,7 +18,7 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Gains;
@@ -32,7 +33,7 @@ public class Intake extends SubsystemBase {
 
   //positions
   public static final int INTAKE_ARM_RETRACT = 0; //intake fully vertical/up
-  public static final int INTAKE_ARM_EXTEND = 1550; //intake down to grab ball (currently has temporary value)
+  public static final int INTAKE_ARM_EXTEND = 1475; //intake down to grab ball (currently has temporary value)
 
   final double DOWN_FEEDFORWARD = .2;
   final double UP_FEEDFORWARD = -.3;
@@ -58,7 +59,7 @@ public class Intake extends SubsystemBase {
   
   //soft limits
   private final int ARM_REVERSE_SOFT_LIMIT = 0;
-  private final int ARM_FORWARD_SOFT_LIMIT = 1850;
+  private final int ARM_FORWARD_SOFT_LIMIT = 1750;
 
   ShuffleboardTab m_intakeTab;
   NetworkTableEntry m_armMaxSpeed, m_armStandardSpeed, m_maxFF, m_minFF, m_forwardSoftLimit, m_armEncoder;
@@ -72,8 +73,11 @@ public class Intake extends SubsystemBase {
 
   private final double INTAKE_WHEEL_SPEEDS = 1;
 
+  private final DigitalInput m_reverse_limit;
+
   public Intake() {
     m_faults = new Faults();
+    m_reverse_limit = new DigitalInput(INTAKE_REVERSE_LIMIT);
     m_armMotor = new TalonSRX(INTAKE_ARM_TALON);
     m_intakeMotor = new TalonSRX(INTAKE_TALON);
     
@@ -289,5 +293,39 @@ public class Intake extends SubsystemBase {
 
   public boolean getArmSoftReverseLimit() {
     return m_faults.ReverseSoftLimit;
+  }
+
+  public void disableArmMotorSoftLimits(){
+    m_armMotor.configReverseSoftLimitEnable(false);
+  }
+
+  public boolean driveMotorToLimitSwitch(){
+    double motorspeed = 0;
+
+    // True represents the limit being hit, so
+    // !reverse_limit.get() means false, such that the limit
+    // has not been hit yet.
+    boolean reverse_limit_hit = m_reverse_limit.get();
+    if(!reverse_limit_hit){
+      
+      // Limit not hit, adjust the speed to go backward at half speed
+      motorspeed = -.5;
+    }
+
+    m_armMotor.set(ControlMode.PercentOutput, motorspeed);
+
+    // Return to the caller whether or not they should end the command,
+    // not whether or not they should keep driving
+    return reverse_limit_hit;
+  }
+
+  public void resetEncoderAndEnableLimit(){
+    m_armMotor.setSelectedSensorPosition(0);
+    m_armMotor.configReverseSoftLimitThreshold(0);
+    m_armMotor.configReverseSoftLimitEnable(true);
+  }
+
+  public void turnOffArmMotor(){
+    m_armMotor.set(ControlMode.PercentOutput, 0);
   }
 }

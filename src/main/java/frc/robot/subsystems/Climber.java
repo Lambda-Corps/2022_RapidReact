@@ -5,8 +5,8 @@
 package frc.robot.subsystems;
 
 import static frc.robot.Constants.CLIMER_SRX;
-import static frc.robot.Constants.FORWARD_LIMIT_SWITCH;
-import static frc.robot.Constants.REVERSE_LIMIT_SWITCH;
+import static frc.robot.Constants.CLIMBER_FORWARD_LIMIT;
+import static frc.robot.Constants.CLIMBER_REVERSE_LIMIT;
 import static frc.robot.Constants.MAXIMUM_CLIMBER_SPEED;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -43,8 +43,8 @@ public class Climber extends SubsystemBase {
     m_climberMotor.setInverted(false);
 
     //Limit Switches
-    m_reverseLimitSwitch = new DigitalInput(REVERSE_LIMIT_SWITCH);
-    m_forwardLimitSwitch = new DigitalInput(FORWARD_LIMIT_SWITCH);
+    m_reverseLimitSwitch = new DigitalInput(CLIMBER_REVERSE_LIMIT);
+    m_forwardLimitSwitch = new DigitalInput(CLIMBER_FORWARD_LIMIT);
 
     //Feedback
     m_climberMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
@@ -56,11 +56,7 @@ public class Climber extends SubsystemBase {
     m_climberMotor.setSelectedSensorPosition(0);
 
     ShuffleboardTab climberTab = Shuffleboard.getTab("Climber");
-    climberTab.addNumber("Encoder", this::getRelativeEncoder).withPosition(1, 1);
-    climberTab.addBoolean("Forward Limit", this::forwardLimitSwitchTriggered).withPosition(2,1);
-    climberTab.addBoolean("Reverse Limit", this::reverseLimitSwitchTriggered).withPosition(3,1);
-    climberTab.addBoolean("Soft Forward Limit", this::getClimberSoftForwardLimit).withPosition(4,1);
-    climberTab.addBoolean("Soft Reverse Limit", this::getClimberSoftReverseLimit).withPosition(5,1);
+    
   }
 
   @Override

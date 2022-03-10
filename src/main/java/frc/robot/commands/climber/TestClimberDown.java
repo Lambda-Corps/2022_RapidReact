@@ -4,9 +4,9 @@
 
 package frc.robot.commands.climber;
 
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Climber;
 
@@ -24,9 +24,9 @@ public class TestClimberDown extends CommandBase {
 
     addRequirements(climber);
 
-    ShuffleboardTab climberTab = Shuffleboard.getTab("Climber");
+    NetworkTable climberTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Climber");
     //m_lowerSpeed = -1; 
-    climberTab.add("Climber Lower Speed", -1).withPosition(2, 2).withSize(1,1).getEntry();
+    m_lowerSpeed = climberTab.getEntry("ClimberDownSpeed");
   }
 
   // Called when the command is initially scheduled.

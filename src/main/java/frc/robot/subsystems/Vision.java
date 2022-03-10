@@ -47,7 +47,7 @@ public class Vision extends SubsystemBase {
       // int shootercamResolutionHeight = 480;    // pixels
       // double shooterminTargetArea = 10;        // square pixels
     
-    NetworkTableInstance.getDefault().getTable("photonvision").getEntry("version").setValue("v2022.1.4");
+    NetworkTableInstance.getDefault().getTable("photonvision").getEntry("version").setValue("v2022.1.5");
     
     NetworkTable table = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Drive");
     cargoTarget = table.getEntry("BallTarget");
