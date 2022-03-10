@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.Indexer.CancelIndexer;
 import frc.robot.commands.Indexer.EjectBalls;
 import frc.robot.commands.Indexer.ShootBallsTilEmptyOrThreeSeconds;
@@ -30,8 +31,11 @@ import frc.robot.commands.autonomous.twoBallLeft;
 import frc.robot.commands.autonomous.twoBallRight;
 import frc.robot.commands.climber.CancelClimber;
 import frc.robot.commands.climber.HighBarClimb;
+import frc.robot.commands.climber.HighBarRaise;
 import frc.robot.commands.climber.LowBarClimb;
+import frc.robot.commands.climber.LowBarRaise;
 import frc.robot.commands.climber.TestClimberDown;
+import frc.robot.commands.climber.TestClimberUp;
 import frc.robot.commands.combined.StopShooterAndIndexerMotors;
 import frc.robot.commands.default_commands.DriveTrainDefaultCommand;
 import frc.robot.commands.default_commands.IndexerDefaultCommand;
@@ -81,6 +85,7 @@ public class RobotContainer {
   //auto chooser
   private SendableChooser<Command> m_auto_chooser;
   GamepadAxisButton m_d_rt, m_d_lt;
+  POVButton m_d_up, m_d_right, m_d_down, m_d_left;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -116,6 +121,12 @@ public class RobotContainer {
     m_p_sel = new JoystickButton(m_partner_controller, XboxController.Button.kBack.value);
     m_p_rs = new JoystickButton(m_partner_controller, XboxController.Button.kRightStick.value);
 
+    // POV Buttons
+    m_d_up = new POVButton(m_driver_controller, 0);
+    m_d_right = new POVButton(m_driver_controller, 90);
+    m_d_down = new POVButton(m_driver_controller, 180);
+    m_d_left = new POVButton(m_driver_controller, 270);
+
     m_driveTrain.setDefaultCommand(new DriveTrainDefaultCommand(m_driveTrain, m_driver_controller));
     m_indexer.setDefaultCommand(new IndexerDefaultCommand(m_indexer));
     
@@ -148,6 +159,12 @@ public class RobotContainer {
     m_d_rs.whenPressed(new HighBarClimb(m_climber, m_driver_controller));
     m_d_ls.whenPressed(new LowBarClimb(m_climber, m_driver_controller));
     m_d_sel.whenPressed(new CancelClimber(m_climber));
+
+    // Driver POV Bindings
+    m_d_up.whenPressed(new CancelClimber(m_climber));
+    m_d_right.whenPressed(new HighBarRaise(m_climber, m_driver_controller));
+    m_d_left.whenPressed(new LowBarRaise(m_climber, m_driver_controller));
+    m_d_down.whenPressed(new TestClimberDown(m_climber));
 
     // Partner Bindings
     m_p_rb.whileHeld(new EjectBalls(m_indexer));
@@ -186,10 +203,10 @@ public class RobotContainer {
     // Shuffleboard.getTab("Intake").add(new CollectBalls(m_intake, m_indexer)).withPosition(0, 1).withSize(2, 1);
     // Shuffleboard.getTab("Intake").add(new DropIntakeAndCollectBalls(m_intake, m_indexer)).withPosition(2, 1).withSize(2, 1);
     // Shuffleboard.getTab("Intake").add(new EjectBalls(m_indexer)).withPosition(0, 3).withSize(2, 1);
-    // Shuffleboard.getTab("Climber").add("Climber Up", new TestClimberUp(m_climber)).withPosition(6, 1);
-    // Shuffleboard.getTab("Climber").add("Climber Down", new TestClimberDown(m_climber)).withPosition(7, 1);
-    // Shuffleboard.getTab("Climber").add("Low Bar Climb", new LowBarClimb(m_climber, m_driver_controller)).withPosition(8, 2);
-    // Shuffleboard.getTab("Climber").add("High Bar Climb", new HighBarClimb(m_climber, m_driver_controller)).withPosition(8, 1);
+    Shuffleboard.getTab("Climber").add("Climber Up", new TestClimberUp(m_climber)).withPosition(6, 1);
+    Shuffleboard.getTab("Climber").add("Climber Down", new TestClimberDown(m_climber)).withPosition(7, 1);
+    Shuffleboard.getTab("Climber").add("Low Bar Climb", new LowBarClimb(m_climber, m_driver_controller)).withPosition(8, 2);
+    Shuffleboard.getTab("Climber").add("High Bar Climb", new HighBarClimb(m_climber, m_driver_controller)).withPosition(8, 1);
   }
 
   private void buildDriverTab(){

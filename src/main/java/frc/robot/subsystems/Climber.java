@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.CLIMER_SRX;
 import static frc.robot.Constants.FORWARD_LIMIT_SWITCH;
 import static frc.robot.Constants.REVERSE_LIMIT_SWITCH;
+import static frc.robot.Constants.MAXIMUM_CLIMBER_SPEED;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.Faults;
@@ -32,10 +33,7 @@ public class Climber extends SubsystemBase {
 
   //Soft Limits
   private final int CLIMBER_REVERSE_SOFT_LIMIT = 0;
-  private final int CLIMBER_FORWARD_SOFT_LIMIT = 24300; 
-
-  //Max Climber Speed
-  private final double MAX_CLIMBER_SPEED = 1; 
+  private final int CLIMBER_FORWARD_SOFT_LIMIT = 24300;  
 
   public Climber() {
     m_faults = new Faults();
@@ -57,12 +55,12 @@ public class Climber extends SubsystemBase {
 
     m_climberMotor.setSelectedSensorPosition(0);
 
-    // ShuffleboardTab climberTab = Shuffleboard.getTab("Climber");
-    // climberTab.addNumber("Encoder", this::getRelativeEncoder).withPosition(1, 1);
-    // climberTab.addBoolean("Forward Limit", this::forwardLimitSwitchTriggered).withPosition(2,1);
-    // climberTab.addBoolean("Reverse Limit", this::reverseLimitSwitchTriggered).withPosition(3,1);
-    // climberTab.addBoolean("Soft Forward Limit", this::getClimberSoftForwardLimit).withPosition(4,1);
-    // climberTab.addBoolean("Soft Reverse Limit", this::getClimberSoftReverseLimit).withPosition(5,1);
+    ShuffleboardTab climberTab = Shuffleboard.getTab("Climber");
+    climberTab.addNumber("Encoder", this::getRelativeEncoder).withPosition(1, 1);
+    climberTab.addBoolean("Forward Limit", this::forwardLimitSwitchTriggered).withPosition(2,1);
+    climberTab.addBoolean("Reverse Limit", this::reverseLimitSwitchTriggered).withPosition(3,1);
+    climberTab.addBoolean("Soft Forward Limit", this::getClimberSoftForwardLimit).withPosition(4,1);
+    climberTab.addBoolean("Soft Reverse Limit", this::getClimberSoftReverseLimit).withPosition(5,1);
   }
 
   @Override
@@ -76,16 +74,16 @@ public class Climber extends SubsystemBase {
       if (forwardLimitSwitchTriggered()) {
         speed = 0; //The limit has been reached, stop immediately.
       } else {
-        if (speed > MAX_CLIMBER_SPEED) {
-          speed = MAX_CLIMBER_SPEED;
+        if (speed > MAXIMUM_CLIMBER_SPEED) {
+          speed = MAXIMUM_CLIMBER_SPEED;
         }
       }
     } else {
       if (reverseLimitSwitchTriggered()) {
         speed = 0; //The limit has been reached, stop immediately.
       } else {
-        if (speed < -MAX_CLIMBER_SPEED) {
-          speed = -MAX_CLIMBER_SPEED;
+        if (speed < -MAXIMUM_CLIMBER_SPEED) {
+          speed = -MAXIMUM_CLIMBER_SPEED;
         }
       }
     }
@@ -99,6 +97,10 @@ public class Climber extends SubsystemBase {
   public void resetClimberMotorEncoder() {
     m_climberMotor.setSelectedSensorPosition(0);
     m_climberMotor.configReverseSoftLimitThreshold(CLIMBER_REVERSE_SOFT_LIMIT);
+  }
+
+  public void resetClimberPositionEncoder() {
+    m_climberMotor.setSelectedSensorPosition(20000);
   }
 
   public void climberIsAtHighest() {

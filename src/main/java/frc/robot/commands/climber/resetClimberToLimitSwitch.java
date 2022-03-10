@@ -4,47 +4,41 @@
 
 package frc.robot.commands.climber;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Climber;
 
-public class TestClimberDown extends CommandBase {
-  /** Creates a new TestClimberDown. */
+public class resetClimberToLimitSwitch extends CommandBase {
+  /** Creates a new resetClimberToLimitSwitch. */
 
   Climber m_climber;
-  NetworkTableEntry m_lowerSpeed;
 
-  double m_speed;
-
-  public TestClimberDown(Climber climber) {
+  public resetClimberToLimitSwitch(Climber climber) {
     // Use addRequirements() here to declare subsystem dependencies.
+
     m_climber = climber;
 
     addRequirements(climber);
-
-    ShuffleboardTab climberTab = Shuffleboard.getTab("Climber");
-    //m_lowerSpeed = -1; 
-    climberTab.add("Climber Lower Speed", -1).withPosition(2, 2).withSize(1,1).getEntry();
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_speed = m_lowerSpeed.getDouble(0); // -1
+    if (!m_climber.reverseLimitSwitchTriggered() || !m_climber.forwardLimitSwitchTriggered()) {
+      m_climber.resetClimberPositionEncoder();
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_climber.setClimberMotor(m_speed);
+    m_climber.setClimberMotor(-1);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     m_climber.climberStopMotor();
+    m_climber.resetClimberMotorEncoder();
   }
 
   // Returns true when the command should end.
