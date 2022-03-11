@@ -29,8 +29,6 @@ public class Vision extends SubsystemBase {
 
   double pitch, yaw, area;
 
-  private boolean m_hasTargets = false;
-
   public Vision() {
       m_limelight.setPipelineIndex(LIMELIGHTPIPELINE);
       m_HD3000.setPipelineIndex(HD3000PIPELINE);
@@ -47,7 +45,7 @@ public class Vision extends SubsystemBase {
       // int shootercamResolutionHeight = 480;    // pixels
       // double shooterminTargetArea = 10;        // square pixels
     
-    NetworkTableInstance.getDefault().getTable("photonvision").getEntry("version").setValue("v2022.1.5");
+    // NetworkTableInstance.getDefault().getTable("photonvision").getEntry("version").setValue("v2022.1.5");
     
     NetworkTable table = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Drive");
     cargoTarget = table.getEntry("BallTarget");
@@ -61,25 +59,23 @@ public class Vision extends SubsystemBase {
   }
 
   private boolean getHighTargetStatus() {
-    // var result = m_limelight.getLatestResult();
-    //  hasTargets = result.hasTargets();
-    //  hubTarget.setBoolean(hasTargets);
-    // return hasTargets;
-    return false;
+    var result = m_limelight.getLatestResult();
+     boolean hasTargets = result.hasTargets();
+     hubTarget.setBoolean(hasTargets);
+    return hasTargets;
   }
 
   private boolean getCargoTargetStatus() {
-    // var result = m_HD3000.getLatestResult();
-    //  hasTargets = result.hasTargets();
-    //  cargoTarget.setBoolean(hasTargets);
-    // return hasTargets;
-    return false;
+    var result = m_HD3000.getLatestResult();
+     boolean hasTargets = result.hasTargets();
+     cargoTarget.setBoolean(hasTargets);
+    return hasTargets;
   }
 
   public double[] getHubTargetRange() {
     double[] range = {0,0};
     var result = m_limelight.getLatestResult();
-    if (m_hasTargets == true) {
+    if (getHighTargetStatus()) {
       range[0] = PhotonUtils.calculateDistanceToTargetMeters(CAMERA_HEIGHT_METERS, TARGET_HEIGHT_METERS, CAMERA_PITCH_RADIANS, Units.degreesToRadians(result.getBestTarget().getPitch()));
       range[1] = result.getBestTarget().getYaw();
     }
@@ -90,7 +86,7 @@ public class Vision extends SubsystemBase {
   public double getCargoTargetYaw() {
     double Yaw = 0;
     var result = m_HD3000.getLatestResult();
-    if (m_hasTargets == true) {
+    if (getCargoTargetStatus()) {
       Yaw = result.getBestTarget().getYaw();
     }
 
