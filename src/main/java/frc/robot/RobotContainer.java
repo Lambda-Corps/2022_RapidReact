@@ -27,6 +27,7 @@ import frc.robot.commands.Intake.ArmMM;
 import frc.robot.commands.Intake.DropIntakeAndCollectBalls;
 import frc.robot.commands.Intake.ResetArmLimitAndEncoder;
 import frc.robot.commands.Intake.ResetIntakeArmEncoder;
+import frc.robot.commands.Intake.SetExtendLimit;
 import frc.robot.commands.Intake.TurnOffIntakeArm;
 import frc.robot.commands.autonomous.oneBall;
 import frc.robot.commands.autonomous.twoBallLeft;
@@ -193,11 +194,11 @@ public class RobotContainer {
   
   private void buildShuffleboard(){
     buildDriverTab();
-    buildDriverTestTab();
-    buildShooterTab();
+    // buildDriverTestTab();
+    // buildShooterTab();
     buildIntakeTestTab();
-    buildClimberTestTab();
-    buildVisionTab();
+    // buildClimberTestTab();
+    // buildVisionTab();
 
     // Shuffleboard.getTab("Combined Test").add(new TestIntakeIndexerAndShooter(m_indexer, m_intake, m_shooter)).withPosition(0, 1).withSize(2, 1);
     // Shuffleboard.getTab("Combined Test").add(new SetForwardLimit(m_intake)).withPosition(0, 3).withSize(2, 1);
@@ -239,9 +240,9 @@ public class RobotContainer {
     driveTab.add("Ball Count",0).withSize(1, 1).withPosition(6, 0).withWidget(BuiltInWidgets.kDial)
                               .withProperties(Map.of("Min", 0, "Max", 2));
     driveTab.add("Ball Count Test", 0).withSize(1, 1).withPosition(7, 0);  
-    // driveTab.add("ShootBreak", false).withSize(1, 1).withPosition(7, 0).withWidget(BuiltInWidgets.kBooleanBox);
-    // driveTab.add("MidBreak", false).withSize(1, 1).withPosition(8, 0).withWidget(BuiltInWidgets.kBooleanBox);
-    // driveTab.add("IntakeBreak", false).withSize(1, 1).withPosition(9, 0).withWidget(BuiltInWidgets.kBooleanBox);
+    driveTab.add("ShootBreak", false).withSize(1, 1).withPosition(7, 0).withWidget(BuiltInWidgets.kBooleanBox);
+    driveTab.add("MidBreak", false).withSize(1, 1).withPosition(8, 0).withWidget(BuiltInWidgets.kBooleanBox);
+    driveTab.add("IntakeBreak", false).withSize(1, 1).withPosition(9, 0).withWidget(BuiltInWidgets.kBooleanBox);
     // Add Intake Limits
     driveTab.add("Int. Fwd Hard", false).withSize(1, 1).withPosition(6, 1).withWidget(BuiltInWidgets.kBooleanBox);
     driveTab.add("Int. Fwd Soft", false).withSize(1, 1).withPosition(7, 1).withWidget(BuiltInWidgets.kBooleanBox);
@@ -313,13 +314,20 @@ public class RobotContainer {
 
   private void buildIntakeTestTab(){
     ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake");
-    intakeTab.add("ResetDriveSpeed", -.5).withPosition(0, 0).withSize(1, 1);
+    intakeTab.add("ResetDriveSpeed", -.5)                  .withPosition(0, 0).withSize(1, 1);
+    intakeTab.add("Extend Limit", Intake.INTAKE_ARM_EXTEND).withPosition(3, 0).withSize(1, 1);
 
-    intakeTab.add("ResetArmLimitAndEncoder", new ResetArmLimitAndEncoder(m_intake)).withPosition(0, 1).withSize(2, 1);
-    intakeTab.add("TurnOffIntakeArm", new TurnOffIntakeArm(m_intake))              .withPosition(2, 1).withSize(2, 1);
-
+    intakeTab.add("Intake Fwd Limit", 1)                            .withPosition(1, 1).withSize(1, 1).withWidget(BuiltInWidgets.kBooleanBox);
+    intakeTab.add("Intake Rev Limit", 0)                            .withPosition(2, 1).withSize(1, 1).withWidget(BuiltInWidgets.kBooleanBox);
+    intakeTab.addNumber("Arm Encoder", m_intake::getRelativeEncoder).withPosition(3, 1).withSize(1, 1);
+    
     intakeTab.add("RetractIntakeArm", new ArmMM(m_intake, Intake.INTAKE_ARM_RETRACT)).withPosition(0, 2).withSize(2, 1);
     intakeTab.add("ExtendIntakeArm", new ArmMM(m_intake, Intake.INTAKE_ARM_EXTEND))  .withPosition(2, 2).withSize(2, 1);
+    intakeTab.add("Reset Extend Limit", new SetExtendLimit(m_intake))                .withPosition(4, 2).withSize(2, 1);
+
+    intakeTab.add("ResetArmLimitAndEncoder", new ResetArmLimitAndEncoder(m_intake)).withPosition(0, 3).withSize(2, 1);
+    intakeTab.add("TurnOffIntakeArm", new TurnOffIntakeArm(m_intake))              .withPosition(2, 3).withSize(2, 1);
+
   }
 
   private void buildClimberTestTab(){

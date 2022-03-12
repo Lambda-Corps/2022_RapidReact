@@ -40,6 +40,8 @@ public class LEDsubsystem extends SubsystemBase {
 
   private int LEFT_SIDE_COUNT = 36, MIDDLE_COUNT = 14, RIGHT_SIDE_COUNT = 36;
   private int TOTAL_LED_COUNT = LEFT_SIDE_COUNT + RIGHT_SIDE_COUNT + MIDDLE_COUNT;
+
+  private int m_loop_count;
   
   // Intake State Collector
   private NetworkTableEntry m_LEDSNetworkTableEntry;
@@ -59,6 +61,8 @@ public class LEDsubsystem extends SubsystemBase {
     // Set the data
     m_led.setData(m_ledBuffer);
     m_led.start();
+
+    m_loop_count = 0;
   }
 
   @Override
@@ -73,6 +77,7 @@ public class LEDsubsystem extends SubsystemBase {
     
     switch(led_color_state){
       case LED_ONE_BALL:
+          blueChase();
           break;
       case LED_TWO_BALL:
           break;
@@ -97,6 +102,7 @@ public class LEDsubsystem extends SubsystemBase {
         }
         break;
     }
+    m_loop_count++;
   }
 
   @Override
@@ -155,6 +161,20 @@ public class LEDsubsystem extends SubsystemBase {
       // Set the value
       m_ledBuffer.setHSV(i, 40, 255, 128);
     }
+    m_led.setData(m_ledBuffer);
+  }
+
+  private void blueChase (){
+    // For every pixel
+    for (var i = 0; i < LEFT_SIDE_COUNT; i++) {
+      // Set the value for the current
+      if(m_loop_count % 2 == 0){
+        m_ledBuffer.setHSV(i, 120, 255, 128);
+        m_ledBuffer.setHSV(((TOTAL_LED_COUNT-1) - i), 120, 255, 128);
+      }
+      
+    }
+
     m_led.setData(m_ledBuffer);
   }
 }

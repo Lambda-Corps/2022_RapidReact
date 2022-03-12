@@ -41,6 +41,7 @@ public final class Constants {
 	public final static int CLIMBER_REVERSE_LIMIT = 4;
 	public final static int CLIMBER_FORWARD_LIMIT = 3;
 	public final static int INTAKE_REVERSE_LIMIT = 5;
+	public final static int INTAKE_FORWARD_LIMIT = 6;
 
     ///////////// Drive Train Values /////////////
     public final static double kControllerDeadband = .1;
