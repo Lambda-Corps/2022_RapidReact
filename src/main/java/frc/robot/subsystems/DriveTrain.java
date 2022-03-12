@@ -90,7 +90,7 @@ public class DriveTrain extends SubsystemBase {
 
 	/////////// Vision PID Controllers ///////////
 	PIDController m_speedPidController, m_turnPidController;
-	double visionDrivekP, visionDrivekD, visionTurnkP, visionTurnkD;
+	double visionDrivekP, visionDrivekI, visionDrivekD, visionTurnkP, visionTurnkI, visionTurnkD;
 
 	// Motion Magic Setpoints for each side of the motor
 	private double m_left_setpoint, m_right_setpoint;
@@ -282,8 +282,12 @@ public class DriveTrain extends SubsystemBase {
 		  m_rotation_rate = driveTestable.getEntry("Rotation Limiter");
 		  m_gyro.reset();
 
-		  m_speedPidController = new PIDController(visionDrivekD, 0, visionDrivekD);
-		  m_turnPidController = new PIDController(visionTurnkP, 0, visionTurnkD);
+			visionDrivekD = 0;
+			visionDrivekP = 0.1;
+			visionDrivekI = 0;
+			visionTurnkD = 0;
+			visionTurnkI = 0;
+			visionTurnkP = 0.1;
   	}
 
 	@Override
@@ -696,13 +700,26 @@ public class DriveTrain extends SubsystemBase {
 		m_turnPidController.reset();
 	}
 
+	public void configureVisionDriveController(double kP, double kI, double kD) {
+		m_speedPidController = new PIDController(kP, kI, kD);
+	}
+
+	public void configureVisionTurnController(double kP, double kI, double kD) {
+		m_turnPidController = new PIDController(kP, kI, kD);
+	}
+
 	public void visionDrive(double range,  double yaw, double goalInMeters) {
+		
 		double forwardspeed = 0;
 		double turnspeed = 0;
 		
 		if (range > 0) {
 			forwardspeed = -m_speedPidController.calculate(range, goalInMeters);
 			turnspeed = -m_turnPidController.calculate(yaw, 0);
+
+			NetworkTable visionTable = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Vision");
+			visionTable.getEntry("forward drive speed").forceSetDouble(forwardspeed);
+			visionTable.getEntry("Turn speed").forceSetDouble(turnspeed);
 		}
 
 		teleop_drive(forwardspeed, turnspeed);

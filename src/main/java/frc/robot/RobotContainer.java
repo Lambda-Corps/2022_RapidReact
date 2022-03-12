@@ -348,7 +348,22 @@ public class RobotContainer {
   private void buildVisionTab() {
     ShuffleboardTab visionTab = Shuffleboard.getTab("Vision");
 
-    visionTab.add("LED on", new LEDon(m_vision)).withPosition(0, 0);
+    visionTab.addNumber("Distance to Target", m_vision::getHubTargetRangeIndex0).withPosition(1, 0);
+    visionTab.addNumber("Target Yaw",         m_vision::getHubTargetRangeIndex1).withPosition(1, 1);
+
+    visionTab.add("LED on", new LEDon(m_vision))  .withPosition(0, 0);
     visionTab.add("LED off", new LEDoff(m_vision)).withPosition(0, 1);
+
+    visionTab.add("forward drive speed", 0);
+    visionTab.add("Turn speed", 0);
+
+    visionTab.add("Drive kP", 0);
+    visionTab.add("Drive kD", 0);
+    visionTab.add("Drive kI", 0);
+    visionTab.add("Drive kF", 0);
+    visionTab.add("Turn kP", 0);
+    visionTab.add("Turn kD", 0);
+    visionTab.add("Turn kI", 0);
+    visionTab.add("Turn kF", 0);
   }
 }

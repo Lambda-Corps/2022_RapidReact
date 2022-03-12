@@ -3,6 +3,8 @@ import static frc.robot.Constants.CAMERA_HEIGHT_METERS;
 import static frc.robot.Constants.CAMERA_PITCH_RADIANS;
 import static frc.robot.Constants.TARGET_HEIGHT_METERS;
 
+import javax.swing.event.DocumentEvent;
+
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
 import org.photonvision.common.hardware.VisionLEDMode;
@@ -75,18 +77,28 @@ public class Vision extends SubsystemBase {
   public double[] getHubTargetRange() {
     double[] range = {0,0};
     var result = m_limelight.getLatestResult();
-    if (getHighTargetStatus()) {
-      range[0] = PhotonUtils.calculateDistanceToTargetMeters(CAMERA_HEIGHT_METERS, TARGET_HEIGHT_METERS, CAMERA_PITCH_RADIANS, Units.degreesToRadians(result.getBestTarget().getPitch()));
+    if (result.hasTargets()) {
+      range[0] = PhotonUtils.calculateDistanceToTargetMeters(CAMERA_HEIGHT_METERS, 
+                                                             TARGET_HEIGHT_METERS, CAMERA_PITCH_RADIANS, 
+                                                             Units.degreesToRadians(result.getBestTarget().getPitch()));
       range[1] = result.getBestTarget().getYaw();
     }
 
     return range;
   }
+  
+  public double getHubTargetRangeIndex0() {
+    return getHubTargetRange()[0];
+  }
+
+  public double getHubTargetRangeIndex1() {
+    return getHubTargetRange()[1];
+  }
 
   public double getCargoTargetYaw() {
     double Yaw = 0;
     var result = m_HD3000.getLatestResult();
-    if (getCargoTargetStatus()) {
+    if (result.hasTargets()) {
       Yaw = result.getBestTarget().getYaw();
     }
 
