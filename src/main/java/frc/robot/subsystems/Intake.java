@@ -37,7 +37,7 @@ public class Intake extends SubsystemBase {
 
   //positions
   public static final int INTAKE_ARM_RETRACT = 0; //intake fully vertical/up
-  public static int INTAKE_ARM_EXTEND = 1475; //intake down to grab ball (currently has temporary value)
+  public static int INTAKE_ARM_EXTEND = 1510; //intake down to grab ball (currently has temporary value)
   // public static final int INTAKE_ARM_EXTEND = 1475; //intake down to grab ball (currently has temporary value)
 
   final double DOWN_FEEDFORWARD = .2;
