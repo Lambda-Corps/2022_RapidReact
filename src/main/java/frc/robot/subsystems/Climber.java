@@ -63,6 +63,9 @@ public class Climber extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     m_climberMotor.getFaults(m_faults);
+    if (reverseLimitSwitchTriggered()) {
+      resetClimberMotorEncoder();
+    }
   }
 
   public void setClimberMotor(double speed) {
