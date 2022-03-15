@@ -44,6 +44,8 @@ import frc.robot.commands.default_commands.DriveTrainDefaultCommand;
 import frc.robot.commands.default_commands.IndexerDefaultCommand;
 import frc.robot.commands.drivetrain.DriveMM;
 import frc.robot.commands.drivetrain.DriveMMTest;
+import frc.robot.commands.drivetrain.TurnGyroWithPID;
+import frc.robot.commands.drivetrain.TurnGyroWithPIDTest;
 import frc.robot.commands.drivetrain.TurnToAngle;
 import frc.robot.commands.drivetrain.TurnToAngleTest;
 import frc.robot.commands.drivetrain.UpdateDriveLimiters;
@@ -215,7 +217,9 @@ public class RobotContainer {
 
   private void buildDriverTab(){
     ShuffleboardTab driveTab = Shuffleboard.getTab("Drive");
-
+    // Turn Gyro Command Testing
+    driveTab.add("Turn 90 Gyro PID", new TurnGyroWithPID(m_driveTrain, 90)).withPosition(0, 1).withSize(2, 1);
+    driveTab.add("Turn GyroPID Test", new TurnGyroWithPIDTest(m_driveTrain, 90)).withPosition(2, 1).withSize(2, 1);
     // The drive tab is roughly 9 x 5 (columns x rows)
     // Camera can be 4 x 4, gyro 
     // driveTab.add("Cargo Cam", new HttpCamera("Cargo Photon", "http://10.50.24.11:5800"))
@@ -300,6 +304,8 @@ public class RobotContainer {
     driveMMTab.add("Turn MM 90", new TurnToAngle(m_driveTrain, 90))          .withPosition(0, 4).withSize(2, 1);
     driveMMTab.add("Turn MM -90", new TurnToAngle(m_driveTrain, -90))        .withPosition(2, 4).withSize(2, 1);
     driveMMTab.add("Turn MM Test", new TurnToAngleTest(m_driveTrain, 0))     .withPosition(4, 4).withSize(2, 1);
+
+    
   }
 
   public void buildShooterTab(){

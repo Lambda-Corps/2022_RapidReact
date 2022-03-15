@@ -38,6 +38,7 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
@@ -54,6 +55,8 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+
+import static frc.robot.Constants.*;
 
 public class DriveTrain extends SubsystemBase {
 	private final double MAX_TELEOP_DRIVE_SPEED = .75;
@@ -95,6 +98,12 @@ public class DriveTrain extends SubsystemBase {
 	// Motion Magic Setpoints for each side of the motor
 	private double m_left_setpoint, m_right_setpoint;
 	private boolean m_isCCWTurn;
+
+	// PID controller for turning with Gyro
+	private PIDController m_gyro_pidcontroller;
+	private double GYRO_PID_TOLERANCE = 5.0; // 1 degree
+	private double GYRO_PID_FEEDFORWARD = .1; 
+	private double GYRO_PID_TURN_SPEED = .5;
 
   	/** Creates a new DriveTrain. */
  	public DriveTrain() {
@@ -284,6 +293,10 @@ public class DriveTrain extends SubsystemBase {
 
 		  m_speedPidController = new PIDController(visionDrivekD, 0, visionDrivekD);
 		  m_turnPidController = new PIDController(visionTurnkP, 0, visionTurnkD);
+
+		  // Configure the PID controller for gyro turns
+		  m_gyro_pidcontroller = new PIDController(kGains_GyroTurn.kP, kGains_GyroTurn.kI, kGains_GyroTurn.kD);
+		  m_gyro_pidcontroller.setTolerance(GYRO_PID_TOLERANCE);
   	}
 
 	@Override
@@ -731,5 +744,40 @@ public class DriveTrain extends SubsystemBase {
 
 	public double getLeftSetPoint(){
 		return m_left_setpoint;
+	}
+
+	public void resetGyroPIDController(){
+		m_gyro_pidcontroller.reset();
+	}
+
+	public void resetGyroPIDController(double kp, double ki, double kd){
+		m_gyro_pidcontroller = new PIDController(kp, ki, kd);
+		// m_gyro_pidcontroller.setTolerance(GYRO_PID_TOLERANCE);
+
+		m_gyro_pidcontroller.reset();
+	}
+
+	public boolean atGyroPIDSetpoint(){
+		double error = m_gyro_pidcontroller.getPositionError();
+		return error <= GYRO_PID_TOLERANCE;
+	}
+
+	public void driveGyroPID(double set_point){
+		double turnspeed = 0;
+		double currentAngle = m_gyro.getAngle();
+
+		double turnmodifier = (set_point < currentAngle) ? -1 : 1;
+
+		turnspeed = m_gyro_pidcontroller.calculate(currentAngle, set_point);
+
+		turnspeed = turnspeed * (GYRO_PID_TURN_SPEED * turnmodifier);
+		turnspeed = MathUtil.clamp(turnspeed, -GYRO_PID_TURN_SPEED, GYRO_PID_TURN_SPEED);
+
+		teleop_drive(0, turnspeed);
+
+	}
+
+	public void resetGyroPIDTurnSpeed(double speed) {
+		GYRO_PID_TURN_SPEED = speed;
 	}
 }
