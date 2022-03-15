@@ -81,8 +81,8 @@ public class Indexer extends SubsystemBase {
   @Override
   public void periodic() {
     boolean bottom = m_bottomBeam.get();
-    boolean mid = m_bottomBeam.get();
-    boolean top = m_bottomBeam.get();
+    boolean mid = m_midbeam.get();
+    boolean top = m_topBeam.get();
     m_intakeIndexerEntry.setBoolean(bottom);
     m_midIndexerEntry.setBoolean(mid);
     m_shooterIndexerEntry.setBoolean(top);

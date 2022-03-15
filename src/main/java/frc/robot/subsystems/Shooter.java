@@ -32,6 +32,10 @@ public class Shooter extends SubsystemBase {
   private final int SHOOTER_SETPOINT_TARMAC_LINE   = 8000, //40%
                     SHOOTER_SETPOINT_CLOSESHOT   = 6700,   //30%
                     SHOOTER_SETPOINT_MIDTARMAC = 6760;     //35%
+
+  // Move balls that are stuck
+  private final double SHOOTER_EJECT_SPEED = -.15;
+  private final double SHOOTER_TOLERANCE = .03; // within 3% of the set point is good 
     
   /** Creates a new Shooter. */
   public Shooter() {
@@ -71,9 +75,10 @@ public class Shooter extends SubsystemBase {
     shooterConfig.slot3.closedLoopPeakOutput = kGains_TarmacLine.kPeakOutput;
     
     // Setup the open loop limits so the drivers can't mess it up
-    shooterConfig.peakOutputReverse = 0;
+    shooterConfig.peakOutputReverse = -.2;
     shooterConfig.peakOutputForward = 1;
     shooterConfig.nominalOutputForward = 0;
+    shooterConfig.closedloopRamp = .5;
     
     shooterConfig.primaryPID.selectedFeedbackSensor = TalonFXFeedbackDevice.IntegratedSensor.toFeedbackDevice();
 
@@ -143,8 +148,16 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean isUpToSpeed(){
-    double currentLoopError = m_Shooter.getClosedLoopError();
+    double currentLoopError = Math.abs(m_Shooter.getClosedLoopError());
 
-    return (currentLoopError >= (m_shooter_set_point * .95));
+    return currentLoopError < m_shooter_set_point * SHOOTER_TOLERANCE;
+  }
+
+  public double getClosedLoopError(){
+    return m_Shooter.getClosedLoopError();
+  }
+
+  public void ejectBallsBackward() {
+    m_Shooter.set(ControlMode.PercentOutput, SHOOTER_EJECT_SPEED);
   }
 }
