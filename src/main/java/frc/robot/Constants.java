@@ -79,7 +79,7 @@ public final class Constants {
 														// drivetrain, encoders mount 1:1 with the gearbox shaft.
 	public static final double kGearRatio = 10.71;   // Switch kSensorGearRatio to this gear ratio if encoder is on the motor instead
 														// of on the gearbox.
-	public static final double kWheelRadiusInches = 3.0;
+	public static final double kWheelRadiusInches = 3.15;
 	public static final int k100msPerSecond = 10;
 	public final static int kEncoderUnitsPerRotation = 88554;
 	public final static double kEncoderTicksPerDegree = kEncoderUnitsPerRotation / 360;
@@ -105,9 +105,9 @@ public final class Constants {
      * Not all set of Gains are used in this project and may be removed as desired.
      * 	
 	 * 	                                    			  		 kP      kI   kD   kF        Iz    PeakOut */
-	public final static Gains kGains_Turning =   	  new Gains(0.3,   0.0,  0.0, 0.1, 200,  1.0 );
-	public final static Gains kGains_Driving =   	  new Gains(0.3,   0.0,  0.0, 0.1, 100,  1.0 );
-	public final static Gains kGains_IntakeDown =	  new Gains(2.69,  0.0,  0.0, 0.341,   100,  1.0 );
+	public final static Gains kGains_Turning =   	  new Gains(0.3,   0.0,  0.0, 0.3,      200,  1.0 );
+	public final static Gains kGains_Driving =   	  new Gains(0.3,   0.0,  6.0, 0.3,      100,  1.0 );
+	public final static Gains kGains_IntakeDown =	  new Gains(2.69,  0.0,  0.0, 0.341,    100,  1.0 );
 	public final static Gains kGains_IntakeUp =  	  new Gains(0.299, 0.0,  0.0, 1.023,	200,  1.0 );
 	public final static Gains kGains_IntakeHold = 	  new Gains(8.000, 0.0,  40,  0.0,		300,  1.0 );
 	public final static Gains kGains_CloseShot =      new Gains(0.1, 0.0,  0, 0.0533,    100,  1.0);
