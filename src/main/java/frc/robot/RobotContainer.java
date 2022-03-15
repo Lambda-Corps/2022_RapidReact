@@ -55,6 +55,8 @@ import frc.robot.commands.vision.AimAtCargo;
 import frc.robot.commands.vision.DriveWithVision;
 import frc.robot.commands.vision.LEDoff;
 import frc.robot.commands.vision.LEDon;
+import frc.robot.commands.vision.configureVisionDrivePID;
+import frc.robot.commands.vision.configureVisionTurnPID;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Indexer;
@@ -353,6 +355,8 @@ public class RobotContainer {
 
     visionTab.add("LED on", new LEDon(m_vision))  .withPosition(0, 0);
     visionTab.add("LED off", new LEDoff(m_vision)).withPosition(0, 1);
+    visionTab.add("Condigure Vision Drive", new configureVisionDrivePID(m_driveTrain)).withPosition(0, 4);
+    visionTab.add("Configure Turn Turn", new configureVisionTurnPID(m_driveTrain))    .withPosition(0, 3);
 
     visionTab.add("forward drive speed", 0);
     visionTab.add("Turn speed", 0);

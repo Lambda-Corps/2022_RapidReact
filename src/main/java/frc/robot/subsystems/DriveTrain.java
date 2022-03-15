@@ -283,11 +283,14 @@ public class DriveTrain extends SubsystemBase {
 		  m_gyro.reset();
 
 			visionDrivekD = 0;
-			visionDrivekP = 0.1;
+			visionDrivekP = 0.4;
 			visionDrivekI = 0;
 			visionTurnkD = 0;
 			visionTurnkI = 0;
-			visionTurnkP = 0.1;
+			visionTurnkP = 0.02;
+
+			m_speedPidController = new PIDController(visionDrivekP, visionDrivekI, visionDrivekD);
+			m_turnPidController = new PIDController(visionTurnkP, visionTurnkI, visionTurnkD);
   	}
 
 	@Override
@@ -724,7 +727,7 @@ public class DriveTrain extends SubsystemBase {
 
 		teleop_drive(forwardspeed, turnspeed);
 	}
-
+	// TODO test this
 	public void cargoAim(double yaw, double forward) {
 		double forwardspeed = forward;
 		double turnspeed = 0;
