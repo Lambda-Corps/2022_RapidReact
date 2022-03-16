@@ -7,14 +7,14 @@ package frc.robot.commands.climber;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Climber;
 
-public class DriveClimbertoReverseHardLimit extends CommandBase {
-  private final double CLIMBER_DOWN_SPEED = -1; 
+public class LowerClimber extends CommandBase {
+  /** Creates a new LowerClimber. */
 
   Climber m_climber;
-    /** Creates a new resetClimberToLimitSwitch. */
-  public DriveClimbertoReverseHardLimit(Climber climber) {
-    // Use addRequirements() here to declare subsystem dependencies.
 
+  public LowerClimber(Climber climber) {
+    // Use addRequirements() here to declare subsystem dependencies.
+    
     m_climber = climber;
 
     addRequirements(climber);
@@ -22,23 +22,18 @@ public class DriveClimbertoReverseHardLimit extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    if (!m_climber.reverseLimitSwitchTriggered() || !m_climber.forwardLimitSwitchTriggered()) {
-      m_climber.resetClimberPositionEncoder();
-    }
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_climber.setClimberMotor(CLIMBER_DOWN_SPEED);
+    m_climber.setClimberMotor(1);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     m_climber.climberStopMotor();
-    m_climber.resetClimberMotorEncoder();
   }
 
   // Returns true when the command should end.

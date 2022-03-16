@@ -37,6 +37,7 @@ import frc.robot.commands.climber.HighBarClimb;
 import frc.robot.commands.climber.HighBarRaise;
 import frc.robot.commands.climber.LowBarClimb;
 import frc.robot.commands.climber.LowBarRaise;
+import frc.robot.commands.climber.LowerClimber;
 import frc.robot.commands.climber.TestClimberDown;
 import frc.robot.commands.climber.TestClimberUp;
 import frc.robot.commands.climber.DriveClimbertoReverseHardLimit;
@@ -171,7 +172,7 @@ public class RobotContainer {
     m_d_up.whenPressed(new CancelClimber(m_climber));
     m_d_right.whenPressed(new HighBarRaise(m_climber, m_driver_controller));
     m_d_left.whenPressed(new LowBarRaise(m_climber, m_driver_controller));
-    m_d_down.whenPressed(new TestClimberDown(m_climber));
+    m_d_down.whenHeld(new LowerClimber(m_climber));
 
     // Partner Bindings
     m_p_rb.whileHeld(new EjectBalls(m_indexer, m_shooter));

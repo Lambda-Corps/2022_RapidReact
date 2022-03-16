@@ -99,7 +99,7 @@ public class Climber extends SubsystemBase {
   }
 
   public void resetClimberPositionEncoder() {
-    m_climberMotor.setSelectedSensorPosition(20000);
+    m_climberMotor.setSelectedSensorPosition(30000);
   }
 
   public void climberIsAtHighest() {

@@ -59,7 +59,7 @@ public final class Constants {
 	public final static double TARGET_DISTANCE_FAR = 2.15265;
 
 	//////////////// Climber Speed ///////////////
-	public final static double MAXIMUM_CLIMBER_SPEED = 0.8;
+	public final static double MAXIMUM_CLIMBER_SPEED = 1.0;
 
     //////////// Talon Specific Values ///////////
     /**
