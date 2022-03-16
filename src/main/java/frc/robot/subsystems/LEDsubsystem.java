@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import edu.wpi.first.wpilibj.Timer;
 
 public class LEDsubsystem extends SubsystemBase {
   // No enum, but use the same construct
@@ -38,14 +40,22 @@ public class LEDsubsystem extends SubsystemBase {
   // Store what the last hue of the first pixel is
   private int m_rainbowFirstPixelHue;
 
-  private int LEFT_SIDE_COUNT = 36, MIDDLE_COUNT = 14, RIGHT_SIDE_COUNT = 36;
-  private int TOTAL_LED_COUNT = LEFT_SIDE_COUNT + RIGHT_SIDE_COUNT + MIDDLE_COUNT;
+  private Timer cmdTimer;
+
+  private int m_loopcount;
+  private int m_LED_number;
+  private int m_LEDPoint;
   
+  private int LEFT_SIDE_COUNT = 36, MIDDLE_COUNT = 14, RIGHT_SIDE_COUNT = 36; //86
+  private int TOTAL_LED_COUNT = LEFT_SIDE_COUNT + RIGHT_SIDE_COUNT + MIDDLE_COUNT;
+
+
   // Intake State Collector
   private NetworkTableEntry m_LEDSNetworkTableEntry;
   /** Creates a new LEDsubsystem. */
   public LEDsubsystem() { // PWM port 9
     // Must be a PWM header, not MXP or DIO
+    cmdTimer = new Timer(); // used to delay the conveyor if necessary
     m_LEDSNetworkTableEntry = NetworkTableInstance.getDefault().getTable("Shuffleboard")
                                                                .getSubTable("Drive").getEntry("Ball Count Test");
 
@@ -56,13 +66,16 @@ public class LEDsubsystem extends SubsystemBase {
     m_ledBuffer = new AddressableLEDBuffer(TOTAL_LED_COUNT);
     m_led.setLength(m_ledBuffer.getLength());
 
+
     // Set the data
     m_led.setData(m_ledBuffer);
     m_led.start();
+
   }
 
   @Override
   public void periodic() {
+
     if( DriverStation.getAlliance() == Alliance.Blue){
       m_alliance_color = ALLIANCE_COLOR_BLUE;
     }
@@ -90,12 +103,20 @@ public class LEDsubsystem extends SubsystemBase {
       case LED_DEFAULT:
       default:
         if(m_alliance_color == ALLIANCE_COLOR_BLUE){
-          blue();
+          bluechase();
         }
         else{
-          red();
+          bluechase();
         }
         break;
+    }
+    m_loopcount =  m_loopcount + 1;
+    if (m_loopcount > 258){
+      m_loopcount = 0;
+      m_LEDPoint = 0;
+      
+      bluechase();
+      //System.out.print("Reached reset " + m_loopcount);
     }
   }
 
@@ -157,4 +178,28 @@ public class LEDsubsystem extends SubsystemBase {
     }
     m_led.setData(m_ledBuffer);
   }
+  public void bluechase() {
+    // m_loopcount = 0;
+    System.out.print("Reached here " + m_loopcount);
+     if(m_loopcount %5 == 0){
+      for (var i = (0 + m_LEDPoint); i < m_ledBuffer.getLength(); i += 86) {
+        m_ledBuffer.setHSV((TOTAL_LED_COUNT -1) - i, 120, 255, 128);
+        m_ledBuffer.setHSV(i, 120, 255, 128);
+        m_LEDPoint = m_LEDPoint + 2;
+        m_led.setData(m_ledBuffer);
+        }
+       }
+      else if(m_loopcount %258 == 0){
+        
+        for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+          // Set the value
+          m_ledBuffer.setHSV(i, 0, 100, 0);
+          //System.out.print("Works" + m_loopcount);
+          m_led.setData(m_ledBuffer);
+        }
+        
+      }
+  }
+ 
 }
+  
