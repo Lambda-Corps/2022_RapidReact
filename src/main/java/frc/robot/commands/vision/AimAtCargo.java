@@ -34,7 +34,7 @@ public class AimAtCargo extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double forward = m_drive_remote.getRawAxis(DRIVER_RIGHT_AXIS);
+    double forward = m_drive_remote.getRawAxis(DRIVER_LEFT_AXIS);
     m_driveTrain.cargoAim(m_vision.getCargoTargetYaw(), forward);
   }
 

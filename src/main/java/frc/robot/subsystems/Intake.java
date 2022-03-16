@@ -17,11 +17,15 @@ import com.ctre.phoenix.motorcontrol.Faults;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Gains;
+
+import static frc.robot.Constants.*;
 
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
@@ -33,7 +37,8 @@ public class Intake extends SubsystemBase {
 
   //positions
   public static final int INTAKE_ARM_RETRACT = 0; //intake fully vertical/up
-  public static final int INTAKE_ARM_EXTEND = 1475; //intake down to grab ball (currently has temporary value)
+  public static int INTAKE_ARM_EXTEND = 1510; //intake down to grab ball (currently has temporary value)
+  // public static final int INTAKE_ARM_EXTEND = 1475; //intake down to grab ball (currently has temporary value)
 
   final double DOWN_FEEDFORWARD = .2;
   final double UP_FEEDFORWARD = -.3;
@@ -73,11 +78,14 @@ public class Intake extends SubsystemBase {
 
   private final double INTAKE_WHEEL_SPEEDS = 1;
 
-  private final DigitalInput m_reverse_limit;
+  private final DigitalInput m_reverse_limit, m_forward_limit;
+
+  private final NetworkTableEntry m_rev_limit_entry, m_fwd_limit_entry;
 
   public Intake() {
     m_faults = new Faults();
     m_reverse_limit = new DigitalInput(INTAKE_REVERSE_LIMIT);
+    m_forward_limit = new DigitalInput(INTAKE_FORWARD_LIMIT);
     m_armMotor = new TalonSRX(INTAKE_ARM_TALON);
     m_intakeMotor = new TalonSRX(INTAKE_TALON);
     
@@ -143,10 +151,16 @@ public class Intake extends SubsystemBase {
     // armMMTab.addBoolean("Soft Reverse", this::getArmSoftReverseLimit).withPosition(5,1);
     m_armMotor.setSelectedSensorPosition(0);
     holdMotorPosition(0);
+
+    NetworkTable intakeTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Intake");
+    m_rev_limit_entry = intakeTab.getEntry("Intake Rev Limit");
+    m_fwd_limit_entry = intakeTab.getEntry("Intake Fwd Limit");
   }
 
   @Override
   public void periodic() {
+    m_rev_limit_entry.forceSetBoolean(m_reverse_limit.get());
+    m_fwd_limit_entry.forceSetBoolean(m_forward_limit.get());
     // This method will be called once per scheduler run
     //if(getArmLimit()){
       // m_armMotor.getSelectedSensorPosition(0);
