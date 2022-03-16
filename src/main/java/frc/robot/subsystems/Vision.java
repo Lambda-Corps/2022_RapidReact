@@ -26,7 +26,7 @@ public class Vision extends SubsystemBase {
   PhotonCamera m_limelight = new PhotonCamera("eagletron");
 
   ShuffleboardTab m_visionTab;
-  NetworkTableEntry m_tx, m_ty, m_ta, m_bestTarget, targetPitch, targetYaw, targetRange, targetCount, targetType, cargoTarget, hubTarget;
+  NetworkTableEntry m_tx, m_ty, m_ta, m_cargoYaw, m_cargoHasTargets, m_bestTarget, targetPitch, targetYaw, targetRange, targetCount, targetType, cargoTarget, hubTarget;
   PhotonTrackedTarget m_target;
 
   double pitch, yaw, area;
@@ -52,6 +52,10 @@ public class Vision extends SubsystemBase {
     NetworkTable table = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Drive");
     cargoTarget = table.getEntry("BallTarget");
     hubTarget = table.getEntry("HighTarget");
+
+    NetworkTable cargoTable = NetworkTableInstance.getDefault().getTable("photonvision").getSubTable("Microsoft_LifeCam_HD-3000");
+    m_cargoYaw = cargoTable.getEntry("targetYaw");
+    m_cargoHasTargets = cargoTable.getEntry("hasTarget");
   }
 
   @Override
@@ -96,13 +100,8 @@ public class Vision extends SubsystemBase {
   }
 
   public double getCargoTargetYaw() {
-    double Yaw = 0;
-    var result = m_HD3000.getLatestResult();
-    if (result.hasTargets()) {
-      Yaw = result.getBestTarget().getYaw();
-    }
-
-   return Yaw;
+    double Yaw = m_cargoYaw.getDouble(0);
+    return Yaw;
   }
 
   public void setTeamPipeline() {

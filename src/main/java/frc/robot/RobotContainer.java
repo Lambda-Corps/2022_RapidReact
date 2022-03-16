@@ -57,6 +57,7 @@ import frc.robot.commands.vision.AimAtCargo;
 import frc.robot.commands.vision.DriveWithVision;
 import frc.robot.commands.vision.LEDoff;
 import frc.robot.commands.vision.LEDon;
+import frc.robot.commands.vision.configureVisionCargoPID;
 import frc.robot.commands.vision.configureVisionDrivePID;
 import frc.robot.commands.vision.configureVisionTurnPID;
 import frc.robot.subsystems.Climber;
@@ -367,19 +368,22 @@ public class RobotContainer {
 
     visionTab.add("LED on", new LEDon(m_vision))  .withPosition(0, 0);
     visionTab.add("LED off", new LEDoff(m_vision)).withPosition(0, 1);
-    visionTab.add("Condigure Vision Drive", new configureVisionDrivePID(m_driveTrain)).withPosition(0, 4);
+    visionTab.add("Condigure Vision Drive", new configureVisionDrivePID(m_driveTrain)).withPosition(0, 2);
     visionTab.add("Configure Turn Turn", new configureVisionTurnPID(m_driveTrain))    .withPosition(0, 3);
+    visionTab.add("Configure Cargo controllre", new configureVisionCargoPID(m_driveTrain)).withPosition(0, 4);
 
     visionTab.add("forward drive speed", 0);
     visionTab.add("Turn speed", 0);
+    visionTab.add("Cargo Yaw", 0);
 
-    visionTab.add("Drive kP", 0);
+    visionTab.add("Drive kP", 0.4);
     visionTab.add("Drive kD", 0);
     visionTab.add("Drive kI", 0);
     visionTab.add("Drive kF", 0);
-    visionTab.add("Turn kP", 0);
+    visionTab.add("Turn kP", 0.02);
     visionTab.add("Turn kD", 0);
     visionTab.add("Turn kI", 0);
     visionTab.add("Turn kF", 0);
+    visionTab.add("Cargo kP,", 0.011);
   }
 }
