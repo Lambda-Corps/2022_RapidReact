@@ -25,6 +25,7 @@ import static frc.robot.Constants.kTurnTravelUnitsPerRotation;
 import static frc.robot.Constants.kWheelRadiusInches;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
@@ -57,6 +58,7 @@ import frc.robot.Robot;
 
 public class DriveTrain extends SubsystemBase {
 	private final double MAX_TELEOP_DRIVE_SPEED = .75;
+	private final double arbFF = 0.2;
 	// TalonFX's for the drivetrain
 	// Right side is inverted here to drive forward
 	WPI_TalonFX m_left_leader, m_right_leader, m_left_follower, m_right_follower;
@@ -393,10 +395,10 @@ public class DriveTrain extends SubsystemBase {
   	}
 
 	public boolean motionMagicDrive(double target_position) {
-		double tolerance = 25;
-		
-		m_left_leader.set(ControlMode.MotionMagic, m_left_setpoint);
-		m_right_leader.set(ControlMode.MotionMagic, m_right_setpoint);
+		double tolerance = 75;
+		//add ifs if we need to set negative arbFF for going backward
+		m_left_leader.set(ControlMode.MotionMagic, m_left_setpoint); //, DemandType.ArbitraryFeedForward, arbFF);
+		m_right_leader.set(ControlMode.MotionMagic, m_right_setpoint);//, DemandType.ArbitraryFeedForward, arbFF);
 		// m_left_leader.set(ControlMode.MotionMagic, target_position);
 		// m_right_leader.set(ControlMode.MotionMagic, target_position);
 	
@@ -407,9 +409,14 @@ public class DriveTrain extends SubsystemBase {
 	}
 
   	public boolean motionMagicTurn(double arcTicks){
-		double tolerance = 25; 
-		m_left_leader.set(ControlMode.MotionMagic, m_left_setpoint);
-		m_right_leader.set(ControlMode.MotionMagic, m_right_setpoint);
+		double tolerance = 75;
+		if(arcTicks > 0){
+			m_left_leader.set(ControlMode.MotionMagic, m_left_setpoint);//, DemandType.ArbitraryFeedForward, -arbFF);
+			m_right_leader.set(ControlMode.MotionMagic, m_right_setpoint);//, DemandType.ArbitraryFeedForward, arbFF);
+		}else{
+			m_left_leader.set(ControlMode.MotionMagic, m_left_setpoint);//, DemandType.ArbitraryFeedForward, arbFF);
+			m_right_leader.set(ControlMode.MotionMagic, m_right_setpoint);//, DemandType.ArbitraryFeedForward, -arbFF);
+		}
 		double currentLeftPos =  m_left_leader.getSelectedSensorPosition();
 		double currentRightPos = m_right_leader.getSelectedSensorPosition();
 		 
@@ -420,10 +427,10 @@ public class DriveTrain extends SubsystemBase {
 		m_left_setpoint = m_left_leader.getSelectedSensorPosition() + lengthInTicks;
 		m_right_setpoint = m_right_leader.getSelectedSensorPosition() + lengthInTicks;
 
-		m_left_leader.configMotionCruiseVelocity(16636,kTimeoutMs);
-		m_left_leader.configMotionAcceleration(8318, kTimeoutMs); //cruise velocity / 2, so will take 2 seconds
-		m_right_leader.configMotionCruiseVelocity(16636,kTimeoutMs);
-		m_right_leader.configMotionAcceleration(8318, kTimeoutMs);
+		m_left_leader.configMotionCruiseVelocity(12318,kTimeoutMs);
+		m_left_leader.configMotionAcceleration(6159, kTimeoutMs); //cruise velocity / 2, so will take 2 seconds
+		m_right_leader.configMotionCruiseVelocity(12318,kTimeoutMs);
+		m_right_leader.configMotionAcceleration(6159, kTimeoutMs);
 		
 		//set up talon to use DriveMM slots
 		m_left_leader.selectProfileSlot(kSlot_DriveMM, PID_PRIMARY);
@@ -443,9 +450,9 @@ public class DriveTrain extends SubsystemBase {
 		m_left_leader.selectProfileSlot(kSlot_Turning, PID_PRIMARY);
 		m_right_leader.selectProfileSlot(kSlot_Turning, PID_PRIMARY);
 		m_left_leader.configMotionCruiseVelocity(16636, kTimeoutMs);
-		m_left_leader.configMotionAcceleration(8318, kTimeoutMs);
+		m_left_leader.configMotionAcceleration(4159, kTimeoutMs);
 		m_right_leader.configMotionCruiseVelocity(16636, kTimeoutMs);
-		m_right_leader.configMotionAcceleration(8318, kTimeoutMs);
+		m_right_leader.configMotionAcceleration(4159, kTimeoutMs);
 	
 		// length in Ticks is negative
 		m_left_setpoint = m_left_leader.getSelectedSensorPosition() + lengthInTicks;
