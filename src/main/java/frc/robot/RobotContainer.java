@@ -165,15 +165,15 @@ public class RobotContainer {
     m_d_rb.whenHeld(new PrintCommand("Driving Inverted"));
     m_d_lb.whenPressed(new DropIntakeAndCollectBalls(m_intake, m_indexer));
     m_d_lb.whenReleased(new ArmMM(m_intake, Intake.INTAKE_ARM_RETRACT));
-    m_d_rs.whenPressed(new HighBarClimb(m_climber, m_driver_controller));
-    m_d_ls.whenPressed(new LowBarClimb(m_climber, m_driver_controller));
-    m_d_sel.whenPressed(new CancelClimber(m_climber));
+    m_d_rs.whenPressed(new HighBarClimb(m_climber, m_ledsubsystem, m_driver_controller));
+    m_d_ls.whenPressed(new LowBarClimb(m_climber, m_ledsubsystem, m_driver_controller));
+    m_d_sel.whenPressed(new CancelClimber(m_climber, m_ledsubsystem));
 
     // Driver POV Bindings
-    m_d_up.whenPressed(new CancelClimber(m_climber));
-    m_d_right.whenPressed(new HighBarRaise(m_climber, m_driver_controller));
-    m_d_left.whenPressed(new LowBarRaise(m_climber, m_driver_controller));
-    m_d_down.whileHeld(new LowerClimber(m_climber));
+    m_d_up.whenPressed(new CancelClimber(m_climber, m_ledsubsystem));
+    m_d_right.whenPressed(new HighBarRaise(m_climber, m_ledsubsystem, m_driver_controller));
+    m_d_left.whenPressed(new LowBarRaise(m_climber, m_ledsubsystem, m_driver_controller));
+    m_d_down.whileHeld(new LowerClimber(m_climber, m_ledsubsystem));
 
     // Partner Bindings
     m_p_rb.whileHeld(new EjectBalls(m_indexer, m_shooter));
@@ -351,9 +351,9 @@ public class RobotContainer {
     climberTab.addBoolean("Soft Reverse Limit", m_climber::getClimberSoftReverseLimit).withPosition(5, 1);
     
     // High bar raise
-    climberTab.add("Raise to MidRung", new HighBarRaise(m_climber, m_driver_controller)).withPosition(0, 2).withSize(2, 1);
-    climberTab.add("Raise to LowBar", new LowBarRaise(m_climber, m_driver_controller))  .withPosition(2, 2).withSize(2, 1);
-    climberTab.add("Cancel Climber", new CancelClimber(m_climber))                      .withPosition(4, 2).withSize(2, 1);
+    climberTab.add("Raise to MidRung", new HighBarRaise(m_climber, m_ledsubsystem, m_driver_controller)).withPosition(0, 2).withSize(2, 1);
+    climberTab.add("Raise to LowBar", new LowBarRaise(m_climber, m_ledsubsystem, m_driver_controller))  .withPosition(2, 2).withSize(2, 1);
+    climberTab.add("Cancel Climber", new CancelClimber(m_climber, m_ledsubsystem))                      .withPosition(4, 2).withSize(2, 1);
     // climberTab.add("Lower Climber", new LowerToLimitOrTime(m_climber))                  .withPosition(6, 2).withSize(2, 1);
     
     climberTab.add("TestClimbDown", new TestClimberDown(m_climber))                     .withPosition(0, 3).withSize(2, 1);

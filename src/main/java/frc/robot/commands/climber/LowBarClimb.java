@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.LEDsubsystem;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -16,14 +17,16 @@ public class LowBarClimb extends SequentialCommandGroup {
   /** Creates a new LowBarClimb. */
 
   Climber m_climber;
+  LEDsubsystem m_LEDsubsystem;
 
-  public LowBarClimb(Climber climber, XboxController driverController) {
+  public LowBarClimb(Climber climber, LEDsubsystem ledsubsystem, XboxController driverController) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     m_climber = climber;
+    m_LEDsubsystem = ledsubsystem;
 
     addCommands(
-      new LowBarRaise(climber, driverController),
+      new LowBarRaise(climber, ledsubsystem, driverController),
       new WaitCommand(2),
       new LowBarLower(climber)
     );
