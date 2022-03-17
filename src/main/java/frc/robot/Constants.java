@@ -114,6 +114,9 @@ public final class Constants {
 	public final static Gains kGains_MidTarmac =      new Gains(0.1, 0.0,  0, 0.0533,    200,  1.0);
 	public final static Gains kGains_TarmacLine =     new Gains(0.1, 0.0,  0, 0.0533,    300,  1.0);
 	public final static Gains kGains_ShooterGains =   new Gains(0.1, 0.0,  0, 0.0533,    400,  1.0);
+	public final static Gains kGains_visionDrive =    new Gains(0.4, 0.0,  0, 0,         100,  1.0);
+	public final static Gains kGains_visionTurn =     new Gains(0.02, 0, 0, 0, 100, 1.0);
+	public final static Gains kGains_visionCargo =    new Gains(0.011, 0, 0, 0, 100, 1.0);
 
 	/** ---- Flat constants, you should not need to change these ---- */
 	/* We allow either a 0 or 1 when selecting an ordinal for remote devices [You can have up to 2 devices assigned remotely to a talon/victor] */

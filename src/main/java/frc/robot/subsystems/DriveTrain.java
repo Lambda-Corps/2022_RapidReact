@@ -4,25 +4,7 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.LEFT_TALON_FOLLOWER;
-import static frc.robot.Constants.LEFT_TALON_LEADER;
-import static frc.robot.Constants.PID_PRIMARY;
-import static frc.robot.Constants.RIGHT_TALON_FOLLOWER;
-import static frc.robot.Constants.RIGHT_TALON_LEADER;
-import static frc.robot.Constants.k100msPerSecond;
-import static frc.robot.Constants.kControllerDeadband;
-import static frc.robot.Constants.kCountsPerRev;
-import static frc.robot.Constants.kEncoderUnitsPerRotation;
-import static frc.robot.Constants.kGains_Driving;
-import static frc.robot.Constants.kGains_Turning;
-import static frc.robot.Constants.kGearRatio;
-import static frc.robot.Constants.kNeutralDeadband;
-import static frc.robot.Constants.kSensorGearRatio;
-import static frc.robot.Constants.kSlot_DriveMM;
-import static frc.robot.Constants.kSlot_Turning;
-import static frc.robot.Constants.kTimeoutMs;
-import static frc.robot.Constants.kTurnTravelUnitsPerRotation;
-import static frc.robot.Constants.kWheelRadiusInches;
+import static frc.robot.Constants.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
@@ -91,7 +73,7 @@ public class DriveTrain extends SubsystemBase {
 	NetworkTableEntry m_left_output, m_right_output, m_forward_rate, m_rotation_rate, m_drive_max_entry;
 
 	/////////// Vision PID Controllers ///////////
-	PIDController m_speedPidController, m_turnPidController;
+	PIDController m_speedPidController, m_turnPidController, m_cargoController;
 	double visionDrivekP, visionDrivekI, visionDrivekD, visionTurnkP, visionTurnkI, visionTurnkD;
 
 	// Motion Magic Setpoints for each side of the motor
@@ -284,15 +266,10 @@ public class DriveTrain extends SubsystemBase {
 		  m_rotation_rate = driveTestable.getEntry("Rotation Limiter");
 		  m_gyro.reset();
 
-			visionDrivekD = 0;
-			visionDrivekP = 0.4;
-			visionDrivekI = 0;
-			visionTurnkD = 0;
-			visionTurnkI = 0;
-			visionTurnkP = 0.02;
-
-			m_speedPidController = new PIDController(visionDrivekP, visionDrivekI, visionDrivekD);
-			m_turnPidController = new PIDController(visionTurnkP, visionTurnkI, visionTurnkD);
+			m_speedPidController = new PIDController(kGains_visionDrive.kP, kGains_visionDrive.kI, kGains_visionDrive.kD);
+			m_turnPidController = new PIDController(kGains_visionTurn.kP, kGains_visionTurn.kI, kGains_visionTurn.kD);
+			m_cargoController = new PIDController(kGains_visionCargo.kP, kGains_visionCargo.kI, kGains_visionCargo.kD);
+			
   	}
 
 	@Override
@@ -718,6 +695,10 @@ public class DriveTrain extends SubsystemBase {
 		m_turnPidController = new PIDController(kP, kI, kD);
 	}
 
+	public void configureVisionCargoController(double kP) {
+		m_cargoController = new PIDController(kP, kGains_visionCargo.kI, kGains_visionCargo.kD);
+	}
+
 	public void visionDrive(double range,  double yaw, double goalInMeters) {
 		
 		double forwardspeed = 0;
@@ -740,11 +721,15 @@ public class DriveTrain extends SubsystemBase {
 		double turnspeed = 0;
 
 		if (yaw != 0) {
-			turnspeed = -m_turnPidController.calculate(yaw, 0);
+			turnspeed = -m_cargoController.calculate(yaw, 0);
 		}else {
 			turnspeed = 0;
 		}
 
+		NetworkTable visionTable = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Vision");
+		visionTable.getEntry("forward drive speed").forceSetDouble(forwardspeed);
+		visionTable.getEntry("Turn speed").forceSetDouble(turnspeed);
+		visionTable.getEntry("Cargo Yaw").forceSetDouble(yaw);
 		teleop_drive(forwardspeed, turnspeed);
 	}
 
