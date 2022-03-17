@@ -98,11 +98,11 @@ public class LEDsubsystem extends SubsystemBase {
           break;
       case LED_DEFAULT:
       default:
-        if(m_alliance_color == ALLIANCE_COLOR_BLUE){
+        if(DriverStation.getAlliance() == Alliance.Blue){
           bluechase();
         }
         else{
-          bluechase();
+          redchase();
         }
         break;
     }
@@ -111,7 +111,11 @@ public class LEDsubsystem extends SubsystemBase {
       m_loopcount = 0;
       m_LEDPoint = 0;
       
-      bluechase();
+      if (m_alliance_color == ALLIANCE_COLOR_BLUE) {
+        bluechase();
+      } else {
+        redchase();
+      }
       //System.out.print("Reached reset " + m_loopcount);
     }
   }
@@ -196,6 +200,27 @@ public class LEDsubsystem extends SubsystemBase {
         
       }
   }
- 
+  public void redchase() {
+    // m_loopcount = 0;
+    // System.out.print("Reached here " + m_loopcount);
+     if(m_loopcount %5 == 0){
+      for (var i = (0 + m_LEDPoint); i < m_ledBuffer.getLength(); i += 86) {
+        m_ledBuffer.setHSV((TOTAL_LED_COUNT -1) - i, 0, 255, 128);
+        m_ledBuffer.setHSV(i, 0, 255, 128);
+        m_LEDPoint = m_LEDPoint + 2;
+        m_led.setData(m_ledBuffer);
+        }
+       }
+      else if(m_loopcount %258 == 0){
+        
+        for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+          // Set the value
+          m_ledBuffer.setHSV(i, 0, 255, 128);
+          //System.out.print("Works" + m_loopcount);
+          m_led.setData(m_ledBuffer);
+        }
+        
+      }
+  }
 }
   
