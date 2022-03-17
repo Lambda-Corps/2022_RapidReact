@@ -22,7 +22,8 @@ public class TurnGyroWithPID extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_current_angle = m_drivetrain.getHeading();
+    // m_current_angle = m_drivetrain.getHeading();
+    m_current_angle = m_drivetrain.getRawAngle();
     m_setpoint_angle = m_current_angle + m_target_angle;
     m_drivetrain.resetGyroPIDController();
   }

@@ -36,7 +36,7 @@ public class TurnGyroWithPIDTest extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_current_angle = m_drivetrain.getHeading();
+    m_current_angle = m_drivetrain.getRawAngle();
     m_setpoint_angle = m_current_angle + m_arclengthEntry.getDouble(0);
     m_drivetrain.resetGyroPIDController(m_turnkPEntry.getDouble(0), m_kIEntry.getDouble(0), m_kDEntry.getDouble(0));
     m_start_time = Timer.getFPGATimestamp();

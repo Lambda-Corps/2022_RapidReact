@@ -103,7 +103,7 @@ public class DriveTrain extends SubsystemBase {
 
 	// PID controller for turning with Gyro
 	private PIDController m_gyro_pidcontroller;
-	private double GYRO_PID_TOLERANCE = 5.0; // 1 degree
+	private double GYRO_PID_TOLERANCE = 3.0; // 1 degree
 	private double GYRO_PID_FEEDFORWARD = .1; 
 	private double GYRO_PID_TURN_SPEED = .5;
 
@@ -787,12 +787,12 @@ public class DriveTrain extends SubsystemBase {
 	}
 
 	public boolean atGyroPIDSetpoint(){
-		double error = m_gyro_pidcontroller.getPositionError();
+		double error = Math.abs(m_gyro_pidcontroller.getPositionError());
 		return error <= GYRO_PID_TOLERANCE;
 	}
 
 	public void driveGyroPID(double set_point){
-		double turnspeed = 0;
+		double turnspeed = GYRO_PID_FEEDFORWARD;
 		double currentAngle = m_gyro.getAngle();
 
 		double turnmodifier = (set_point < currentAngle) ? -1 : 1;
