@@ -98,7 +98,7 @@ public class LEDsubsystem extends SubsystemBase {
           break;
       case LED_DEFAULT:
       default:
-        if(DriverStation.getAlliance() == Alliance.Blue){
+        if(m_alliance_color == ALLIANCE_COLOR_BLUE){
           bluechase();
         }
         else{
@@ -215,7 +215,7 @@ public class LEDsubsystem extends SubsystemBase {
         
         for (var i = 0; i < m_ledBuffer.getLength(); i++) {
           // Set the value
-          m_ledBuffer.setHSV(i, 0, 255, 128);
+          m_ledBuffer.setHSV(i,  0, 100, 0);
           //System.out.print("Works" + m_loopcount);
           m_led.setData(m_ledBuffer);
         }
