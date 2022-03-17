@@ -1,9 +1,5 @@
 package frc.robot.subsystems;
-import static frc.robot.Constants.CAMERA_HEIGHT_METERS;
-import static frc.robot.Constants.CAMERA_PITCH_RADIANS;
-import static frc.robot.Constants.TARGET_HEIGHT_METERS;
-
-import javax.swing.event.DocumentEvent;
+import static frc.robot.Constants.*;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
@@ -26,7 +22,7 @@ public class Vision extends SubsystemBase {
   PhotonCamera m_limelight = new PhotonCamera("eagletron");
 
   ShuffleboardTab m_visionTab;
-  NetworkTableEntry m_tx, m_ty, m_ta, m_bestTarget, targetPitch, targetYaw, targetRange, targetCount, targetType, cargoTarget, hubTarget;
+  NetworkTableEntry m_tx, m_ty, m_ta, m_cargoYaw, m_cargoHasTargets, m_bestTarget, targetPitch, targetYaw, targetRange, targetCount, targetType, cargoTarget, hubTarget;
   PhotonTrackedTarget m_target;
 
   double pitch, yaw, area;
@@ -52,6 +48,10 @@ public class Vision extends SubsystemBase {
     NetworkTable table = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Drive");
     cargoTarget = table.getEntry("BallTarget");
     hubTarget = table.getEntry("HighTarget");
+
+    NetworkTable cargoTable = NetworkTableInstance.getDefault().getTable("photonvision").getSubTable("lifecam");
+    m_cargoYaw = cargoTable.getEntry("targetYaw");
+    m_cargoHasTargets = cargoTable.getEntry("hasTarget");
   }
 
   @Override

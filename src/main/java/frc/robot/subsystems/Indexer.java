@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Indexer extends SubsystemBase {
   private final double INTAKE_SHOOT_SPEED = .27; // measured testing
-  private final double INTAKE_INTAKE_SPEED = .43;
+  private final double INTAKE_INTAKE_SPEED = .4;
 
   public enum StorageState {
     EMPTY, 
