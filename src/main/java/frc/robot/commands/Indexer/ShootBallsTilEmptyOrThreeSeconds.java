@@ -7,15 +7,19 @@ package frc.robot.commands.Indexer;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
+import frc.robot.subsystems.Shooter;
 
 public class ShootBallsTilEmptyOrThreeSeconds extends CommandBase {
 
   Indexer m_indexer;
+  Shooter m_shooter;
   Timer m_timer;
+  int m_emptycount;
 
   /** Creates a new Index_Balls_into_FlyWheel. */
-  public ShootBallsTilEmptyOrThreeSeconds(Indexer indexer) {
+  public ShootBallsTilEmptyOrThreeSeconds(Indexer indexer, Shooter shooter) {
     m_indexer = indexer;
+    m_shooter = shooter;
     m_timer = new Timer();
     m_timer.start();
     // Use addRequirements() here to declare subsystem dependencies.
@@ -25,6 +29,7 @@ public class ShootBallsTilEmptyOrThreeSeconds extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    m_emptycount = 0;
     m_timer.reset();
   }
 
@@ -32,17 +37,25 @@ public class ShootBallsTilEmptyOrThreeSeconds extends CommandBase {
   @Override
   public void execute() {
     m_indexer.shootBalls();
+    if(m_indexer.isEmpty()){
+      m_emptycount++;
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_indexer.stopMotors();
+    m_shooter.stopMotor();
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    boolean done = m_indexer.isEmpty();
-    if(m_timer.hasElapsed(3)){
+    boolean done = false;
+    // If we've been empty for more than .4 seconds, or 
+    // the timer elapsed, end the command
+    if(m_timer.hasElapsed(3) || m_emptycount >= 20){
       done = true;
     }
   

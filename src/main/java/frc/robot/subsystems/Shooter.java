@@ -36,6 +36,10 @@ public class Shooter extends SubsystemBase {
   // Move balls that are stuck
   private final double SHOOTER_EJECT_SPEED = -.15;
   private final double SHOOTER_TOLERANCE = .03; // within 3% of the set point is good 
+
+  // Keep track of whether we're shooting, either for LEDs or shooting sequences
+  private boolean m_is_shooting;
+  private int m_shooter_clock_count;
     
   /** Creates a new Shooter. */
   public Shooter() {
@@ -89,10 +93,17 @@ public class Shooter extends SubsystemBase {
 
     m_shooter_set_point = SHOOTER_SETPOINT_CLOSESHOT;
     // Default to the initiation line
+
+    m_is_shooting = false;
+    m_shooter_clock_count = 0;
   }
+
   public void stopMotor() {
+    m_is_shooting = false;
+    m_shooter_clock_count = 0;
     m_Shooter.set(ControlMode.PercentOutput, 0);
   }
+
   public void velocityPID(double setpoint){
     m_Shooter.set(ControlMode.Velocity, m_shooter_set_point);
   }
@@ -141,6 +152,9 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    if(m_is_shooting){
+      m_shooter_clock_count++;
+    }
   }
 
   public void startVelocityPID(){
@@ -150,7 +164,14 @@ public class Shooter extends SubsystemBase {
   public boolean isUpToSpeed(){
     double currentLoopError = Math.abs(m_Shooter.getClosedLoopError());
 
-    return currentLoopError < m_shooter_set_point * SHOOTER_TOLERANCE;
+    boolean atspeed = currentLoopError < (m_shooter_set_point * SHOOTER_TOLERANCE);
+
+    // The command was ending right as it started because the closed loop error
+    // hadn't gotten far enough away from the inertia start.
+    // Only return true if we've been spinning for at least half a second AND we
+    // are spinning within the tolerance
+    atspeed = atspeed && (m_shooter_clock_count >= 25);
+    return atspeed ;
   }
 
   public double getClosedLoopError(){
