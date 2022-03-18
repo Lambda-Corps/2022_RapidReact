@@ -59,7 +59,7 @@ import frc.robot.Robot;
 
 public class DriveTrain extends SubsystemBase {
 	private final double MAX_TELEOP_DRIVE_SPEED = .75;
-	private final double arbFF = 0.2;
+	// private final double arbFF = 0.2;
 	// TalonFX's for the drivetrain
 	// Right side is inverted here to drive forward
 	WPI_TalonFX m_left_leader, m_right_leader, m_left_follower, m_right_follower;
@@ -734,7 +734,7 @@ public class DriveTrain extends SubsystemBase {
 
 		teleop_drive(forwardspeed, turnspeed);
 	}
-	// TODO test this
+	
 	public void cargoAim(double yaw, double forward) {
 		double forwardspeed = forward;
 		double turnspeed = 0;

@@ -33,7 +33,7 @@ public class Shooting_Sequence extends SequentialCommandGroup {
       new SetShooterDistance(m_shooter, distance),
       new StartShooterWheel(m_shooter),
       new WaitUntilCommand(m_shooter::isUpToSpeed),
-      new ShootBallsTilEmptyOrThreeSeconds(m_indexer),
+      new ShootBallsTilEmptyOrThreeSeconds(m_indexer, m_shooter),
       new StopShooterAndIndexerMotors(m_shooter, m_indexer)
     );
   }

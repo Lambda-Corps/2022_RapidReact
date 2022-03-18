@@ -25,7 +25,7 @@ public class Auto_Shooting_Sequence extends SequentialCommandGroup {
       new SetShooterDistance(shooter, distance),
       new StartShooterWheel(shooter),
       new WaitUntilCommand(shooter::isUpToSpeed),
-      new ShootBallsTilEmptyOrThreeSeconds(indexer),
+      new ShootBallsTilEmptyOrThreeSeconds(indexer, shooter),
       new StopShooterAndIndexerMotors(shooter, indexer)  
     );
   }

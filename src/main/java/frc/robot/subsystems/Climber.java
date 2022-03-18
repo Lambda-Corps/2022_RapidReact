@@ -4,9 +4,9 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.CLIMER_SRX;
 import static frc.robot.Constants.CLIMBER_FORWARD_LIMIT;
 import static frc.robot.Constants.CLIMBER_REVERSE_LIMIT;
+import static frc.robot.Constants.CLIMER_SRX;
 import static frc.robot.Constants.MAXIMUM_CLIMBER_SPEED;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -15,8 +15,6 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
@@ -55,7 +53,7 @@ public class Climber extends SubsystemBase {
 
     m_climberMotor.setSelectedSensorPosition(0);
 
-    ShuffleboardTab climberTab = Shuffleboard.getTab("Climber");
+    // ShuffleboardTab climberTab = Shuffleboard.getTab("Climber");
     
   }
 
