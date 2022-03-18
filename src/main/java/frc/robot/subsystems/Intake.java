@@ -162,9 +162,9 @@ public class Intake extends SubsystemBase {
     m_rev_limit_entry.forceSetBoolean(m_reverse_limit.get());
     m_fwd_limit_entry.forceSetBoolean(m_forward_limit.get());
     // This method will be called once per scheduler run
-    //if(getArmLimit()){
-      // m_armMotor.getSelectedSensorPosition(0);
-    //}
+    if(m_reverse_limit.get()){
+      m_armMotor.getSelectedSensorPosition(0);
+    }
 
     // Periodically grab the talon faults
     m_armMotor.getFaults(m_faults);
