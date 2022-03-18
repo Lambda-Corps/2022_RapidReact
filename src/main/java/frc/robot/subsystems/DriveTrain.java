@@ -4,10 +4,30 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.*;
+import static frc.robot.Constants.LEFT_TALON_FOLLOWER;
+import static frc.robot.Constants.LEFT_TALON_LEADER;
+import static frc.robot.Constants.PID_PRIMARY;
+import static frc.robot.Constants.RIGHT_TALON_FOLLOWER;
+import static frc.robot.Constants.RIGHT_TALON_LEADER;
+import static frc.robot.Constants.k100msPerSecond;
+import static frc.robot.Constants.kControllerDeadband;
+import static frc.robot.Constants.kCountsPerRev;
+import static frc.robot.Constants.kEncoderUnitsPerRotation;
+import static frc.robot.Constants.kGains_Driving;
+import static frc.robot.Constants.kGains_Turning;
+import static frc.robot.Constants.kGains_visionCargo;
+import static frc.robot.Constants.kGains_visionDrive;
+import static frc.robot.Constants.kGains_visionTurn;
+import static frc.robot.Constants.kGearRatio;
+import static frc.robot.Constants.kNeutralDeadband;
+import static frc.robot.Constants.kSensorGearRatio;
+import static frc.robot.Constants.kSlot_DriveMM;
+import static frc.robot.Constants.kSlot_Turning;
+import static frc.robot.Constants.kTimeoutMs;
+import static frc.robot.Constants.kTurnTravelUnitsPerRotation;
+import static frc.robot.Constants.kWheelRadiusInches;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
@@ -34,7 +54,6 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 
