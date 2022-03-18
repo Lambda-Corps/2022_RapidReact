@@ -1,9 +1,5 @@
 package frc.robot.subsystems;
-import static frc.robot.Constants.CAMERA_HEIGHT_METERS;
-import static frc.robot.Constants.CAMERA_PITCH_RADIANS;
-import static frc.robot.Constants.TARGET_HEIGHT_METERS;
-
-import javax.swing.event.DocumentEvent;
+import static frc.robot.Constants.*;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonUtils;
@@ -53,7 +49,11 @@ public class Vision extends SubsystemBase {
     cargoTarget = table.getEntry("BallTarget");
     hubTarget = table.getEntry("HighTarget");
 
+<<<<<<< HEAD
     NetworkTable cargoTable = NetworkTableInstance.getDefault().getTable("photonvision").getSubTable("Microsoft_LifeCam_HD-3000");
+=======
+    NetworkTable cargoTable = NetworkTableInstance.getDefault().getTable("photonvision").getSubTable("lifecam");
+>>>>>>> origin/temp
     m_cargoYaw = cargoTable.getEntry("targetYaw");
     m_cargoHasTargets = cargoTable.getEntry("hasTarget");
   }
