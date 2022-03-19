@@ -107,8 +107,8 @@ public final class Constants {
 	 * 	                                    			  		 kP      kI   kD   kF        Iz    PeakOut */
 	public final static Gains kGains_Turning =   	  new Gains(0.3,   0.0,  0.0, 0.3,      200,  1.0 );
 	public final static Gains kGains_Driving =   	  new Gains(0.3,   0.0,  6.0, 0.3,      100,  1.0 );
-	public final static Gains kGains_IntakeDown =	  new Gains(2.69,  0.0,  0.0, 0.341,    100,  1.0 );
-	public final static Gains kGains_IntakeUp =  	  new Gains(0.299, 0.0,  0.0, 1.023,	200,  1.0 );
+	public final static Gains kGains_IntakeDown =	  new Gains(3.0,  0.0,  0.0, 0.341,    100,  1.0 );
+	public final static Gains kGains_IntakeUp =  	  new Gains(6.0, 0.0,  0.0, 1.023,	200,  1.0 );
 	public final static Gains kGains_IntakeHold = 	  new Gains(8.000, 0.0,  40,  0.0,		300,  1.0 );
 	public final static Gains kGains_CloseShot =      new Gains(0.1, 0.0,  0, 0.0533,    100,  1.0);
 	public final static Gains kGains_MidTarmac =      new Gains(0.1, 0.0,  0, 0.0533,    200,  1.0);

@@ -37,11 +37,11 @@ public class Intake extends SubsystemBase {
 
   //positions
   public static final int INTAKE_ARM_RETRACT = 0; //intake fully vertical/up
-  public static int INTAKE_ARM_EXTEND = 1510; //intake down to grab ball (currently has temporary value)
+  public static int INTAKE_ARM_EXTEND = 1485; //intake down to grab ball (currently has temporary value)
   // public static final int INTAKE_ARM_EXTEND = 1475; //intake down to grab ball (currently has temporary value)
 
-  final double DOWN_FEEDFORWARD = 0.2;
-  final double UP_FEEDFORWARD = -.3;
+  final double DOWN_FEEDFORWARD = 0.3;
+  final double UP_FEEDFORWARD = -.65;
   final double HOLD_FEEDFORWARD = -.2; //PID (would this one also be motion magic?)
   final double MM_DONE_TOLERANCE = 10;
   
@@ -98,7 +98,7 @@ public class Intake extends SubsystemBase {
     m_armMotor.setSensorPhase(false);
 
     // TEsting limits
-    m_armMotor.configPeakOutputForward(.2);
+    //m_armMotor.configPeakOutputForward(.2);
   
     //selected feedback
     m_armMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
@@ -110,7 +110,7 @@ public class Intake extends SubsystemBase {
     // m_armMotor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
     //mm
     m_armMotor.configMotionCruiseVelocity(300, 0);
-    m_armMotor.configMotionAcceleration(100, 0);
+    m_armMotor.configMotionAcceleration(300, 0);
 
     //current limits?
     //m_armMotor.configPeakCurrentLimit(0);
@@ -212,13 +212,13 @@ public class Intake extends SubsystemBase {
   }
 
   public boolean moveMM(int targetPosition){
-    int kMeasuredPosHorizontal = 900; //Position measured when arm is horizontal
+    int kMeasuredPosHorizontal = 570; //Position measured when arm is horizontal
     double kTicksPerDegree = 4096 / 360; //Sensor is 1:1 with arm rotation
     double currentPos = m_armMotor.getSelectedSensorPosition();
     double degrees = (currentPos - kMeasuredPosHorizontal) / kTicksPerDegree;
     double radians = java.lang.Math.toRadians(degrees);
-    double cosineScalar = java.lang.Math.cos(radians);
-    m_armMotor.set(ControlMode.MotionMagic, targetPosition, DemandType.ArbitraryFeedForward, MM_FEEDFORWARD * -cosineScalar);
+    //double cosineScalar = java.lang.Math.cos(radians);
+    m_armMotor.set(ControlMode.MotionMagic, targetPosition, DemandType.ArbitraryFeedForward, MM_FEEDFORWARD); // * -cosineScalar);
     m_is_on_target = Math.abs(currentPos - targetPosition) < MM_DONE_TOLERANCE;
     return m_is_on_target;
   }
@@ -328,7 +328,7 @@ public class Intake extends SubsystemBase {
     if(!reverse_limit_hit){
       
       // Limit not hit, adjust the speed to go backward at half speed
-      motorspeed = -.5;
+      motorspeed = -.6;
     }
 
     m_armMotor.set(ControlMode.PercentOutput, motorspeed);

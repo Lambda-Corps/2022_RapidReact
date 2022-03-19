@@ -24,6 +24,7 @@ import frc.robot.commands.Indexer.CancelIndexer;
 import frc.robot.commands.Indexer.EjectBalls;
 import frc.robot.commands.Indexer.ShootBallsTilEmptyOrThreeSeconds;
 import frc.robot.commands.Intake.ArmMM;
+import frc.robot.commands.Intake.CollectBalls;
 import frc.robot.commands.Intake.DropIntakeAndCollectBalls;
 import frc.robot.commands.Intake.ResetArmLimitAndEncoder;
 import frc.robot.commands.Intake.SetExtendLimit;
@@ -170,9 +171,9 @@ public class RobotContainer {
     m_d_lt.whenPressed(new CancelIndexer(m_indexer));
     m_d_rb.whenHeld(new PrintCommand("Driving Inverted"));
     m_d_lb.whenPressed(new DropIntakeAndCollectBalls(m_intake, m_indexer));
-    m_d_lb.whenReleased(new ArmMM(m_intake, Intake.INTAKE_ARM_RETRACT));
-    m_d_rs.whenPressed(new HighBarClimb(m_climber, m_ledsubsystem, m_driver_controller));
-    m_d_ls.whenPressed(new LowBarClimb(m_climber, m_ledsubsystem, m_driver_controller));
+    m_d_lb.whenReleased(new ResetArmLimitAndEncoder(m_intake));
+    //m_d_rs.whenPressed(new HighBarClimb(m_climber, m_ledsubsystem, m_driver_controller));
+    //m_d_ls.whenPressed(new LowBarClimb(m_climber, m_ledsubsystem, m_driver_controller));
 
     // Driver POV Bindings
     m_d_up.whenPressed(new CancelClimber(m_climber, m_ledsubsystem));
@@ -211,7 +212,7 @@ public class RobotContainer {
     buildDriverTab();
     buildDriverTestTab();
     // buildShooterTab();
-    // buildIntakeTestTab();
+    buildIntakeTestTab();
     buildClimberTestTab();
     // buildVisionTab();
 
@@ -225,7 +226,7 @@ public class RobotContainer {
     // Shuffleboard.getTab("Turn MM Testing").add("Turn MM", new TurnToAngle(m_driveTrain, 0)).withPosition(0, 3).withSize(2, 1);
     // Shuffleboard.getTab("Intake").add(new CollectBalls(m_intake, m_indexer)).withPosition(0, 1).withSize(2, 1);
     // Shuffleboard.getTab("Intake").add(new DropIntakeAndCollectBalls(m_intake, m_indexer)).withPosition(2, 1).withSize(2, 1);
-    // Shuffleboard.getTab("Intake").add(new EjectBalls(m_indexer)).withPosition(0, 3).withSize(2, 1);
+    // Shuffleboard.getTab("Intake").add(new EjectBalls(m_indexer, m_shooter)).withPosition(0, 3).withSize(2, 1);
     
   }
 

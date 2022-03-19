@@ -176,7 +176,7 @@ public class Indexer extends SubsystemBase {
   }
   
   public void shootBalls(){
-    m_intakeIndex.set(ControlMode.PercentOutput, INTAKE_SHOOT_SPEED);
+    m_intakeIndex.set(ControlMode.PercentOutput, INTAKE_SHOOT_SPEED + 0.1);
     m_midIndex.set(ControlMode.PercentOutput, INTAKE_SHOOT_SPEED);
     m_shooterIndex.set(ControlMode.PercentOutput, INTAKE_SHOOT_SPEED);
   }
