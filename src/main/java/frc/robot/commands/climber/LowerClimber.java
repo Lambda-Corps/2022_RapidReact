@@ -26,7 +26,11 @@ public class LowerClimber extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_LEDsubsystem.resetClimberLEDInformation();
+    m_LEDsubsystem.resetClimberLEDInformation(2);
+    if (m_LEDsubsystem.checkDriverSignalActive()) {
+      m_LEDsubsystem.blackout();
+      m_LEDsubsystem.resetDriverSignal();
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.

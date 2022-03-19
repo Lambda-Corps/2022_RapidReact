@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LEDsubsystem extends SubsystemBase {
@@ -38,8 +39,8 @@ public class LEDsubsystem extends SubsystemBase {
   private int m_loopcount;
   private int m_LEDPoint;
   
-  private int LEFT_SIDE_COUNT = 36, MIDDLE_COUNT = 14, RIGHT_SIDE_COUNT = 36; //86
-  private int TOTAL_LED_COUNT = LEFT_SIDE_COUNT + RIGHT_SIDE_COUNT + MIDDLE_COUNT;
+  private final int LEFT_SIDE_COUNT = 37, MIDDLE_COUNT = 14, RIGHT_SIDE_COUNT = 37; //88
+  private final int TOTAL_LED_COUNT = LEFT_SIDE_COUNT + RIGHT_SIDE_COUNT + MIDDLE_COUNT;
 
   private boolean climberLEDHighBar = false; // Actually the mid bar
   private boolean climberLEDLowBar = false;
@@ -47,13 +48,14 @@ public class LEDsubsystem extends SubsystemBase {
   private boolean climberFinishedClimb = false;
   private boolean climbInProgress = false;
 
+  private boolean driverSignalActive = false;
+
   // Intake State Collector
   private NetworkTableEntry m_LEDSNetworkTableEntry;
   /** Creates a new LEDsubsystem. */
   public LEDsubsystem() { // PWM port 9
     // Must be a PWM header, not MXP or DIO
-    m_LEDSNetworkTableEntry = NetworkTableInstance.getDefault().getTable("Shuffleboard")
-                                                               .getSubTable("Drive").getEntry("Ball Count Test");
+    m_LEDSNetworkTableEntry = Shuffleboard.getTab("LED").add("TestNumber", 0).getEntry();
 
     m_led = new AddressableLED(9);
     // Reuse buffer
@@ -71,6 +73,11 @@ public class LEDsubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    m_loopcount =  m_loopcount + 1;
+    if (m_loopcount > 250){
+      m_loopcount = 0;
+      m_LEDPoint = 0;
+    }
 
     if( DriverStation.getAlliance() == Alliance.Blue){
       m_alliance_color = ALLIANCE_COLOR_BLUE;
@@ -100,36 +107,43 @@ public class LEDsubsystem extends SubsystemBase {
       case LED_DEFAULT:
       default:
         if(m_alliance_color == ALLIANCE_COLOR_BLUE){
-          bluechase();
+          //bluechase();
         }
         else{
-          redchase();
+          //redchase();
+          // bluechase();
         }
         break;
     }
+
     if (climberLEDHighBar) {
-      green();
+      if (!climberFinishedClimb) {
+        green();
+        driverSignalActive = true;
+      }
     } else if (climberLEDLowBar) {
-      green();
+      if (!climberFinishedClimb) {
+        green();
+        driverSignalActive = true;
+      }
     }
     if (climberFinishedClimb) {
       rainbow();
     }
-    m_loopcount =  m_loopcount + 1;
-    if (m_loopcount > 258){
-      m_loopcount = 0;
-      m_LEDPoint = 0;
-      
-      if (!climberLEDHighBar || !climberLEDLowBar) {
+
+
+
+    if (!climberLEDHighBar || !climberLEDLowBar) {
+      if (!climberFinishedClimb && !driverSignalActive) {
         if (m_alliance_color == ALLIANCE_COLOR_BLUE) {
           bluechase();
         } else {
           redchase();
         }
       }
+    }
       //System.out.print("Reached reset " + m_loopcount);
     }
-  }
 
   @Override
   public void simulationPeriodic() {
@@ -189,49 +203,59 @@ public class LEDsubsystem extends SubsystemBase {
     }
     m_led.setData(m_ledBuffer);
   }
+
+  public void blackout() {
+    // For every pixel
+    for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+      // Set the value
+      m_ledBuffer.setHSV(i, 0, 100, 0);
+    }
+    m_led.setData(m_ledBuffer);
+  }
+
   public void bluechase() {
     // m_loopcount = 0;
     // System.out.print("Reached here " + m_loopcount);
-     if(m_loopcount %5 == 0){
-      for (var i = (m_LEDPoint); i < m_ledBuffer.getLength(); i += 86) {
-        m_ledBuffer.setHSV((TOTAL_LED_COUNT -1) - i, 120, 255, 128);
-        m_ledBuffer.setHSV(i, 120, 255, 128);
-        m_LEDPoint = m_LEDPoint + 2;
+    if(m_loopcount == 0){     
+      for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+        // Set the value
+        m_ledBuffer.setHSV(i, 0, 100, 0);
+        //System.out.print("Works" + m_loopcount);
         m_led.setData(m_ledBuffer);
-        }
-       }
-      else if(m_loopcount %258 == 0){
-        
-        for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-          // Set the value
-          m_ledBuffer.setHSV(i, 0, 100, 0);
-          //System.out.print("Works" + m_loopcount);
-          m_led.setData(m_ledBuffer);
-        }
-        
       }
+      
+    }
+    else if(m_loopcount %5 == 0 && m_loopcount != 0){
+      for (var i = (m_LEDPoint); i < m_ledBuffer.getLength(); i += 88) {
+        //if( i < m_LEDPoint )
+          m_ledBuffer.setHSV((TOTAL_LED_COUNT -1) -i, 120, 255, 128);
+          m_ledBuffer.setHSV(i, 120, 255, 128);
+          m_LEDPoint = m_LEDPoint + 2;
+          m_led.setData(m_ledBuffer);
+      }
+    }
   }
   public void redchase() {
-    // m_loopcount = 0;
-    // System.out.print("Reached here " + m_loopcount);
-     if(m_loopcount %5 == 0){
-      for (var i = (m_LEDPoint); i < m_ledBuffer.getLength(); i += 86) {
-        m_ledBuffer.setHSV((TOTAL_LED_COUNT -1) - i, 0, 255, 128);
-        m_ledBuffer.setHSV(i, 0, 255, 128);
-        m_LEDPoint = m_LEDPoint + 2;
+    // // m_loopcount = 0;
+    // // System.out.print("Reached here " + m_loopcount);
+    if(m_loopcount == 0){     
+      for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+        // Set the value
+        m_ledBuffer.setHSV(i, 0, 100, 0);
+        //System.out.print("Works" + m_loopcount);
         m_led.setData(m_ledBuffer);
-        }
-       }
-      else if(m_loopcount %258 == 0){
-        
-        for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-          // Set the value
-          m_ledBuffer.setHSV(i,  0, 100, 0);
-          //System.out.print("Works" + m_loopcount);
-          m_led.setData(m_ledBuffer);
-        }
-        
       }
+      
+    }
+    else if(m_loopcount %5 == 0 && m_loopcount != 0){
+      for (var i = (m_LEDPoint); i < m_ledBuffer.getLength(); i += 88) {
+        //if( i < m_LEDPoint )
+          m_ledBuffer.setHSV((TOTAL_LED_COUNT -1) -i, 0, 255, 128);
+          m_ledBuffer.setHSV(i, 0, 255, 128);
+          m_LEDPoint = m_LEDPoint + 2;
+          m_led.setData(m_ledBuffer);
+      }
+    }
   }
   
   public void updateClimberLEDInformation(double prompt) {
@@ -242,9 +266,15 @@ public class LEDsubsystem extends SubsystemBase {
     }
   }
 
-  public void resetClimberLEDInformation() {
-    climberLEDHighBar = false;
-    climberLEDLowBar = false;
+  public void resetClimberLEDInformation(double value) {
+    if (value == 1) {
+      climberLEDHighBar = false;
+    } else if (value == 0) {
+      climberLEDLowBar = false;
+    } else if (value == 2) {
+      climberLEDHighBar = false;
+      climberLEDLowBar = false;
+    }
   }
 
   public void setClimbInProgress(double checker) {
@@ -259,8 +289,24 @@ public class LEDsubsystem extends SubsystemBase {
     climberFinishedClimb = true;
   }
 
+  public void resetDriverSignal() {
+    driverSignalActive = false;
+  }
+
   public boolean checkClimbInProgress() {
     return climbInProgress;
+  }
+
+  public boolean checkClimbHigh() {
+    return climberLEDHighBar;
+  }
+
+  public boolean checkClimbLow() {
+    return climberLEDLowBar;
+  }
+
+  public boolean checkDriverSignalActive() {
+    return driverSignalActive;
   }
 }
   

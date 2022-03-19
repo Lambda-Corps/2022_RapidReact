@@ -34,6 +34,9 @@ public class HighBarRaise extends CommandBase {
     if (m_climber.reverseLimitSwitchTriggered() && m_climber.getRelativeEncoder() != 0) {
       m_climber.resetClimberMotorEncoder();
     }
+    if (m_LEDsubsystem.checkClimbLow()) {
+      m_LEDsubsystem.resetClimberLEDInformation(0);
+    }
     m_LEDsubsystem.setClimbInProgress(1);
   }
 
