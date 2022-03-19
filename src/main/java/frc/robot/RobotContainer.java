@@ -138,10 +138,10 @@ public class RobotContainer {
     m_d_left = new POVButton(m_driver_controller, 270);
 
     // Partner POV Buttons
-    m_p_up = new POVButton(m_driver_controller, 0);
-    m_p_right = new POVButton(m_driver_controller, 90);
-    m_p_down = new POVButton(m_driver_controller, 180);
-    m_p_left = new POVButton(m_driver_controller, 270);
+    m_p_up = new POVButton(m_partner_controller, 0);
+    m_p_right = new POVButton(m_partner_controller, 90);
+    m_p_down = new POVButton(m_partner_controller, 180);
+    m_p_left = new POVButton(m_partner_controller, 270);
 
     m_driveTrain.setDefaultCommand(new DriveTrainDefaultCommand(m_driveTrain, m_driver_controller));
     m_indexer.setDefaultCommand(new IndexerDefaultCommand(m_indexer));
@@ -187,12 +187,13 @@ public class RobotContainer {
     m_p_b.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.MidTarmac));
     m_p_y.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.TarmacLine));
     m_p_x.whenPressed(new CancelShooter(m_shooter));
+    m_p_sel.whenPressed(new DriveClimbertoReverseHardLimit(m_climber));
 
     // Partner POV Bindings
     m_p_down.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.ClosestShot).andThen(new StartShooterWheel(m_shooter)));
-    m_p_left.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.MidTarmac).andThen(new StartShooterWheel(m_shooter)));
+    m_p_right.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.MidTarmac).andThen(new StartShooterWheel(m_shooter)));
     m_p_up.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.TarmacLine).andThen(new StartShooterWheel(m_shooter)));
-    m_p_right.whenPressed(new CancelShooter(m_shooter));
+    m_p_left.whenPressed(new CancelShooter(m_shooter));
 
   }
 
@@ -209,8 +210,8 @@ public class RobotContainer {
   private void buildShuffleboard(){
     buildDriverTab();
     buildDriverTestTab();
-    buildShooterTab();
-    buildIntakeTestTab();
+    // buildShooterTab();
+    // buildIntakeTestTab();
     buildClimberTestTab();
     // buildVisionTab();
 
@@ -253,7 +254,6 @@ public class RobotContainer {
     // Add Intake Sensors and Ball Count
     driveTab.add("Ball Count",0).withSize(1, 1).withPosition(6, 0).withWidget(BuiltInWidgets.kDial)
                               .withProperties(Map.of("Min", 0, "Max", 2));
-    driveTab.add("Ball Count Test", 0).withSize(1, 1).withPosition(7, 0);  
     driveTab.add("ShootBreak", false).withSize(1, 1).withPosition(7, 0).withWidget(BuiltInWidgets.kBooleanBox);
     driveTab.add("MidBreak", false).withSize(1, 1).withPosition(8, 0).withWidget(BuiltInWidgets.kBooleanBox);
     driveTab.add("IntakeBreak", false).withSize(1, 1).withPosition(9, 0).withWidget(BuiltInWidgets.kBooleanBox);
