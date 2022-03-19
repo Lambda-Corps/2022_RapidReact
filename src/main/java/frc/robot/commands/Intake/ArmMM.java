@@ -32,7 +32,8 @@ public class ArmMM extends CommandBase {
     m_timer.start();
 
     addRequirements(m_intake);
-    m_targetPosition = target_position;
+    // m_targetPosition = target_position;
+    m_targetPosition = Intake.INTAKE_ARM_EXTEND;
   }
 
   // Called when the command is initially scheduled.

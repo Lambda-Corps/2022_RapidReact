@@ -40,7 +40,7 @@ public class Intake extends SubsystemBase {
   public static int INTAKE_ARM_EXTEND = 1510; //intake down to grab ball (currently has temporary value)
   // public static final int INTAKE_ARM_EXTEND = 1475; //intake down to grab ball (currently has temporary value)
 
-  final double DOWN_FEEDFORWARD = .2;
+  final double DOWN_FEEDFORWARD = 0.2;
   final double UP_FEEDFORWARD = -.3;
   final double HOLD_FEEDFORWARD = -.2; //PID (would this one also be motion magic?)
   final double MM_DONE_TOLERANCE = 10;
@@ -82,6 +82,8 @@ public class Intake extends SubsystemBase {
 
   private final NetworkTableEntry m_rev_limit_entry, m_fwd_limit_entry;
 
+  private boolean m_arm_is_moving;
+
   public Intake() {
     m_faults = new Faults();
     m_reverse_limit = new DigitalInput(INTAKE_REVERSE_LIMIT);
@@ -94,6 +96,9 @@ public class Intake extends SubsystemBase {
     m_armMotor.configFactoryDefault();
     m_armMotor.setInverted(true);
     m_armMotor.setSensorPhase(false);
+
+    // TEsting limits
+    m_armMotor.configPeakOutputForward(.2);
   
     //selected feedback
     m_armMotor.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
@@ -105,7 +110,7 @@ public class Intake extends SubsystemBase {
     // m_armMotor.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.NormallyOpen);
     //mm
     m_armMotor.configMotionCruiseVelocity(300, 0);
-    m_armMotor.configMotionAcceleration(300, 0);
+    m_armMotor.configMotionAcceleration(100, 0);
 
     //current limits?
     //m_armMotor.configPeakCurrentLimit(0);
@@ -159,11 +164,11 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    m_rev_limit_entry.forceSetBoolean(m_reverse_limit.get());
-    m_fwd_limit_entry.forceSetBoolean(m_forward_limit.get());
+    m_rev_limit_entry.forceSetBoolean(isReverseLimitSwitchHit());
+    m_fwd_limit_entry.forceSetBoolean(isForwardLimitSwitchHit());
     // This method will be called once per scheduler run
-    if(m_reverse_limit.get()){
-      m_armMotor.getSelectedSensorPosition(0);
+    if(isReverseLimitSwitchHit()){
+      m_armMotor.setSelectedSensorPosition(0);
     }
 
     // Periodically grab the talon faults
@@ -213,7 +218,7 @@ public class Intake extends SubsystemBase {
     double degrees = (currentPos - kMeasuredPosHorizontal) / kTicksPerDegree;
     double radians = java.lang.Math.toRadians(degrees);
     double cosineScalar = java.lang.Math.cos(radians);
-    m_armMotor.set(ControlMode.MotionMagic, targetPosition, DemandType.ArbitraryFeedForward, MM_FEEDFORWARD * cosineScalar);
+    m_armMotor.set(ControlMode.MotionMagic, targetPosition, DemandType.ArbitraryFeedForward, MM_FEEDFORWARD * -cosineScalar);
     m_is_on_target = Math.abs(currentPos - targetPosition) < MM_DONE_TOLERANCE;
     return m_is_on_target;
   }
@@ -293,12 +298,12 @@ public class Intake extends SubsystemBase {
     }
   }
 
-  public boolean getArmIntegratedForwardLimit() {
-    return m_faults.ForwardLimitSwitch;
+  public boolean isForwardLimitSwitchHit() {
+    return !m_forward_limit.get();
   }
 
-  public boolean getArmIntegratedReverseLimit() {
-    return m_faults.ReverseLimitSwitch;
+  public boolean isReverseLimitSwitchHit() {
+    return !m_reverse_limit.get();
   }
 
   public boolean getArmSoftForwardLimit() {
@@ -319,7 +324,7 @@ public class Intake extends SubsystemBase {
     // True represents the limit being hit, so
     // !reverse_limit.get() means false, such that the limit
     // has not been hit yet.
-    boolean reverse_limit_hit = m_reverse_limit.get();
+    boolean reverse_limit_hit = isReverseLimitSwitchHit();
     if(!reverse_limit_hit){
       
       // Limit not hit, adjust the speed to go backward at half speed

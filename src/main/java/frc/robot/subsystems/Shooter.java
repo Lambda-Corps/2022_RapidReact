@@ -18,6 +18,8 @@ import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
@@ -40,6 +42,9 @@ public class Shooter extends SubsystemBase {
   // Keep track of whether we're shooting, either for LEDs or shooting sequences
   private boolean m_is_shooting;
   private int m_shooter_clock_count;
+  private double m_closed_loop_error;
+
+  NetworkTableEntry m_at_speed_entry;
     
   /** Creates a new Shooter. */
   public Shooter() {
@@ -96,6 +101,8 @@ public class Shooter extends SubsystemBase {
 
     m_is_shooting = false;
     m_shooter_clock_count = 0;
+
+    m_at_speed_entry = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Shooter").getEntry("At Speed");
   }
 
   public void stopMotor() {
@@ -155,9 +162,12 @@ public class Shooter extends SubsystemBase {
     if(m_is_shooting){
       m_shooter_clock_count++;
     }
+
+    m_closed_loop_error = m_Shooter.getClosedLoopError(PID_PRIMARY);
   }
 
   public void startVelocityPID(){
+    m_is_shooting = true;
     m_Shooter.set(ControlMode.Velocity, m_shooter_set_point);
   }
 
@@ -165,7 +175,7 @@ public class Shooter extends SubsystemBase {
     double currentLoopError = Math.abs(m_Shooter.getClosedLoopError());
 
     boolean atspeed = currentLoopError < (m_shooter_set_point * SHOOTER_TOLERANCE);
-
+    m_at_speed_entry.forceSetBoolean(atspeed);
     // The command was ending right as it started because the closed loop error
     // hadn't gotten far enough away from the inertia start.
     // Only return true if we've been spinning for at least half a second AND we
@@ -175,10 +185,14 @@ public class Shooter extends SubsystemBase {
   }
 
   public double getClosedLoopError(){
-    return m_Shooter.getClosedLoopError();
+    return m_closed_loop_error;
   }
 
   public void ejectBallsBackward() {
     m_Shooter.set(ControlMode.PercentOutput, SHOOTER_EJECT_SPEED);
+  }
+
+  public double getLoopCount(){
+    return m_shooter_clock_count;
   }
 }

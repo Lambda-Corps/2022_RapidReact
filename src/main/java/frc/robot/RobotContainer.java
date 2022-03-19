@@ -94,6 +94,7 @@ public class RobotContainer {
   private SendableChooser<Command> m_auto_chooser;
   GamepadAxisButton m_d_rt, m_d_lt;
   POVButton m_d_up, m_d_right, m_d_down, m_d_left;
+  POVButton m_p_up, m_p_right, m_p_down, m_p_left;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -124,6 +125,7 @@ public class RobotContainer {
     m_p_a = new JoystickButton(m_partner_controller, XboxController.Button.kA.value);
     m_p_b = new JoystickButton(m_partner_controller, XboxController.Button.kB.value);
     m_p_y = new JoystickButton(m_partner_controller, XboxController.Button.kY.value);
+    m_p_x = new JoystickButton(m_partner_controller, XboxController.Button.kX.value);
     m_p_rb = new JoystickButton(m_partner_controller, XboxController.Button.kRightBumper.value);
     m_p_start = new JoystickButton(m_partner_controller, XboxController.Button.kStart.value);
     m_p_sel = new JoystickButton(m_partner_controller, XboxController.Button.kBack.value);
@@ -134,6 +136,12 @@ public class RobotContainer {
     m_d_right = new POVButton(m_driver_controller, 90);
     m_d_down = new POVButton(m_driver_controller, 180);
     m_d_left = new POVButton(m_driver_controller, 270);
+
+    // Partner POV Buttons
+    m_p_up = new POVButton(m_driver_controller, 0);
+    m_p_right = new POVButton(m_driver_controller, 90);
+    m_p_down = new POVButton(m_driver_controller, 180);
+    m_p_left = new POVButton(m_driver_controller, 270);
 
     m_driveTrain.setDefaultCommand(new DriveTrainDefaultCommand(m_driveTrain, m_driver_controller));
     m_indexer.setDefaultCommand(new IndexerDefaultCommand(m_indexer));
@@ -153,10 +161,9 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Driver Bindings
-    m_d_a.whenPressed(new LEDon(m_vision));
-    m_d_b.whenPressed(new LEDon(m_vision));
-    m_d_a.whileHeld(new DriveWithVision(m_driveTrain, m_vision, TARGET_DISTANCE_CLOSE));
-    m_d_b.whileHeld(new DriveWithVision(m_driveTrain, m_vision, TARGET_DISTANCE_FAR));
+
+    m_d_a.whileHeld(new LEDon(m_vision).andThen(new DriveWithVision(m_driveTrain, m_vision, TARGET_DISTANCE_CLOSE)));
+    m_d_b.whileHeld(new LEDon(m_vision).andThen(new DriveWithVision(m_driveTrain, m_vision, TARGET_DISTANCE_FAR)));
     m_d_a.whenReleased(new LEDoff(m_vision));
     m_d_b.whenReleased(new LEDoff(m_vision));
     m_d_rt.whileHeld(new AimAtCargo(m_vision, m_driveTrain, m_driver_controller));
@@ -166,7 +173,6 @@ public class RobotContainer {
     m_d_lb.whenReleased(new ArmMM(m_intake, Intake.INTAKE_ARM_RETRACT));
     m_d_rs.whenPressed(new HighBarClimb(m_climber, m_ledsubsystem, m_driver_controller));
     m_d_ls.whenPressed(new LowBarClimb(m_climber, m_ledsubsystem, m_driver_controller));
-    m_d_sel.whenPressed(new CancelClimber(m_climber, m_ledsubsystem));
 
     // Driver POV Bindings
     m_d_up.whenPressed(new CancelClimber(m_climber, m_ledsubsystem));
@@ -177,12 +183,16 @@ public class RobotContainer {
     // Partner Bindings
     m_p_rb.whileHeld(new EjectBalls(m_indexer, m_shooter));
     m_p_start.whenPressed(new TurnOffIntakeArm(m_intake));
-    m_p_sel.whenPressed(new ResetArmLimitAndEncoder(m_intake));
-    m_p_a.whenPressed(new Shoot(m_shooter, m_indexer, ShotDistance.ClosestShot));
+    m_p_a.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.ClosestShot));
     m_p_b.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.MidTarmac));
-    m_p_y.whenPressed(new Shoot(m_shooter, m_indexer, ShotDistance.TarmacLine));
-    m_p_sel.whenPressed(new CancelShooter(m_shooter));
-    m_p_rs.whenPressed(new TestClimberDown(m_climber));
+    m_p_y.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.TarmacLine));
+    m_p_x.whenPressed(new CancelShooter(m_shooter));
+
+    // Partner POV Bindings
+    m_p_down.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.ClosestShot).andThen(new StartShooterWheel(m_shooter)));
+    m_p_left.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.MidTarmac).andThen(new StartShooterWheel(m_shooter)));
+    m_p_up.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.TarmacLine).andThen(new StartShooterWheel(m_shooter)));
+    m_p_right.whenPressed(new CancelShooter(m_shooter));
 
   }
 
@@ -317,6 +327,8 @@ public class RobotContainer {
 
     driveTab.addBoolean("Is Up To Speed", m_shooter::isUpToSpeed).withPosition(0, 2).withSize(1, 1);
     driveTab.addNumber("Closed Loop Error", m_shooter::getClosedLoopError).withPosition(1, 2).withSize(1, 1);
+    driveTab.add("At Speed", false).withPosition(2, 2).withSize(1, 1).withWidget(BuiltInWidgets.kBooleanBox);
+    driveTab.addNumber("Shooter Loop Count", m_shooter::getLoopCount).withPosition(3, 2).withSize(1, 1);
   }
 
   private void buildIntakeTestTab(){
