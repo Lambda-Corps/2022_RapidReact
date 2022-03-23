@@ -43,7 +43,9 @@ import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
@@ -99,6 +101,8 @@ public class DriveTrain extends SubsystemBase {
 	private double m_left_setpoint, m_right_setpoint;
 	private boolean m_isCCWTurn;
 
+	private final DifferentialDrive m_safety_drive;
+
   	/** Creates a new DriveTrain. */
  	public DriveTrain() {
     	m_gyro = new AHRS(SPI.Port.kMXP);
@@ -130,6 +134,8 @@ public class DriveTrain extends SubsystemBase {
 		/* Configure output */
 		m_left_leader.setInverted(m_left_invert);
 		m_right_leader.setInverted(m_right_invert);
+
+		m_safety_drive = new DifferentialDrive(m_left_leader, m_right_leader);
   
     	/* Configure the left Talon's selected sensor as integrated sensor */
 		/* 
@@ -762,5 +768,31 @@ public class DriveTrain extends SubsystemBase {
 
 	public double getLeftSetPoint(){
 		return m_left_setpoint;
+	}
+
+	public Pose2d getPose() {
+		return m_odometry.getPoseMeters();
+	}
+
+	public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+		double left_meters_sec = k100msPerSecond * nativeUnitsToDistanceMeters(m_left_leader.getSelectedSensorVelocity());
+		double right_meters_sec = k100msPerSecond * nativeUnitsToDistanceMeters(m_right_leader.getSelectedSensorVelocity());
+		return new DifferentialDriveWheelSpeeds(left_meters_sec, right_meters_sec);
+	}
+
+	public void tankDriveVolts(double leftVolts, double rightVolts) {
+		m_left_leader.setVoltage(leftVolts);
+		m_right_leader.setVoltage(rightVolts);
+		m_safety_drive.feed();
+	}
+
+	public void resetEncoders() {
+		m_right_leader.setSelectedSensorPosition(0);
+		m_left_leader.setSelectedSensorPosition(0);
+	}
+
+	public void resetOdometry(Pose2d pose) {
+		resetEncoders();
+		m_odometry.resetPosition(pose, m_gyro.getRotation2d());
 	}
 }
