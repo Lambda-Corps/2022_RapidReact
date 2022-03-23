@@ -56,6 +56,7 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 
@@ -243,6 +244,7 @@ public class DriveTrain extends SubsystemBase {
 
 		/// Odometry Tracker objects
 		m_2dField = new Field2d();
+		SmartDashboard.putData(m_2dField);
 		m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
 
 		// Code for simulation within the DriveTrain Constructor
