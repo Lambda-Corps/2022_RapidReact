@@ -52,6 +52,7 @@ public class LowBarRaise extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     m_climber.climberStopMotor();
+    m_LEDsubsystem.blackout();
     m_LEDsubsystem.updateClimberLEDInformation(0);
     m_driverController.setRumble(GenericHID.RumbleType.kRightRumble, 1);
   }

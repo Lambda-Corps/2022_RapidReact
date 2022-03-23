@@ -42,7 +42,7 @@ public class twoBallLeft extends SequentialCommandGroup {
       new ArmMM(m_intake, Intake.INTAKE_ARM_EXTEND),
       new ParallelCommandGroup(new CollectBalls(m_intake, m_indexer).withTimeout(5), new WaitCommand(.75).andThen(new DriveMM(m_drive_train, 45.44))),
       new ResetArmLimitAndEncoder(m_intake),
-      new TurnToAngle(m_drive_train, 200), //turn around
+      new TurnToAngle(m_drive_train, 192), //turn around
       new DriveMM(m_drive_train, 60), //drive up to fender, may need lowered a little
       //new TurnToAngle(m_drive_train, 30), //angle to be perpendicular to the hub fender
       new Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.ClosestShot)

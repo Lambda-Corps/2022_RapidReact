@@ -210,10 +210,10 @@ public class RobotContainer {
   
   private void buildShuffleboard(){
     buildDriverTab();
-    buildDriverTestTab();
+    // buildDriverTestTab();
     // buildShooterTab();
-    buildIntakeTestTab();
-    buildClimberTestTab();
+    // buildIntakeTestTab();
+    // buildClimberTestTab();
     // buildVisionTab();
 
     // Shuffleboard.getTab("Combined Test").add(new TestIntakeIndexerAndShooter(m_indexer, m_intake, m_shooter)).withPosition(0, 1).withSize(2, 1);
@@ -275,8 +275,9 @@ public class RobotContainer {
     // //auto chooser
     m_auto_chooser = new SendableChooser<Command>();
     m_auto_chooser.addOption("1 ball", new oneBall(m_driveTrain, m_shooter, m_intake, m_indexer));
-    m_auto_chooser.addOption("Left Tarmac, 2 ball", new twoBallLeft(m_driveTrain, m_shooter, m_intake, m_indexer));
+    // m_auto_chooser.addOption("Left Tarmac, 2 ball", new twoBallLeft(m_driveTrain, m_shooter, m_intake, m_indexer));
     m_auto_chooser.addOption("Right Tarmac, 2 ball", new twoBallRight(m_driveTrain, m_shooter, m_intake, m_indexer));
+    m_auto_chooser.setDefaultOption("Left Tarmac, 2 ball", new twoBallLeft(m_driveTrain, m_shooter, m_intake, m_indexer));
     //m_auto_chooser.addOption("Bottom Left Tarmac, 4 ball", new fourBall(m_driveTrain, m_shooter, m_intake, m_indexer));
     driveTab.add("Autonomous Chooser", m_auto_chooser).withWidget(BuiltInWidgets.kComboBoxChooser).withPosition(4, 4).withSize(2, 1);
   }

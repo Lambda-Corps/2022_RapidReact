@@ -34,8 +34,10 @@ public class HighBarRaise extends CommandBase {
     if (m_climber.reverseLimitSwitchTriggered() && m_climber.getRelativeEncoder() != 0) {
       m_climber.resetClimberMotorEncoder();
     }
-    if (m_LEDsubsystem.checkClimbLow()) {
+    if (m_LEDsubsystem.checkClimbLow() || m_LEDsubsystem.checkDriverSignalActive()) {
       m_LEDsubsystem.resetClimberLEDInformation(0);
+      m_LEDsubsystem.resetDriverSignal();
+      m_LEDsubsystem.blackout();
     }
     m_LEDsubsystem.setClimbInProgress(1);
   }
@@ -50,6 +52,7 @@ public class HighBarRaise extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     m_climber.climberStopMotor();
+    m_LEDsubsystem.blackout();
     m_LEDsubsystem.updateClimberLEDInformation(1);
     m_driverController.setRumble(GenericHID.RumbleType.kRightRumble, 1);
   }

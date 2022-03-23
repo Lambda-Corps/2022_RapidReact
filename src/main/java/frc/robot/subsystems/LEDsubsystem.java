@@ -73,7 +73,8 @@ public class LEDsubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    m_loopcount =  m_loopcount + 1;
+    try{
+      m_loopcount =  m_loopcount + 1;
     if (m_loopcount > 250){
       m_loopcount = 0;
       m_LEDPoint = 0;
@@ -118,17 +119,27 @@ public class LEDsubsystem extends SubsystemBase {
 
     if (climberLEDHighBar) {
       if (!climberFinishedClimb) {
-        green();
-        driverSignalActive = true;
+        if (!driverSignalActive) {
+          green();
+          driverSignalActive = true;
+          green();
+        }
       }
     } else if (climberLEDLowBar) {
       if (!climberFinishedClimb) {
-        green();
-        driverSignalActive = true;
+        if (!driverSignalActive) {
+          green();
+          driverSignalActive = true;
+          green();
+        }
       }
     }
     if (climberFinishedClimb) {
-      rainbow();
+      //if (!climberLEDLowBar && !climberLEDHighBar && !climbInProgress) {
+        rainbow();
+      //} else {
+        //climberFinishedClimb = false;
+      //}
     }
 
 
@@ -143,7 +154,12 @@ public class LEDsubsystem extends SubsystemBase {
       }
     }
       //System.out.print("Reached reset " + m_loopcount);
+
     }
+    catch(Exception excpt){
+      //Don't do anything
+    }
+        }
 
   @Override
   public void simulationPeriodic() {

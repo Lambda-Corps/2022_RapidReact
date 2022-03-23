@@ -24,11 +24,12 @@ public class HighBarClimb extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
 
     m_climber = climber;
+    m_LEDsubsystem = ledsubsystem;
 
     addCommands(
       new HighBarRaise(climber, ledsubsystem, driverController),
       new WaitCommand(2),
-      new HighBarLower(climber)
+      new HighBarLower(climber, ledsubsystem)
     );
   }
 }

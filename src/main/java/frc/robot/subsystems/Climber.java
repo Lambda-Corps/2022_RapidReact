@@ -49,7 +49,7 @@ public class Climber extends SubsystemBase {
     m_climberMotor.configForwardSoftLimitThreshold(CLIMBER_FORWARD_SOFT_LIMIT);
     m_climberMotor.configReverseSoftLimitThreshold(CLIMBER_REVERSE_SOFT_LIMIT);
     m_climberMotor.configForwardSoftLimitEnable(true);
-    m_climberMotor.configReverseSoftLimitEnable(true);
+    //m_climberMotor.configReverseSoftLimitEnable(true);
 
     m_climberMotor.setSelectedSensorPosition(0);
 

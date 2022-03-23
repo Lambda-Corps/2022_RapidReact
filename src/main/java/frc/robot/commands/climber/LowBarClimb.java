@@ -28,7 +28,7 @@ public class LowBarClimb extends SequentialCommandGroup {
     addCommands(
       new LowBarRaise(climber, ledsubsystem, driverController),
       new WaitCommand(2),
-      new LowBarLower(climber)
+      new LowBarLower(climber, ledsubsystem)
     );
   }
 }
