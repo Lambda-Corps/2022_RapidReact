@@ -43,7 +43,7 @@ public class Shooter extends SubsystemBase {
   private boolean m_is_shooting;
   private int m_shooter_clock_count;
   private double m_closed_loop_error;
-
+  private int m_ball_stuck_counter;
   NetworkTableEntry m_at_speed_entry;
     
   /** Creates a new Shooter. */
@@ -101,7 +101,7 @@ public class Shooter extends SubsystemBase {
 
     m_is_shooting = false;
     m_shooter_clock_count = 0;
-
+    m_ball_stuck_counter = 0;
     m_at_speed_entry = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Shooter").getEntry("At Speed");
   }
 
@@ -161,8 +161,22 @@ public class Shooter extends SubsystemBase {
     // This method will be called once per scheduler run
     if(m_is_shooting){
       m_shooter_clock_count++;
-    }
 
+
+
+    }
+      
+      double shooterVelocity = m_Shooter.getSelectedSensorVelocity();
+      double shooterCurrent = m_Shooter.getStatorCurrent();
+      if (shooterVelocity == 0.0 && shooterCurrent > 0){
+       m_ball_stuck_counter++;
+       if (m_ball_stuck_counter > 0){
+         // Start Command roll the wheels backwards to un-stick shooter 
+       }
+       
+
+     
+      }
     m_closed_loop_error = m_Shooter.getClosedLoopError(PID_PRIMARY);
   }
 
