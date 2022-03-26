@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LEDsubsystem extends SubsystemBase {
@@ -34,20 +34,10 @@ public class LEDsubsystem extends SubsystemBase {
   // Store what the last hue of the first pixel is
   private int m_rainbowFirstPixelHue;
 
-  private Timer cmdTimer;
 
   private int m_loopcount;
-  private int m_LED_number;
   private int m_LEDPoint;
   
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-  private int LEFT_SIDE_COUNT = 36, MIDDLE_COUNT = 14, RIGHT_SIDE_COUNT = 36; //86
-  private int TOTAL_LED_COUNT = LEFT_SIDE_COUNT + RIGHT_SIDE_COUNT + MIDDLE_COUNT;
-
-=======
-=======
->>>>>>> Stashed changes
   private final int LEFT_SIDE_COUNT = 37, MIDDLE_COUNT = 13, RIGHT_SIDE_COUNT = 36; //86
   private final int TOTAL_LED_COUNT = LEFT_SIDE_COUNT + RIGHT_SIDE_COUNT + MIDDLE_COUNT;
 
@@ -58,16 +48,13 @@ public class LEDsubsystem extends SubsystemBase {
   private boolean climbInProgress = false;
   public static boolean shootingInProgress = false;
   private boolean driverSignalActive = false;
->>>>>>> Stashed changes
 
   // Intake State Collector
   private NetworkTableEntry m_LEDSNetworkTableEntry;
   /** Creates a new LEDsubsystem. */
   public LEDsubsystem() { // PWM port moved to port 9
     // Must be a PWM header, not MXP or DIO
-    cmdTimer = new Timer(); // used to delay the conveyor if necessary
-    m_LEDSNetworkTableEntry = NetworkTableInstance.getDefault().getTable("Shuffleboard")
-                                                               .getSubTable("Drive").getEntry("Ball Count Test");
+    m_LEDSNetworkTableEntry = Shuffleboard.getTab("LED").add("TestNumber", 0).getEntry();
 
     m_led = new AddressableLED(9);
     // Reuse buffer
@@ -85,19 +72,12 @@ public class LEDsubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-<<<<<<< Updated upstream
-
-=======
     try{
       m_loopcount =  m_loopcount + 1;
     if (m_loopcount > 250){
       m_loopcount = 0;
       m_LEDPoint = 0;
     }
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     if( DriverStation.getAlliance() == Alliance.Blue){
       m_alliance_color = ALLIANCE_COLOR_BLUE;
     }
@@ -125,43 +105,12 @@ public class LEDsubsystem extends SubsystemBase {
           break;
       case LED_DEFAULT:
       default:
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-        if(DriverStation.getAlliance() == Alliance.Blue){
-=======
-        if(m_alliance_color == ALLIANCE_COLOR_BLUE){
-<<<<<<< Updated upstream
->>>>>>> 138d09d7c4f694241c82d63fa3e2470e0e2f7139
-          bluechase();
-        }
-        else{
-          redchase();
-        }
-        break;
-    }
-    m_loopcount =  m_loopcount + 1;
-    if (m_loopcount > 258){
-      m_loopcount = 0;
-      m_LEDPoint = 0;
-      
-      if (m_alliance_color == ALLIANCE_COLOR_BLUE) {
-        bluechase();
-      } else {
-        redchase();
-=======
         if(m_alliance_color == ALLIANCE_COLOR_BLUE){
         }
         else{
         }
         break;
     }
-=======
-        }
-        else{
-        }
-        break;
-    }
->>>>>>> Stashed changes
     if (shootingInProgress  ==  true){
       rainbowchase();
     }
@@ -198,14 +147,18 @@ public class LEDsubsystem extends SubsystemBase {
             if (m_alliance_color == ALLIANCE_COLOR_BLUE) {
               bluechase();
             } else {
-              rainbowchase();
+              redchase();
             }
         }
->>>>>>> Stashed changes
       }
-      //System.out.print("Reached reset " + m_loopcount);
     }
-  }
+      //System.out.print("Reached reset " + m_loopcount);
+
+    }
+    catch(Exception excpt){
+      //Don't do anything
+    }
+        }
 
   @Override
   public void simulationPeriodic() {
@@ -272,8 +225,6 @@ public class LEDsubsystem extends SubsystemBase {
     }
     m_led.setData(m_ledBuffer);
   }
-<<<<<<< Updated upstream
-=======
 
   public void blackout() {
     // For every pixel
@@ -285,8 +236,6 @@ public class LEDsubsystem extends SubsystemBase {
   }
   //Slava Ukraine
   public void Ukraine() {
-<<<<<<< Updated upstream
-=======
     // m_loopcount = 0;
     // System.out.print("Reached here " + m_loopcount);
     if(m_loopcount == 0){     
@@ -310,7 +259,6 @@ public class LEDsubsystem extends SubsystemBase {
   }
   // for only lighting up half of the strip use " m_loopcount == 46"
   public void bluechase() {
->>>>>>> Stashed changes
     // m_loopcount = 0;
     // System.out.print("Reached here " + m_loopcount);
     if(m_loopcount == 0){     
@@ -319,41 +267,6 @@ public class LEDsubsystem extends SubsystemBase {
         m_ledBuffer.setHSV(i, 0, 100, 0);
         //System.out.print("Works" + m_loopcount);
         m_led.setData(m_ledBuffer);
-      }
-      
-    }
-    else if(m_loopcount %5 == 0 && m_loopcount != 0){
-      for (var i = (m_LEDPoint); i < m_ledBuffer.getLength(); i += 86) {
-        //if( i < m_LEDPoint )
-          m_ledBuffer.setHSV((TOTAL_LED_COUNT -1) -i, 35, 255, 128);
-          m_ledBuffer.setHSV(i, 120, 255, 128);
-          m_LEDPoint = m_LEDPoint + 2;
-          m_led.setData(m_ledBuffer);
-      }
-    }
-  }
-  // for only lighting up half of the strip use " m_loopcount == 46"
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-  public void bluechase() {
-    // m_loopcount = 0;
-    // System.out.print("Reached here " + m_loopcount);
-     if(m_loopcount %5 == 0){
-      for (var i = (0 + m_LEDPoint); i < m_ledBuffer.getLength(); i += 86) {
-        m_ledBuffer.setHSV((TOTAL_LED_COUNT -1) - i, 120, 255, 128);
-        m_ledBuffer.setHSV(i, 120, 255, 128);
-        m_LEDPoint = m_LEDPoint + 2;
-        m_led.setData(m_ledBuffer);
-<<<<<<< Updated upstream
-        }
-       }
-      else if(m_loopcount %258 == 0){
-        
-        for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-          // Set the value
-          m_ledBuffer.setHSV(i, 0, 100, 0);
-          //System.out.print("Works" + m_loopcount);
-=======
       }
       
     }
@@ -363,20 +276,14 @@ public class LEDsubsystem extends SubsystemBase {
           m_ledBuffer.setHSV((TOTAL_LED_COUNT -1) -i, 120, 255, 128);
           m_ledBuffer.setHSV(i, 120, 255, 128);
           m_LEDPoint = m_LEDPoint + 2;
->>>>>>> Stashed changes
           m_led.setData(m_ledBuffer);
-        }
-        
       }
+    }
   }
   // for only lighting up half of the strip use " m_loopcount == 46"
   public void rainbowchase(){
 
-    if(m_loopcount == 40 ){     
-=======
-  public void rainbowchase(){
-
-    if(m_loopcount == 40 ){     
+    if(m_loopcount == 40  ){  /* Only lighting up the sides and not the top 13 */   
       for (var i = 0; i < m_ledBuffer.getLength(); i++) {
         // Set the value
         m_ledBuffer.setHSV(i, 0, 100, 0);
@@ -411,55 +318,11 @@ public class LEDsubsystem extends SubsystemBase {
     // // m_loopcount = 0;
     // // System.out.print("Reached here " + m_loopcount);
     if(m_loopcount == 0){     
->>>>>>> Stashed changes
       for (var i = 0; i < m_ledBuffer.getLength(); i++) {
         // Set the value
         m_ledBuffer.setHSV(i, 0, 100, 0);
         //System.out.print("Works" + m_loopcount);
         m_led.setData(m_ledBuffer);
-        m_LEDPoint = 0;
-        m_loopcount = 0;
-      }
-      
-    }
-    else if(m_loopcount %2 == 0 && m_loopcount != 0){
-    for (var i = m_LEDPoint; i < m_ledBuffer.getLength(); i += 86) {
-      // Calculate the hue - hue is easier for rainbows because the color
-      // shape is a circle so only one value needs to precess
-      final var hue = (m_rainbowFirstPixelHue + (i * 180 / m_ledBuffer.getLength())) % 180;
-     
-      // final var hue = 90;
-      // Set the value
-      m_ledBuffer.setHSV((TOTAL_LED_COUNT -1) -i, hue, 255, 128);
-      m_ledBuffer.setHSV(i, hue, 255, 128);
-      m_LEDPoint = m_LEDPoint + 2;
-    }
-    // Increase by to make the rainbow "move"
-    m_rainbowFirstPixelHue += 3;
-    // Check bounds
-    // System.out.println("==============================================");
-    m_rainbowFirstPixelHue %= 180;
-    m_led.setData(m_ledBuffer);
-  }
-  }
-  public void redchase() {
-    // m_loopcount = 0;
-    // System.out.print("Reached here " + m_loopcount);
-     if(m_loopcount %5 == 0){
-      for (var i = (0 + m_LEDPoint); i < m_ledBuffer.getLength(); i += 86) {
-        m_ledBuffer.setHSV((TOTAL_LED_COUNT -1) - i, 0, 255, 128);
-        m_ledBuffer.setHSV(i, 0, 255, 128);
-        m_LEDPoint = m_LEDPoint + 2;
-        m_led.setData(m_ledBuffer);
-<<<<<<< Updated upstream
-        }
-       }
-      else if(m_loopcount %258 == 0){
-        
-        for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-          // Set the value
-<<<<<<< HEAD
-=======
       }
       
     }
@@ -467,18 +330,10 @@ public class LEDsubsystem extends SubsystemBase {
       for (var i = (m_LEDPoint); i < m_ledBuffer.getLength(); i += 86) {
         //if( i < m_LEDPoint )
           m_ledBuffer.setHSV((TOTAL_LED_COUNT -1) -i, 0, 255, 128);
->>>>>>> Stashed changes
           m_ledBuffer.setHSV(i, 0, 255, 128);
-=======
-          m_ledBuffer.setHSV(i,  0, 100, 0);
->>>>>>> 138d09d7c4f694241c82d63fa3e2470e0e2f7139
-          //System.out.print("Works" + m_loopcount);
+          m_LEDPoint = m_LEDPoint + 2;
           m_led.setData(m_ledBuffer);
-        }
-        
       }
-<<<<<<< Updated upstream
-=======
     }
   }
   
@@ -530,7 +385,6 @@ public class LEDsubsystem extends SubsystemBase {
 
   public boolean checkDriverSignalActive() {
     return driverSignalActive;
->>>>>>> Stashed changes
   }
 }
   
