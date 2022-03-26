@@ -6,6 +6,9 @@ import org.photonvision.PhotonUtils;
 import org.photonvision.common.hardware.VisionLEDMode;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+// import edu.wpi.first.math.geometry.Rotation2d;
+// import edu.wpi.first.math.geometry.Transform2d;
+// import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -18,18 +21,18 @@ public class Vision extends SubsystemBase {
   int LIMELIGHTPIPELINE = 0;
   int HD3000PIPELINE = 0;
 
-  // PhotonCamera m_HD3000 = new PhotonCamera("lifecam");
+  PhotonCamera m_HD3000 = new PhotonCamera("lifecam");
   PhotonCamera m_limelight = new PhotonCamera("eagletron");
-
+ 
   ShuffleboardTab m_visionTab;
-  NetworkTableEntry m_tx, m_ty, m_ta, m_cargoYaw, m_cargoHasTargets, m_bestTarget, targetPitch, targetYaw, targetRange, targetCount, targetType, cargoTarget, hubTarget;
+  NetworkTableEntry m_tx, m_ty, m_ta, m_cargoYaw, m_cargoHasTargets, m_bestTarget, targetPitch, targetYaw, targetRange, targetCount, cargoTarget, hubTarget;
   PhotonTrackedTarget m_target;
 
   double pitch, yaw, area;
 
   public Vision() {
       m_limelight.setPipelineIndex(LIMELIGHTPIPELINE);
-      // m_HD3000.setPipelineIndex(HD3000PIPELINE);
+      m_HD3000.setPipelineIndex(HD3000PIPELINE);
 
       // double ballcamDiagFOV = 75.0; // degrees
       // double shootercamDiagFOV = 75.0; // degrees
@@ -43,7 +46,7 @@ public class Vision extends SubsystemBase {
       // int shootercamResolutionHeight = 480;    // pixels
       // double shooterminTargetArea = 10;        // square pixels
     
-    // NetworkTableInstance.getDefault().getTable("photonvision").getEntry("version").setValue("v2022.1.5");
+    NetworkTableInstance.getDefault().getTable("photonvision").getEntry("version").setValue("v2022.1.5");
     
     NetworkTable table = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Drive");
     cargoTarget = table.getEntry("BallTarget");
@@ -68,11 +71,10 @@ public class Vision extends SubsystemBase {
   }
 
   private boolean getCargoTargetStatus() {
-    // var result = m_HD3000.getLatestResult();
-    //  boolean hasTargets = result.hasTargets();
-    //  cargoTarget.setBoolean(hasTargets);
-    // return hasTargets;
-    return false;
+    var result = m_HD3000.getLatestResult();
+     boolean hasTargets = result.hasTargets();
+     cargoTarget.setBoolean(hasTargets);
+    return hasTargets;
   }
 
   public double[] getHubTargetRange() {
@@ -103,17 +105,12 @@ public class Vision extends SubsystemBase {
 
   public void setTeamPipeline() {
     int pipelineIndex;
-    String allianceColor;
     if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
       pipelineIndex = 1;
-      allianceColor = "Blue Ball";
-      targetType.setString(allianceColor);
-      // m_HD3000.setPipelineIndex(pipelineIndex);
+      m_HD3000.setPipelineIndex(pipelineIndex);
     }else if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
       pipelineIndex = 0;
-      allianceColor = "Red Ball";
-      targetType.setString(allianceColor);
-      // m_HD3000.setPipelineIndex(pipelineIndex);
+      m_HD3000.setPipelineIndex(pipelineIndex);
     }
   }
 
