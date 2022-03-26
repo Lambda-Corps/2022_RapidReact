@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShotDistance;
+import frc.robot.subsystems.LEDsubsystem;
 
 public class Shoot extends CommandBase {
   private double m_setpoint, m_indexerDelay, m_runTime;
@@ -38,6 +39,7 @@ public class Shoot extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    LEDsubsystem.shootingInProgress = true;
         // Grab the relevant values for the PID control from Shuffleboard and set the 
     m_shooter.setShotDistance(m_distance);
     m_shooter.setProfileSlot();
@@ -59,6 +61,7 @@ public class Shoot extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    LEDsubsystem.shootingInProgress = false;
     m_shooter.stopMotor();
     m_indexer.stopMotors();
   }

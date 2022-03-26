@@ -10,6 +10,7 @@ import frc.robot.commands.Indexer.ShootBallsTilEmptyOrThreeSeconds;
 import frc.robot.commands.combined.StopShooterAndIndexerMotors;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LEDsubsystem;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShotDistance;
 
@@ -23,6 +24,7 @@ public class Shooting_Sequence extends SequentialCommandGroup {
   Indexer m_indexer;
   ShotDistance m_distance;
   public Shooting_Sequence(Shooter shooter, Intake intake, Indexer indexer, ShotDistance distance) {
+    LEDsubsystem.shootingInProgress = true;
     m_shooter = shooter;
     m_intake = intake;
     m_indexer = indexer;
@@ -36,5 +38,6 @@ public class Shooting_Sequence extends SequentialCommandGroup {
       new ShootBallsTilEmptyOrThreeSeconds(m_indexer),
       new StopShooterAndIndexerMotors(m_shooter, m_indexer)
     );
+    LEDsubsystem.shootingInProgress = false;
   }
 }

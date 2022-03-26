@@ -78,7 +78,6 @@ public class DriveTrain extends SubsystemBase {
 
 	// Motion Magic Setpoints for each side of the motor
 	private double m_left_setpoint, m_right_setpoint;
-	private boolean m_isCCWTurn;
 
   	/** Creates a new DriveTrain. */
  	public DriveTrain() {
