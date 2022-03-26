@@ -61,7 +61,7 @@ public class pathFollowing extends SequentialCommandGroup {
 
     Trajectory trajectory = new Trajectory();
     //String path = "pathplanner/generatedJSON/testpath.json";
-    String path = "output/testpath.wpilib.json";
+    String path = "output/Unnamed.wpilib.json";
     try{
       Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(path);
       trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
