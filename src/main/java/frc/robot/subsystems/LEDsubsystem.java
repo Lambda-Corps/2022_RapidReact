@@ -41,10 +41,13 @@ public class LEDsubsystem extends SubsystemBase {
   private int m_LEDPoint;
   
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   private int LEFT_SIDE_COUNT = 36, MIDDLE_COUNT = 14, RIGHT_SIDE_COUNT = 36; //86
   private int TOTAL_LED_COUNT = LEFT_SIDE_COUNT + RIGHT_SIDE_COUNT + MIDDLE_COUNT;
 
 =======
+=======
+>>>>>>> Stashed changes
   private final int LEFT_SIDE_COUNT = 37, MIDDLE_COUNT = 13, RIGHT_SIDE_COUNT = 36; //86
   private final int TOTAL_LED_COUNT = LEFT_SIDE_COUNT + RIGHT_SIDE_COUNT + MIDDLE_COUNT;
 
@@ -91,6 +94,9 @@ public class LEDsubsystem extends SubsystemBase {
       m_loopcount = 0;
       m_LEDPoint = 0;
     }
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     if( DriverStation.getAlliance() == Alliance.Blue){
       m_alliance_color = ALLIANCE_COLOR_BLUE;
@@ -124,6 +130,7 @@ public class LEDsubsystem extends SubsystemBase {
         if(DriverStation.getAlliance() == Alliance.Blue){
 =======
         if(m_alliance_color == ALLIANCE_COLOR_BLUE){
+<<<<<<< Updated upstream
 >>>>>>> 138d09d7c4f694241c82d63fa3e2470e0e2f7139
           bluechase();
         }
@@ -148,6 +155,13 @@ public class LEDsubsystem extends SubsystemBase {
         }
         break;
     }
+=======
+        }
+        else{
+        }
+        break;
+    }
+>>>>>>> Stashed changes
     if (shootingInProgress  ==  true){
       rainbowchase();
     }
@@ -271,6 +285,8 @@ public class LEDsubsystem extends SubsystemBase {
   }
   //Slava Ukraine
   public void Ukraine() {
+<<<<<<< Updated upstream
+=======
     // m_loopcount = 0;
     // System.out.print("Reached here " + m_loopcount);
     if(m_loopcount == 0){     
@@ -293,6 +309,31 @@ public class LEDsubsystem extends SubsystemBase {
     }
   }
   // for only lighting up half of the strip use " m_loopcount == 46"
+  public void bluechase() {
+>>>>>>> Stashed changes
+    // m_loopcount = 0;
+    // System.out.print("Reached here " + m_loopcount);
+    if(m_loopcount == 0){     
+      for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+        // Set the value
+        m_ledBuffer.setHSV(i, 0, 100, 0);
+        //System.out.print("Works" + m_loopcount);
+        m_led.setData(m_ledBuffer);
+      }
+      
+    }
+    else if(m_loopcount %5 == 0 && m_loopcount != 0){
+      for (var i = (m_LEDPoint); i < m_ledBuffer.getLength(); i += 86) {
+        //if( i < m_LEDPoint )
+          m_ledBuffer.setHSV((TOTAL_LED_COUNT -1) -i, 35, 255, 128);
+          m_ledBuffer.setHSV(i, 120, 255, 128);
+          m_LEDPoint = m_LEDPoint + 2;
+          m_led.setData(m_ledBuffer);
+      }
+    }
+  }
+  // for only lighting up half of the strip use " m_loopcount == 46"
+<<<<<<< Updated upstream
 >>>>>>> Stashed changes
   public void bluechase() {
     // m_loopcount = 0;
@@ -332,6 +373,45 @@ public class LEDsubsystem extends SubsystemBase {
   public void rainbowchase(){
 
     if(m_loopcount == 40 ){     
+=======
+  public void rainbowchase(){
+
+    if(m_loopcount == 40 ){     
+      for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+        // Set the value
+        m_ledBuffer.setHSV(i, 0, 100, 0);
+        //System.out.print("Works" + m_loopcount);
+        m_led.setData(m_ledBuffer);
+        m_LEDPoint = 0;
+        m_loopcount = 0;
+      }
+      
+    }
+    else if(m_loopcount %2 == 0 && m_loopcount != 0){
+    for (var i = m_LEDPoint; i < m_ledBuffer.getLength(); i += 86) {
+      // Calculate the hue - hue is easier for rainbows because the color
+      // shape is a circle so only one value needs to precess
+      final var hue = (m_rainbowFirstPixelHue + (i * 180 / m_ledBuffer.getLength())) % 180;
+     
+      // final var hue = 90;
+      // Set the value
+      m_ledBuffer.setHSV((TOTAL_LED_COUNT -1) -i, hue, 255, 128);
+      m_ledBuffer.setHSV(i, hue, 255, 128);
+      m_LEDPoint = m_LEDPoint + 2;
+    }
+    // Increase by to make the rainbow "move"
+    m_rainbowFirstPixelHue += 3;
+    // Check bounds
+    // System.out.println("==============================================");
+    m_rainbowFirstPixelHue %= 180;
+    m_led.setData(m_ledBuffer);
+  }
+  }
+  public void redchase() {
+    // // m_loopcount = 0;
+    // // System.out.print("Reached here " + m_loopcount);
+    if(m_loopcount == 0){     
+>>>>>>> Stashed changes
       for (var i = 0; i < m_ledBuffer.getLength(); i++) {
         // Set the value
         m_ledBuffer.setHSV(i, 0, 100, 0);
