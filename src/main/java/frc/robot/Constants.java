@@ -49,7 +49,7 @@ public final class Constants {
     public final static int DRIVER_LEFT_AXIS = 1;
 
 	/////////// Indexer Specific Values //////////
-	public final static double INDEXER_SPEED = 0.3;
+	public final static double INDEXER_SPEED = 0.2;
 
 	/////////// Vision Specific Values ///////////
 	public final static double CAMERA_HEIGHT_METERS = 0.9144;

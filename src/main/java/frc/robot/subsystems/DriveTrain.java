@@ -54,6 +54,7 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 
@@ -237,6 +238,7 @@ public class DriveTrain extends SubsystemBase {
 
 		/// Odometry Tracker objects
 		m_2dField = new Field2d();
+		SmartDashboard.putData(m_2dField);
 		m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
 
 		// Code for simulation within the DriveTrain Constructor
@@ -430,10 +432,10 @@ public class DriveTrain extends SubsystemBase {
 		m_left_setpoint = m_left_leader.getSelectedSensorPosition() + lengthInTicks;
 		m_right_setpoint = m_right_leader.getSelectedSensorPosition() + lengthInTicks;
 
-		m_left_leader.configMotionCruiseVelocity(12318,kTimeoutMs);
-		m_left_leader.configMotionAcceleration(6159, kTimeoutMs); //cruise velocity / 2, so will take 2 seconds
-		m_right_leader.configMotionCruiseVelocity(12318,kTimeoutMs);
-		m_right_leader.configMotionAcceleration(6159, kTimeoutMs);
+		m_left_leader.configMotionCruiseVelocity(16636,kTimeoutMs);
+		m_left_leader.configMotionAcceleration(8318, kTimeoutMs); //cruise velocity / 2, so will take 2 seconds
+		m_right_leader.configMotionCruiseVelocity(16636,kTimeoutMs);
+		m_right_leader.configMotionAcceleration(8318, kTimeoutMs);
 		
 		//set up talon to use DriveMM slots
 		m_left_leader.selectProfileSlot(kSlot_DriveMM, PID_PRIMARY);

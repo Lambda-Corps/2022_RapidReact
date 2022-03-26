@@ -28,6 +28,7 @@ import frc.robot.commands.Intake.DropIntakeAndCollectBalls;
 import frc.robot.commands.Intake.ResetArmLimitAndEncoder;
 import frc.robot.commands.Intake.SetExtendLimit;
 import frc.robot.commands.Intake.TurnOffIntakeArm;
+import frc.robot.commands.autonomous.ThreeBall;
 import frc.robot.commands.autonomous.oneBall;
 import frc.robot.commands.autonomous.twoBallLeft;
 import frc.robot.commands.autonomous.twoBallRight;
@@ -276,7 +277,7 @@ public class RobotContainer {
     // m_auto_chooser.addOption("Left Tarmac, 2 ball", new twoBallLeft(m_driveTrain, m_shooter, m_intake, m_indexer));
     m_auto_chooser.addOption("Right Tarmac, 2 ball", new twoBallRight(m_driveTrain, m_shooter, m_intake, m_indexer));
     m_auto_chooser.setDefaultOption("Left Tarmac, 2 ball", new twoBallLeft(m_driveTrain, m_shooter, m_intake, m_indexer));
-    //m_auto_chooser.addOption("Bottom Left Tarmac, 4 ball", new fourBall(m_driveTrain, m_shooter, m_intake, m_indexer));
+    m_auto_chooser.addOption("Right Tarmac, 3 ball", new ThreeBall(m_driveTrain, m_shooter, m_intake, m_indexer));
     driveTab.add("Autonomous Chooser", m_auto_chooser).withWidget(BuiltInWidgets.kComboBoxChooser).withPosition(4, 4).withSize(2, 1);
   }
 
