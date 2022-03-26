@@ -5,7 +5,6 @@
 package frc.robot.commands.shooter;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.Indexer.ShootBallsTilEmptyOrThreeSeconds;
 import frc.robot.commands.combined.StopShooterAndIndexerMotors;
 import frc.robot.subsystems.Indexer;
@@ -32,7 +31,7 @@ public class Shooting_Sequence extends SequentialCommandGroup {
     addCommands(
       new SetShooterDistance(m_shooter, distance),
       new StartShooterWheel(m_shooter),
-      new WaitUntilCommand(m_shooter::isUpToSpeed),
+      new WaitForShooterToBeUpToSpeed(m_shooter),
       new ShootBallsTilEmptyOrThreeSeconds(m_indexer, m_shooter),
       new StopShooterAndIndexerMotors(m_shooter, m_indexer)
     );

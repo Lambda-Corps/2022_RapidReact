@@ -20,7 +20,9 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.shooter.UnstickShooter;
 
 public class Shooter extends SubsystemBase {
   public static enum ShotDistance {
@@ -35,9 +37,14 @@ public class Shooter extends SubsystemBase {
                     SHOOTER_SETPOINT_CLOSESHOT   = 6700,   //30%
                     SHOOTER_SETPOINT_MIDTARMAC = 6760;     //35%
 
-  // Move balls that are stuck
+  // Fully Eject balls from shooter
   private final double SHOOTER_EJECT_SPEED = -.15;
   private final double SHOOTER_TOLERANCE = .03; // within 3% of the set point is good 
+  
+  // Unstick balls from shooter
+  private final double SHOOTER_UNSTICK_SPEED = -0.10;
+  // Number of iterations of motors being stuck before we decide the ball is truly stuck
+  private final int BALL_STUCK_TIME_COUNT = 3;
 
   // Keep track of whether we're shooting, either for LEDs or shooting sequences
   private boolean m_is_shooting;
@@ -161,23 +168,20 @@ public class Shooter extends SubsystemBase {
     // This method will be called once per scheduler run
     if(m_is_shooting){
       m_shooter_clock_count++;
-
-
-
     }
-      
-      double shooterVelocity = m_Shooter.getSelectedSensorVelocity();
+    m_closed_loop_error = m_Shooter.getClosedLoopError(PID_PRIMARY);
+  }
+
+  public boolean isBallStuck() {
+    double shooterVelocity = m_Shooter.getSelectedSensorVelocity();
       double shooterCurrent = m_Shooter.getStatorCurrent();
       if (shooterVelocity == 0.0 && shooterCurrent > 0){
        m_ball_stuck_counter++;
-       if (m_ball_stuck_counter > 0){
-         // Start Command roll the wheels backwards to un-stick shooter 
+       if (m_ball_stuck_counter >  BALL_STUCK_TIME_COUNT){
+          return true;
        }
-       
-
-     
       }
-    m_closed_loop_error = m_Shooter.getClosedLoopError(PID_PRIMARY);
+      return false;
   }
 
   public void startVelocityPID(){
@@ -204,6 +208,10 @@ public class Shooter extends SubsystemBase {
 
   public void ejectBallsBackward() {
     m_Shooter.set(ControlMode.PercentOutput, SHOOTER_EJECT_SPEED);
+  }
+
+  public void unstickBalls() {
+    m_Shooter.set(ControlMode.PercentOutput, SHOOTER_UNSTICK_SPEED);
   }
 
   public double getLoopCount(){
