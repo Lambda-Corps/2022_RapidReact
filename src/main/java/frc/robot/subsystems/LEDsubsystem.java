@@ -119,8 +119,12 @@ public class LEDsubsystem extends SubsystemBase {
           break;
       case LED_DEFAULT:
       default:
+<<<<<<< HEAD
 <<<<<<< Updated upstream
         if(DriverStation.getAlliance() == Alliance.Blue){
+=======
+        if(m_alliance_color == ALLIANCE_COLOR_BLUE){
+>>>>>>> 138d09d7c4f694241c82d63fa3e2470e0e2f7139
           bluechase();
         }
         else{
@@ -374,6 +378,7 @@ public class LEDsubsystem extends SubsystemBase {
         
         for (var i = 0; i < m_ledBuffer.getLength(); i++) {
           // Set the value
+<<<<<<< HEAD
 =======
       }
       
@@ -384,6 +389,9 @@ public class LEDsubsystem extends SubsystemBase {
           m_ledBuffer.setHSV((TOTAL_LED_COUNT -1) -i, 0, 255, 128);
 >>>>>>> Stashed changes
           m_ledBuffer.setHSV(i, 0, 255, 128);
+=======
+          m_ledBuffer.setHSV(i,  0, 100, 0);
+>>>>>>> 138d09d7c4f694241c82d63fa3e2470e0e2f7139
           //System.out.print("Works" + m_loopcount);
           m_led.setData(m_ledBuffer);
         }
