@@ -24,20 +24,18 @@ import frc.robot.commands.Indexer.CancelIndexer;
 import frc.robot.commands.Indexer.EjectBalls;
 import frc.robot.commands.Indexer.ShootBallsTilEmptyOrThreeSeconds;
 import frc.robot.commands.Intake.ArmMM;
-import frc.robot.commands.Intake.CollectBalls;
 import frc.robot.commands.Intake.DropIntakeAndCollectBalls;
 import frc.robot.commands.Intake.ResetArmLimitAndEncoder;
 import frc.robot.commands.Intake.SetExtendLimit;
 import frc.robot.commands.Intake.TurnOffIntakeArm;
+import frc.robot.commands.autonomous.ThreeBall;
 import frc.robot.commands.autonomous.oneBall;
 import frc.robot.commands.autonomous.twoBallLeft;
 import frc.robot.commands.autonomous.twoBallRight;
 import frc.robot.commands.autonomous.PathWeaver.pathFollowing;
 import frc.robot.commands.climber.CancelClimber;
 import frc.robot.commands.climber.DriveClimbertoReverseHardLimit;
-import frc.robot.commands.climber.HighBarClimb;
 import frc.robot.commands.climber.HighBarRaise;
-import frc.robot.commands.climber.LowBarClimb;
 import frc.robot.commands.climber.LowBarRaise;
 import frc.robot.commands.climber.LowerClimber;
 import frc.robot.commands.climber.TestClimberDown;
@@ -52,7 +50,6 @@ import frc.robot.commands.drivetrain.TurnToAngleTest;
 import frc.robot.commands.drivetrain.UpdateDriveLimiters;
 import frc.robot.commands.shooter.CancelShooter;
 import frc.robot.commands.shooter.SetShooterDistance;
-import frc.robot.commands.shooter.Shoot;
 import frc.robot.commands.shooter.Shooting_Sequence;
 import frc.robot.commands.shooter.StartShooterWheel;
 import frc.robot.commands.vision.AimAtCargo;
@@ -147,6 +144,8 @@ public class RobotContainer {
 
     m_driveTrain.setDefaultCommand(new DriveTrainDefaultCommand(m_driveTrain, m_driver_controller));
     m_indexer.setDefaultCommand(new IndexerDefaultCommand(m_indexer));
+
+    m_vision.setTeamPipeline();
     
     // Build up the driver's heads up display
     buildShuffleboard();
@@ -281,6 +280,7 @@ public class RobotContainer {
     m_auto_chooser.setDefaultOption("Left Tarmac, 2 ball", new twoBallLeft(m_driveTrain, m_shooter, m_intake, m_indexer));
     m_auto_chooser.addOption("Test PathWeaver", new pathFollowing(m_driveTrain));
     //m_auto_chooser.addOption("Bottom Left Tarmac, 4 ball", new fourBall(m_driveTrain, m_shooter, m_intake, m_indexer));
+    m_auto_chooser.addOption("Right Tarmac, 3 ball", new ThreeBall(m_driveTrain, m_shooter, m_intake, m_indexer));
     driveTab.add("Autonomous Chooser", m_auto_chooser).withWidget(BuiltInWidgets.kComboBoxChooser).withPosition(4, 4).withSize(2, 1);
   }
 

@@ -11,8 +11,10 @@ import frc.robot.commands.Intake.CollectBalls;
 import frc.robot.commands.Intake.ResetArmLimitAndEncoder;
 import frc.robot.commands.drivetrain.DriveMM;
 import frc.robot.commands.drivetrain.TurnToAngle;
+import frc.robot.commands.shooter.SetShooterDistance;
 import frc.robot.commands.shooter.Shoot;
 import frc.robot.commands.shooter.Shooting_Sequence;
+import frc.robot.commands.shooter.StartShooterWheel;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
@@ -41,8 +43,8 @@ public class twoBallRight extends SequentialCommandGroup {
       new ArmMM(m_intake, Intake.INTAKE_ARM_EXTEND),
       new ParallelCommandGroup(new CollectBalls(m_intake, m_indexer).withTimeout(3), new DriveMM(m_drive_train, 62)),
       new ResetArmLimitAndEncoder(m_intake),
-      new TurnToAngle(m_drive_train, 180), //turn around
-      new DriveMM(m_drive_train, 40.44),
+      new ParallelCommandGroup(new TurnToAngle(m_drive_train, 180), new SetShooterDistance(m_shooter, ShotDistance.ClosestShot)), //turn around
+      new ParallelCommandGroup(new DriveMM(m_drive_train, 40.44), new StartShooterWheel(shooter)),
       new Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.MidTarmac)
     );
   }

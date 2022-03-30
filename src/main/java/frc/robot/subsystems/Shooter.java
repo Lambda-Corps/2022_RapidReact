@@ -31,7 +31,7 @@ public class Shooter extends SubsystemBase {
   private int m_shooter_set_point;
 
   //10% is 1918
-  private final int SHOOTER_SETPOINT_TARMAC_LINE   = 8000, //40%
+  private final int SHOOTER_SETPOINT_TARMAC_LINE   = 8200, //40%
                     SHOOTER_SETPOINT_CLOSESHOT   = 6700,   //30%
                     SHOOTER_SETPOINT_MIDTARMAC = 6760;     //35%
 
