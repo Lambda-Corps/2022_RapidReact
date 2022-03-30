@@ -301,6 +301,7 @@ public class DriveTrain extends SubsystemBase {
 
 	@Override
 	public void periodic() {
+		m_safety_drive.feedWatchdog();
 		m_odometry.update(m_gyro.getRotation2d(),
                       nativeUnitsToDistanceMeters(m_left_leader.getSelectedSensorPosition()),
                       nativeUnitsToDistanceMeters(m_right_leader.getSelectedSensorPosition()));

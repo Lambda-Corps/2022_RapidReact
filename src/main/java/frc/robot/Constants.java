@@ -146,10 +146,10 @@ public final class Constants {
 	public static boolean kGyroReversed = true;
 
 	/* ---- Characterization Calculations ---- */
-	public static final double ksVolts = 0.65154;
-	public static final double kvVoltSecondsPerMeter = .000012616;
-	public static final double kaVoltSecondsSquaredPerMeter = 0.0000003799;
-	public static final double kPDriveVel = 8.5;
+	public static final double ksVolts = 0.18214;
+	public static final double kvVoltSecondsPerMeter = .21914;
+	public static final double kaVoltSecondsSquaredPerMeter = 0.069893;
+	public static final double kPDriveVel = 0.03175;
 	public static final double kTrackwidthMeters = 0.6731;
 	public static final DifferentialDriveKinematics kDriveKinematics = 
 			new DifferentialDriveKinematics(kTrackwidthMeters);

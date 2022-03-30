@@ -211,7 +211,7 @@ public class RobotContainer {
   
   private void buildShuffleboard(){
     buildDriverTab();
-    // buildDriverTestTab();
+    buildDriverTestTab();
     // buildShooterTab();
     // buildIntakeTestTab();
     // buildClimberTestTab();

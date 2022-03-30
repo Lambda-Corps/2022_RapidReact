@@ -60,15 +60,19 @@ public class pathFollowing extends SequentialCommandGroup {
             .addConstraint(autoVoltageConstraint);
 
     Trajectory trajectory = new Trajectory();
+    //Trajectory trajectory2 = new Trajectory();
     //String path = "pathplanner/generatedJSON/testpath.json";
-    String path = "output/Unnamed.wpilib.json";
-    try{
-      Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(path);
-      trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-    }
-    // A default trajectory to follow.  All units in meters.
-    catch(IOException ex){
-      DriverStation.reportError("Unable to open trajectory: " + path, ex.getStackTrace());
+    // String path = "paths/11First.wpilib.json";
+    // //String path2 = "paths/11Second.wpilib.json";
+    // try{
+    //   Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(path);
+    //   trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+    //   //Path trajectoryPath2 = Filesystem.getDeployDirectory().toPath().resolve(path2);
+    //   //trajectory2 = TrajectoryUtil.fromPathweaverJson(trajectoryPath2);
+    // }
+    // // A default trajectory to follow.  All units in meters.
+    // catch(IOException ex){
+      //DriverStation.reportError("Unable to open trajectory: " + path, ex.getStackTrace());
       trajectory =
         TrajectoryGenerator.generateTrajectory(
             // Start at the origin facing the +X direction
@@ -80,7 +84,7 @@ public class pathFollowing extends SequentialCommandGroup {
             new Pose2d(3, 3, new Rotation2d(0)),
             // Pass config
             config);
-    }
+    //}
 
     addCommands(
       new RamseteCommand(
@@ -97,8 +101,29 @@ public class pathFollowing extends SequentialCommandGroup {
           new PIDController(kPDriveVel, 0, 0),
           // RamseteCommand passes volts to the callback
           m_driveTrain::tankDriveVolts,
-          m_driveTrain));
+          m_driveTrain)
+          
+      /* new RamseteCommand(
+      trajectory2,
+      m_driveTrain::getPose,
+      new RamseteController(kRamseteB, kRamseteZeta),
+      new SimpleMotorFeedforward(
+          ksVolts,
+          kvVoltSecondsPerMeter,
+          kaVoltSecondsSquaredPerMeter),
+          kDriveKinematics,
+          m_driveTrain::getWheelSpeeds,
+          new PIDController(kPDriveVel, 0, 0),
+          new PIDController(kPDriveVel, 0, 0),
+          // RamseteCommand passes volts to the callback
+          m_driveTrain::tankDriveVolts,
+          m_driveTrain) */
+          
+          
+
+          );
           
     m_driveTrain.resetOdometry(trajectory.getInitialPose());
+    // m_driveTrain.resetOdometry(trajectory2.getInitialPose());
   }
 }
