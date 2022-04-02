@@ -36,9 +36,9 @@ public class LEDsubsystem extends SubsystemBase {
 
 
   private int m_loopcount;
-  private int m_LEDPoint;
+  private int m_LEDPoint = 0;
   
-  private final int LEFT_SIDE_COUNT = 37, MIDDLE_COUNT = 13, RIGHT_SIDE_COUNT = 36; //86
+  private final int LEFT_SIDE_COUNT = 37, MIDDLE_COUNT = 13, RIGHT_SIDE_COUNT = 34; //84
   private final int TOTAL_LED_COUNT = LEFT_SIDE_COUNT + RIGHT_SIDE_COUNT + MIDDLE_COUNT;
 
   private boolean climberLEDHighBar = false; // Actually the mid bar
@@ -52,7 +52,7 @@ public class LEDsubsystem extends SubsystemBase {
   // Intake State Collector
   private NetworkTableEntry m_LEDSNetworkTableEntry;
   /** Creates a new LEDsubsystem. */
-  public LEDsubsystem() { // PWM port moved to port 9
+  public LEDsubsystem() { // LEDs normaly use PWM port 9
     // Must be a PWM header, not MXP or DIO
     m_LEDSNetworkTableEntry = Shuffleboard.getTab("LED").add("TestNumber", 0).getEntry();
 
@@ -72,8 +72,6 @@ public class LEDsubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    try{
-      m_loopcount =  m_loopcount + 1;
     if (m_loopcount > 250){
       m_loopcount = 0;
       m_LEDPoint = 0;
@@ -86,6 +84,7 @@ public class LEDsubsystem extends SubsystemBase {
     }
     int led_color_state = (int)m_LEDSNetworkTableEntry.getDouble(0);
     
+    //This area of the periodic is not really used, jobs are mostly done through conditional statements.
     switch(led_color_state){
       case LED_ONE_BALL:
           bluechase();
@@ -153,7 +152,8 @@ public class LEDsubsystem extends SubsystemBase {
       }
     }
       //System.out.print("Reached reset " + m_loopcount);
-
+      try{
+        m_loopcount =  m_loopcount + 1;
     }
     catch(Exception excpt){
       //Don't do anything
@@ -234,7 +234,7 @@ public class LEDsubsystem extends SubsystemBase {
     }
     m_led.setData(m_ledBuffer);
   }
-  //Slava Ukraine
+  //Slava Ukraini
   public void Ukraine() {
     // m_loopcount = 0;
     // System.out.print("Reached here " + m_loopcount);
@@ -244,11 +244,10 @@ public class LEDsubsystem extends SubsystemBase {
         m_ledBuffer.setHSV(i, 0, 100, 0);
         //System.out.print("Works" + m_loopcount);
         m_led.setData(m_ledBuffer);
-      }
-      
+      }     
     }
     else if(m_loopcount %5 == 0 && m_loopcount != 0){
-      for (var i = (m_LEDPoint); i < m_ledBuffer.getLength(); i += 86) {
+      for (var i = (m_LEDPoint); i < m_ledBuffer.getLength(); i += TOTAL_LED_COUNT) {
         //if( i < m_LEDPoint )
           m_ledBuffer.setHSV((TOTAL_LED_COUNT -1) -i, 35, 255, 128);
           m_ledBuffer.setHSV(i, 120, 255, 128);
@@ -261,6 +260,8 @@ public class LEDsubsystem extends SubsystemBase {
   public void bluechase() {
     // m_loopcount = 0;
     // System.out.print("Reached here " + m_loopcount);
+    // m_LEDPoint = 0;
+    
     if(m_loopcount == 0){     
       for (var i = 0; i < m_ledBuffer.getLength(); i++) {
         // Set the value
@@ -268,10 +269,9 @@ public class LEDsubsystem extends SubsystemBase {
         //System.out.print("Works" + m_loopcount);
         m_led.setData(m_ledBuffer);
       }
-      
     }
     else if(m_loopcount %5 == 0 && m_loopcount != 0){
-      for (var i = (m_LEDPoint); i < m_ledBuffer.getLength(); i += 86) {
+      for (var i = (m_LEDPoint); i < m_ledBuffer.getLength(); i += TOTAL_LED_COUNT) {
         //if( i < m_LEDPoint )
           m_ledBuffer.setHSV((TOTAL_LED_COUNT -1) -i, 120, 255, 128);
           m_ledBuffer.setHSV(i, 120, 255, 128);
@@ -292,10 +292,9 @@ public class LEDsubsystem extends SubsystemBase {
         m_LEDPoint = 0;
         m_loopcount = 0;
       }
-      
     }
     else if(m_loopcount %2 == 0 && m_loopcount != 0){
-    for (var i = m_LEDPoint; i < m_ledBuffer.getLength(); i += 86) {
+    for (var i = m_LEDPoint; i < m_ledBuffer.getLength(); i += TOTAL_LED_COUNT) {
       // Calculate the hue - hue is easier for rainbows because the color
       // shape is a circle so only one value needs to precess
       final var hue = (m_rainbowFirstPixelHue + (i * 180 / m_ledBuffer.getLength())) % 180;
@@ -317,6 +316,11 @@ public class LEDsubsystem extends SubsystemBase {
   public void redchase() {
     // // m_loopcount = 0;
     // // System.out.print("Reached here " + m_loopcount);
+
+    // System.out.print("1 LED Point = " + m_LEDPoint);
+    
+      //m_LEDPoint = 0;
+    
     if(m_loopcount == 0){     
       for (var i = 0; i < m_ledBuffer.getLength(); i++) {
         // Set the value
@@ -324,10 +328,9 @@ public class LEDsubsystem extends SubsystemBase {
         //System.out.print("Works" + m_loopcount);
         m_led.setData(m_ledBuffer);
       }
-      
     }
     else if(m_loopcount %5 == 0 && m_loopcount != 0){
-      for (var i = (m_LEDPoint); i < m_ledBuffer.getLength(); i += 86) {
+      for (var i = (m_LEDPoint); i < m_ledBuffer.getLength(); i += TOTAL_LED_COUNT) {
         //if( i < m_LEDPoint )
           m_ledBuffer.setHSV((TOTAL_LED_COUNT -1) -i, 0, 255, 128);
           m_ledBuffer.setHSV(i, 0, 255, 128);
@@ -335,8 +338,8 @@ public class LEDsubsystem extends SubsystemBase {
           m_led.setData(m_ledBuffer);
       }
     }
+    // System.out.print("2 LED Point = " + m_LEDPoint);
   }
-  
   public void updateClimberLEDInformation(double prompt) {
     if (prompt == 1) {
       climberLEDHighBar = true;
