@@ -23,7 +23,7 @@ public class ExtendIntakeBangBang extends CommandBase {
   @Override
   public void initialize() {
     m_finished = false;
-    m_intake.turnOnArmMotor(0.6);
+    m_intake.turnOnArmMotor(0.45);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -35,7 +35,8 @@ public class ExtendIntakeBangBang extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_intake.turnOffArmMotor();
+    // m_intake.turnOffArmMotor();
+    m_intake.holdMotorPosition(m_targetPos);
   }
 
   // Returns true when the command should end.

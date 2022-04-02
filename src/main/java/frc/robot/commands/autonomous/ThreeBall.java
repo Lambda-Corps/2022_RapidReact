@@ -31,8 +31,8 @@ public class ThreeBall extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new ParallelCommandGroup(new ExtendIntakeBangBang(m_intake, 1700).withTimeout(2).andThen(new CollectBalls(m_intake, m_indexer).withTimeout(3)), new WaitCommand(.75).andThen(new DriveMM(m_driveTrain, 45.44))),
-      new ParallelCommandGroup(new ResetArmLimitAndEncoder(m_intake), new SetShooterDistance(m_shooter, ShotDistance.TarmacLine).andThen( new StartShooterWheel(m_shooter))),
+      new ParallelCommandGroup(new ExtendIntakeBangBang(m_intake, Intake.INTAKE_ARM_EXTEND).withTimeout(2).andThen(new CollectBalls(m_intake, m_indexer).withTimeout(3)), new WaitCommand(.75).andThen(new DriveMM(m_driveTrain, 45.44))),
+      new ParallelCommandGroup(new ResetArmLimitAndEncoder(m_intake), new WaitCommand(.6).andThen(new SetShooterDistance(m_shooter, ShotDistance.TarmacLine)).andThen( new StartShooterWheel(m_shooter))),
       new TurnToAngle(m_driveTrain, 201).withTimeout(4), //turn around
       //new TurnToAngle(m_drive_train, 30), //angle to be perpendicular to the hub fender
       new Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.TarmacLine), //Shoot grabbed ball and preload ball
