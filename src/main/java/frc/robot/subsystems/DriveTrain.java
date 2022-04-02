@@ -433,9 +433,9 @@ public class DriveTrain extends SubsystemBase {
 		m_right_setpoint = m_right_leader.getSelectedSensorPosition() + lengthInTicks;
 
 		m_left_leader.configMotionCruiseVelocity(16636,kTimeoutMs);
-		m_left_leader.configMotionAcceleration(8318, kTimeoutMs); //cruise velocity / 2, so will take 2 seconds
+		m_left_leader.configMotionAcceleration(8318/1.25, kTimeoutMs); //cruise velocity / 2, so will take 2 seconds
 		m_right_leader.configMotionCruiseVelocity(16636,kTimeoutMs);
-		m_right_leader.configMotionAcceleration(8318, kTimeoutMs);
+		m_right_leader.configMotionAcceleration(8318/1.25, kTimeoutMs);
 		
 		//set up talon to use DriveMM slots
 		m_left_leader.selectProfileSlot(kSlot_DriveMM, PID_PRIMARY);
@@ -764,5 +764,10 @@ public class DriveTrain extends SubsystemBase {
 
 	public double getLeftSetPoint(){
 		return m_left_setpoint;
+	}
+
+	public void setNeutralMode(NeutralMode mode) {
+		m_left_leader.setNeutralMode(mode);
+		m_left_leader.setNeutralMode(mode);
 	}
 }

@@ -9,6 +9,8 @@ import static frc.robot.Constants.TARGET_DISTANCE_FAR;
 
 import java.util.Map;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -25,6 +27,7 @@ import frc.robot.commands.Indexer.EjectBalls;
 import frc.robot.commands.Indexer.ShootBallsTilEmptyOrThreeSeconds;
 import frc.robot.commands.Intake.ArmMM;
 import frc.robot.commands.Intake.DropIntakeAndCollectBalls;
+import frc.robot.commands.Intake.ExtendIntakeBangBang;
 import frc.robot.commands.Intake.ResetArmLimitAndEncoder;
 import frc.robot.commands.Intake.SetExtendLimit;
 import frc.robot.commands.Intake.TurnOffIntakeArm;
@@ -211,7 +214,7 @@ public class RobotContainer {
     buildDriverTab();
     // buildDriverTestTab();
     // buildShooterTab();
-    // buildIntakeTestTab();
+     buildIntakeTestTab();
     // buildClimberTestTab();
     // buildVisionTab();
 
@@ -348,6 +351,7 @@ public class RobotContainer {
     intakeTab.add("ResetArmLimitAndEncoder", new ResetArmLimitAndEncoder(m_intake)).withPosition(0, 3).withSize(2, 1);
     intakeTab.add("TurnOffIntakeArm", new TurnOffIntakeArm(m_intake))              .withPosition(2, 3).withSize(2, 1);
 
+    intakeTab.add("Move Arm no MM (900)", new ExtendIntakeBangBang(m_intake, 1700)).withPosition(5, 0);
   }
 
   private void buildClimberTestTab(){
@@ -398,5 +402,13 @@ public class RobotContainer {
     visionTab.add("Turn kI", 0);
     visionTab.add("Turn kF", 0);
     visionTab.add("Cargo kP,", 0.011);
+  }
+
+  public void setBrakeModeOff() {
+    m_driveTrain.setNeutralMode(NeutralMode.Coast);
+  }
+
+  public void setBrakeModeOn() {
+    m_driveTrain.setNeutralMode(NeutralMode.Brake);
   }
 }

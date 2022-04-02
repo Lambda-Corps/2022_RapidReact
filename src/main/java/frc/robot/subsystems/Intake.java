@@ -347,4 +347,8 @@ public class Intake extends SubsystemBase {
   public void turnOffArmMotor(){
     m_armMotor.set(ControlMode.PercentOutput, 0);
   }
+
+  public void turnOnArmMotor(double speed){
+    m_armMotor.set(ControlMode.PercentOutput, speed);
+  }
 }

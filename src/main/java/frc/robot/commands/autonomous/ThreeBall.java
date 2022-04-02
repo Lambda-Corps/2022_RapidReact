@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.Intake.ArmMM;
 import frc.robot.commands.Intake.CollectBalls;
+import frc.robot.commands.Intake.ExtendIntakeBangBang;
 import frc.robot.commands.Intake.ResetArmLimitAndEncoder;
 import frc.robot.commands.drivetrain.DriveMM;
 import frc.robot.commands.drivetrain.TurnToAngle;
@@ -30,12 +31,12 @@ public class ThreeBall extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new ParallelCommandGroup(new ArmMM(m_intake, Intake.INTAKE_ARM_EXTEND).withTimeout(2).andThen(new CollectBalls(m_intake, m_indexer).withTimeout(3)), new WaitCommand(.75).andThen(new DriveMM(m_driveTrain, 45.44))),
+      new ParallelCommandGroup(new ExtendIntakeBangBang(m_intake, 1700).withTimeout(2).andThen(new CollectBalls(m_intake, m_indexer).withTimeout(3)), new WaitCommand(.75).andThen(new DriveMM(m_driveTrain, 45.44))),
       new ParallelCommandGroup(new ResetArmLimitAndEncoder(m_intake), new SetShooterDistance(m_shooter, ShotDistance.TarmacLine).andThen( new StartShooterWheel(m_shooter))),
       new TurnToAngle(m_driveTrain, 201).withTimeout(4), //turn around
       //new TurnToAngle(m_drive_train, 30), //angle to be perpendicular to the hub fender
       new Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.TarmacLine), //Shoot grabbed ball and preload ball
-      new ParallelCommandGroup(new TurnToAngle(m_driveTrain, -80).andThen(new DriveMM(m_driveTrain, 86)), new ArmMM(m_intake, Intake.INTAKE_ARM_EXTEND).andThen(new CollectBalls(m_intake, m_indexer).withTimeout(3.5))),
+      new ParallelCommandGroup(new TurnToAngle(m_driveTrain, -85).andThen(new DriveMM(m_driveTrain, 90)), new ExtendIntakeBangBang(m_intake, 1700).andThen(new CollectBalls(m_intake, m_indexer).withTimeout(3.5))),
       new ParallelCommandGroup(new ResetArmLimitAndEncoder(m_intake), new TurnToAngle(m_driveTrain, 118), new StartShooterWheel(m_shooter)),
       new Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.TarmacLine)
     );
