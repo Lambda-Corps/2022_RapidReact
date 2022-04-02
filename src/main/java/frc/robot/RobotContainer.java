@@ -214,7 +214,7 @@ public class RobotContainer {
     buildDriverTab();
     // buildDriverTestTab();
     // buildShooterTab();
-     buildIntakeTestTab();
+    // buildIntakeTestTab();
     // buildClimberTestTab();
     // buildVisionTab();
 
@@ -334,7 +334,7 @@ public class RobotContainer {
     driveTab.add("At Speed", false).withPosition(2, 2).withSize(1, 1).withWidget(BuiltInWidgets.kBooleanBox);
     driveTab.addNumber("Shooter Loop Count", m_shooter::getLoopCount).withPosition(3, 2).withSize(1, 1);
   }
-
+  @SuppressWarnings("unused")
   private void buildIntakeTestTab(){
     ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake");
     intakeTab.add("ResetDriveSpeed", -.5)                  .withPosition(0, 0).withSize(1, 1);
@@ -354,6 +354,7 @@ public class RobotContainer {
     intakeTab.add("Move Arm no MM (900)", new ExtendIntakeBangBang(m_intake, 1700)).withPosition(5, 0);
   }
 
+  @SuppressWarnings("unused")
   private void buildClimberTestTab(){
     ShuffleboardTab climberTab = Shuffleboard.getTab("Climber");
     // Testing Information
@@ -377,6 +378,7 @@ public class RobotContainer {
     climberTab.add("Reset to LowerLimit", new DriveClimbertoReverseHardLimit(m_climber)).withPosition(4, 3).withSize(2, 1);
   }
 
+  @SuppressWarnings("unused")
   private void buildVisionTab() {
     ShuffleboardTab visionTab = Shuffleboard.getTab("Vision");
 

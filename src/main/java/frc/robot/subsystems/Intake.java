@@ -82,7 +82,7 @@ public class Intake extends SubsystemBase {
 
   private final NetworkTableEntry m_rev_limit_entry, m_fwd_limit_entry;
 
-  private boolean m_arm_is_moving;
+  // private boolean m_arm_is_moving;
 
   public Intake() {
     m_faults = new Faults();
@@ -212,11 +212,11 @@ public class Intake extends SubsystemBase {
   }
 
   public boolean moveMM(int targetPosition){
-    int kMeasuredPosHorizontal = 570; //Position measured when arm is horizontal
-    double kTicksPerDegree = 4096 / 360; //Sensor is 1:1 with arm rotation
+    // int kMeasuredPosHorizontal = 570; //Position measured when arm is horizontal
+    // double kTicksPerDegree = 4096 / 360; //Sensor is 1:1 with arm rotation
     double currentPos = m_armMotor.getSelectedSensorPosition();
-    double degrees = (currentPos - kMeasuredPosHorizontal) / kTicksPerDegree;
-    double radians = java.lang.Math.toRadians(degrees);
+    // double degrees = (currentPos - kMeasuredPosHorizontal) / kTicksPerDegree;
+    // double radians = java.lang.Math.toRadians(degrees);
     //double cosineScalar = java.lang.Math.cos(radians);
     m_armMotor.set(ControlMode.MotionMagic, targetPosition, DemandType.ArbitraryFeedForward, MM_FEEDFORWARD); // * -cosineScalar);
     m_is_on_target = Math.abs(currentPos - targetPosition) < MM_DONE_TOLERANCE;
