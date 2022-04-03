@@ -13,7 +13,6 @@ import frc.robot.commands.Intake.ResetArmLimitAndEncoder;
 import frc.robot.commands.drivetrain.DriveMM;
 import frc.robot.commands.drivetrain.TurnToAngle;
 import frc.robot.commands.shooter.SetShooterDistance;
-import frc.robot.commands.shooter.Shoot;
 import frc.robot.commands.shooter.Shooting_Sequence;
 import frc.robot.commands.shooter.StartShooterWheel;
 import frc.robot.subsystems.DriveTrain;
