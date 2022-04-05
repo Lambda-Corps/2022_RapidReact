@@ -20,9 +20,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.shooter.UnstickShooter;
 
 public class Shooter extends SubsystemBase {
   public static enum ShotDistance {
@@ -33,24 +31,19 @@ public class Shooter extends SubsystemBase {
   private int m_shooter_set_point;
 
   //10% is 1918
-  private final int SHOOTER_SETPOINT_TARMAC_LINE   = 8000, //40%
+  private final int SHOOTER_SETPOINT_TARMAC_LINE   = 8200, //40%
                     SHOOTER_SETPOINT_CLOSESHOT   = 6700,   //30%
                     SHOOTER_SETPOINT_MIDTARMAC = 6760;     //35%
 
-  // Fully Eject balls from shooter
+  // Move balls that are stuck
   private final double SHOOTER_EJECT_SPEED = -.15;
   private final double SHOOTER_TOLERANCE = .03; // within 3% of the set point is good 
-  
-  // Unstick balls from shooter
-  private final double SHOOTER_UNSTICK_SPEED = -0.10;
-  // Number of iterations of motors being stuck before we decide the ball is truly stuck
-  private final int BALL_STUCK_TIME_COUNT = 3;
 
   // Keep track of whether we're shooting, either for LEDs or shooting sequences
   private boolean m_is_shooting;
   private int m_shooter_clock_count;
   private double m_closed_loop_error;
-  private int m_ball_stuck_counter;
+
   NetworkTableEntry m_at_speed_entry;
     
   /** Creates a new Shooter. */
@@ -108,8 +101,25 @@ public class Shooter extends SubsystemBase {
 
     m_is_shooting = false;
     m_shooter_clock_count = 0;
-    m_ball_stuck_counter = 0;
+
     m_at_speed_entry = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Shooter").getEntry("At Speed");
+  }
+
+  public boolean isBallStuck() {
+    if((m_is_shooting == true) && (m_Shooter.getStatorCurrent() > 0.05) && (m_Shooter.getSelectedSensorVelocity() < 0.10)   ) {
+      return true;
+      
+
+    } 
+    else {
+      return false;
+    }
+  }
+
+  public void unstickBalls() {
+    m_Shooter.set(ControlMode.PercentOutput, SHOOTER_EJECT_SPEED);
+
+    
   }
 
   public void stopMotor() {
@@ -169,19 +179,8 @@ public class Shooter extends SubsystemBase {
     if(m_is_shooting){
       m_shooter_clock_count++;
     }
-    m_closed_loop_error = m_Shooter.getClosedLoopError(PID_PRIMARY);
-  }
 
-  public boolean isBallStuck() {
-    double shooterVelocity = m_Shooter.getSelectedSensorVelocity();
-      double shooterCurrent = m_Shooter.getStatorCurrent();
-      if (shooterVelocity == 0.0 && shooterCurrent > 0){
-       m_ball_stuck_counter++;
-       if (m_ball_stuck_counter >  BALL_STUCK_TIME_COUNT){
-          return true;
-       }
-      }
-      return false;
+    m_closed_loop_error = m_Shooter.getClosedLoopError(PID_PRIMARY);
   }
 
   public void startVelocityPID(){
@@ -208,10 +207,6 @@ public class Shooter extends SubsystemBase {
 
   public void ejectBallsBackward() {
     m_Shooter.set(ControlMode.PercentOutput, SHOOTER_EJECT_SPEED);
-  }
-
-  public void unstickBalls() {
-    m_Shooter.set(ControlMode.PercentOutput, SHOOTER_UNSTICK_SPEED);
   }
 
   public double getLoopCount(){
