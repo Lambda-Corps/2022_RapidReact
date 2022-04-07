@@ -37,7 +37,7 @@ public class Intake extends SubsystemBase {
 
   //positions
   public static final int INTAKE_ARM_RETRACT = 0; //intake fully vertical/up
-  public static int INTAKE_ARM_EXTEND = 1485; //intake down to grab ball (currently has temporary value)
+  public static int INTAKE_ARM_EXTEND = 1620; //intake down to grab ball (currently has temporary value)
   // public static final int INTAKE_ARM_EXTEND = 1475; //intake down to grab ball (currently has temporary value)
 
   final double DOWN_FEEDFORWARD = 0.3;
@@ -94,8 +94,10 @@ public class Intake extends SubsystemBase {
     m_intakeMotor.configFactoryDefault();
     m_intakeMotor.setInverted(false);
     m_armMotor.configFactoryDefault();
-    m_armMotor.setInverted(true);
-    m_armMotor.setSensorPhase(false);
+    // m_armMotor.setInverted(true);
+    m_armMotor.setInverted(false);
+    // m_armMotor.setSensorPhase(false);
+    m_armMotor.setSensorPhase(true);
 
     // TEsting limits
     //m_armMotor.configPeakOutputForward(.2);
@@ -155,7 +157,7 @@ public class Intake extends SubsystemBase {
     // armMMTab.addBoolean("Soft Forward", this::getArmSoftForwardLimit).withPosition(4, 1);
     // armMMTab.addBoolean("Soft Reverse", this::getArmSoftReverseLimit).withPosition(5,1);
     m_armMotor.setSelectedSensorPosition(0);
-    holdMotorPosition(0);
+    //holdMotorPosition(0);
 
     NetworkTable intakeTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Intake");
     m_rev_limit_entry = intakeTab.getEntry("Intake Rev Limit");
