@@ -186,9 +186,9 @@ public class RobotContainer {
     // Partner Bindings
     m_p_rb.whileHeld(new EjectBalls(m_indexer, m_shooter));
     m_p_start.whenPressed(new TurnOffIntakeArm(m_intake));
-    m_p_a.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.ClosestShot));
-    m_p_b.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.MidTarmac));
-    m_p_y.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.TarmacLine));
+    m_p_a.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_ledsubsystem, ShotDistance.ClosestShot));
+    m_p_b.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_ledsubsystem, ShotDistance.MidTarmac));
+    m_p_y.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_ledsubsystem, ShotDistance.TarmacLine));
     m_p_x.whenPressed(new CancelShooter(m_shooter));
     m_p_sel.whenPressed(new DriveClimbertoReverseHardLimit(m_climber));
 
@@ -276,11 +276,11 @@ public class RobotContainer {
 
     // //auto chooser
     m_auto_chooser = new SendableChooser<Command>();
-    m_auto_chooser.addOption("1 ball", new oneBall(m_driveTrain, m_shooter, m_intake, m_indexer));
+    m_auto_chooser.addOption("1 ball", new oneBall(m_driveTrain, m_shooter, m_intake, m_indexer, m_ledsubsystem));
     // m_auto_chooser.addOption("Left Tarmac, 2 ball", new twoBallLeft(m_driveTrain, m_shooter, m_intake, m_indexer));
-    m_auto_chooser.addOption("Right Tarmac, 2 ball", new twoBallRight(m_driveTrain, m_shooter, m_intake, m_indexer));
-    m_auto_chooser.setDefaultOption("Left Tarmac, 2 ball", new twoBallLeft(m_driveTrain, m_shooter, m_intake, m_indexer));
-    m_auto_chooser.addOption("Right Tarmac, 3 ball", new ThreeBall(m_driveTrain, m_shooter, m_intake, m_indexer));
+    m_auto_chooser.addOption("Right Tarmac, 2 ball", new twoBallRight(m_driveTrain, m_shooter, m_intake, m_indexer, m_ledsubsystem));
+    m_auto_chooser.setDefaultOption("Left Tarmac, 2 ball", new twoBallLeft(m_driveTrain, m_shooter, m_intake, m_indexer, m_ledsubsystem));
+    m_auto_chooser.addOption("Right Tarmac, 3 ball", new ThreeBall(m_driveTrain, m_shooter, m_intake, m_indexer, m_ledsubsystem));
     driveTab.add("Autonomous Chooser", m_auto_chooser).withWidget(BuiltInWidgets.kComboBoxChooser).withPosition(4, 4).withSize(2, 1);
   }
 
@@ -326,7 +326,7 @@ public class RobotContainer {
     driveTab.add("SetShotDistanceCloseShot", new SetShooterDistance(m_shooter, ShotDistance.ClosestShot)).withPosition(0, 0).withSize(2, 1);
     driveTab.add("StarShooterWheel", new StartShooterWheel(m_shooter)).withPosition(2, 0).withSize(2, 1);
     driveTab.add("WaitUntilCommand", new WaitUntilCommand(m_shooter::isUpToSpeed)).withPosition(4, 0).withSize(2, 1);
-    driveTab.add("ShootBallsUntilEmpty", new ShootBallsTilEmptyOrThreeSeconds(m_indexer, m_shooter)).withPosition(6, 0).withSize(2, 1);
+    driveTab.add("ShootBallsUntilEmpty", new ShootBallsTilEmptyOrThreeSeconds(m_indexer, m_shooter, m_ledsubsystem)).withPosition(6, 0).withSize(2, 1);
     driveTab.add("StopShooter", new StopShooterAndIndexerMotors(m_shooter, m_indexer)).withPosition(8, 0).withSize(2, 1);
 
     driveTab.addBoolean("Is Up To Speed", m_shooter::isUpToSpeed).withPosition(0, 2).withSize(1, 1);

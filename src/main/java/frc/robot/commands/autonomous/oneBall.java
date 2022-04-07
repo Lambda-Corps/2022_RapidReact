@@ -12,6 +12,7 @@ import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShotDistance;
+import frc.robot.subsystems.LEDsubsystem;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -22,17 +23,19 @@ public class oneBall extends SequentialCommandGroup {
   Shooter m_shooter;
   Intake m_intake;
   Indexer m_indexer;
-  public oneBall(DriveTrain driveTrain, Shooter shooter, Intake intake, Indexer indexer) {
+  LEDsubsystem m_LEDsubsystem;
+  public oneBall(DriveTrain driveTrain, Shooter shooter, Intake intake, Indexer indexer, LEDsubsystem ledsubsystem) {
     m_drive_train = driveTrain;
     m_shooter = shooter;
     m_intake = intake;
     m_indexer = indexer;
+    m_LEDsubsystem = ledsubsystem;
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     //STARTING CONDITIONS: 
     //ball placed inside indexer, robot placed 19 inches away from hub fender
     addCommands(
-      new Shoot(m_shooter, m_indexer, ShotDistance.ClosestShot),
+      new Shoot(m_shooter, m_indexer, m_LEDsubsystem, ShotDistance.ClosestShot),
       new DriveMM(m_drive_train, -50)//DriveMM(m_drive_train, 50)
     );
   }

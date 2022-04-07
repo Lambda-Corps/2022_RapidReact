@@ -26,5 +26,6 @@ public class CancelClimber extends InstantCommand {
   public void initialize() {
     m_climber.climberStopMotor();
     m_LEDsubsystem.setClimbInProgress(0);
+    m_LEDsubsystem.resetClimberLEDInformation(2);
   }
 }

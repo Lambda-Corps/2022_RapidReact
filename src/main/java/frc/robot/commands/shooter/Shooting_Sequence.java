@@ -10,6 +10,7 @@ import frc.robot.commands.Indexer.ShootBallsTilEmptyOrThreeSeconds;
 import frc.robot.commands.combined.StopShooterAndIndexerMotors;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LEDsubsystem;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShotDistance;
 
@@ -22,18 +23,20 @@ public class Shooting_Sequence extends SequentialCommandGroup {
   Intake m_intake;
   Indexer m_indexer;
   ShotDistance m_distance;
-  public Shooting_Sequence(Shooter shooter, Intake intake, Indexer indexer, ShotDistance distance) {
+  LEDsubsystem m_LEDsubsystem;
+  public Shooting_Sequence(Shooter shooter, Intake intake, Indexer indexer, LEDsubsystem ledsubsystem, ShotDistance distance) {
     m_shooter = shooter;
     m_intake = intake;
     m_indexer = indexer;
     m_distance = distance;
+    m_LEDsubsystem = ledsubsystem;
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
       new SetShooterDistance(m_shooter, distance),
       new StartShooterWheel(m_shooter),
       new WaitUntilCommand(m_shooter::isUpToSpeed),
-      new ShootBallsTilEmptyOrThreeSeconds(m_indexer, m_shooter),
+      new ShootBallsTilEmptyOrThreeSeconds(m_indexer, m_shooter, m_LEDsubsystem),
       new StopShooterAndIndexerMotors(m_shooter, m_indexer)
     );
   }

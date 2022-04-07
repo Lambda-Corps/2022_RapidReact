@@ -18,6 +18,7 @@ import frc.robot.commands.shooter.StartShooterWheel;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LEDsubsystem;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShotDistance;
 
@@ -30,11 +31,13 @@ public class twoBallLeft extends SequentialCommandGroup {
   Shooter m_shooter;
   Intake m_intake;
   Indexer m_indexer;
-  public twoBallLeft(DriveTrain driveTrain, Shooter shooter, Intake intake, Indexer indexer) {
+  LEDsubsystem m_LEDsubsystem;
+  public twoBallLeft(DriveTrain driveTrain, Shooter shooter, Intake intake, Indexer indexer, LEDsubsystem ledsubsystem) {
     m_drive_train = driveTrain;
     m_shooter = shooter;
     m_intake = intake;
     m_indexer = indexer;
+    m_LEDsubsystem = ledsubsystem;
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     //STARTING CONDITIONS: 1 ball in robot, front of the robot at edge of tarmac, directly in front of the ball
@@ -46,7 +49,7 @@ public class twoBallLeft extends SequentialCommandGroup {
       new ParallelCommandGroup(new TurnToAngle(m_drive_train, 192), new SetShooterDistance(m_shooter, ShotDistance.ClosestShot)), //turn around
       new ParallelCommandGroup(new DriveMM(m_drive_train, 60), new StartShooterWheel(shooter)), //drive up to fender, may need lowered a little
       //new TurnToAngle(m_drive_train, 30), //angle to be perpendicular to the hub fender
-      new Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.ClosestShot)
+      new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_LEDsubsystem, ShotDistance.ClosestShot)
     );
   }
 }

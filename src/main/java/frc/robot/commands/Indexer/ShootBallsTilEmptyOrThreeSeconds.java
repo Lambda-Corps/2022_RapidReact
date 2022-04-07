@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.LEDsubsystem;
 
 public class ShootBallsTilEmptyOrThreeSeconds extends CommandBase {
 
@@ -15,15 +16,17 @@ public class ShootBallsTilEmptyOrThreeSeconds extends CommandBase {
   Shooter m_shooter;
   Timer m_timer;
   int m_emptycount;
+  LEDsubsystem m_LEDsubsystem;
 
   /** Creates a new Index_Balls_into_FlyWheel. */
-  public ShootBallsTilEmptyOrThreeSeconds(Indexer indexer, Shooter shooter) {
+  public ShootBallsTilEmptyOrThreeSeconds(Indexer indexer, Shooter shooter, LEDsubsystem ledsubsystem) {
     m_indexer = indexer;
     m_shooter = shooter;
+    m_LEDsubsystem = ledsubsystem;
     m_timer = new Timer();
     m_timer.start();
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(m_indexer);
+    addRequirements(m_indexer, m_LEDsubsystem);
   }
 
   // Called when the command is initially scheduled.
@@ -36,6 +39,8 @@ public class ShootBallsTilEmptyOrThreeSeconds extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    m_LEDsubsystem.blackout();
+    m_LEDsubsystem.shooterActive(1);
     m_indexer.shootBalls();
     if(m_indexer.isEmpty()){
       m_emptycount++;
@@ -47,6 +52,7 @@ public class ShootBallsTilEmptyOrThreeSeconds extends CommandBase {
   public void end(boolean interrupted) {
     m_indexer.stopMotors();
     m_shooter.stopMotor();
+    m_LEDsubsystem.shooterActive(0);
   }
 
   // Returns true when the command should end.
