@@ -142,6 +142,7 @@ public class Indexer extends SubsystemBase {
       case TOO_FAR:
         mid_speed = -3*INTAKE_SHOOT_SPEED;
         shooter_speed = -3*INTAKE_SHOOT_SPEED;
+        intake_speed = -INDEXER_SPEED;
         break;
       case PURGE:
         intake_speed = -INTAKE_SHOOT_SPEED;
