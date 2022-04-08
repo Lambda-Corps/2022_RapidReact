@@ -45,7 +45,7 @@ public class twoBallLeft extends SequentialCommandGroup {
     addCommands(
       new ArmMM(m_intake, Intake.INTAKE_ARM_EXTEND),
       new ParallelCommandGroup(new CollectBalls(m_intake, m_indexer).withTimeout(5), new WaitCommand(.75).andThen(new DriveMM(m_drive_train, 45.44))),
-      new ResetArmLimitAndEncoder(m_intake),
+      new ResetArmLimitAndEncoder(m_intake).andThen(new WaitCommand(.75)), // Wait 3/4 of a second to try and fix if ball squeezes forward
       new ParallelCommandGroup(new TurnToAngle(m_drive_train, 192), new SetShooterDistance(m_shooter, ShotDistance.ClosestShot)), //turn around
       new ParallelCommandGroup(new DriveMM(m_drive_train, 60), new StartShooterWheel(shooter)), //drive up to fender, may need lowered a little
       //new TurnToAngle(m_drive_train, 30), //angle to be perpendicular to the hub fender
