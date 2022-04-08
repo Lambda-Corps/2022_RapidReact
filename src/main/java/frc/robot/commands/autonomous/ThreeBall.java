@@ -4,9 +4,12 @@
 
 package frc.robot.commands.autonomous;
 
+import org.ejml.equation.ParseError;
+
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.commands.Indexer.ClearShooter;
 import frc.robot.commands.Intake.CollectBalls;
 import frc.robot.commands.Intake.ExtendIntakeBangBang;
 import frc.robot.commands.Intake.ResetArmLimitAndEncoder;
@@ -37,25 +40,25 @@ public class ThreeBall extends SequentialCommandGroup {
     m_LEDsubsystem = ledsubsystem;
 
     addCommands(
-      new ParallelCommandGroup(new ExtendIntakeBangBang(m_intake, Intake.INTAKE_ARM_EXTEND, true).withTimeout(2)
+      new ParallelCommandGroup(new ExtendIntakeBangBang(m_intake, Intake.INTAKE_ARM_EXTEND).withTimeout(2)
                                .andThen(new CollectBalls(m_intake, m_indexer).withTimeout(3)),
                                new WaitCommand(.75).andThen(new DriveMM(m_driveTrain, 45.44))
                                ),
       new ParallelCommandGroup(new ResetArmLimitAndEncoder(m_intake), 
-                               new WaitCommand(.6).andThen(new SetShooterDistance(m_shooter, ShotDistance.TarmacLine))
-                               .andThen( new StartShooterWheel(m_shooter))
+                               new SetShooterDistance(m_shooter, ShotDistance.TarmacLine)
                                ),
-      new TurnToAngle(m_driveTrain, 201).withTimeout(4), //turn around
+
+      new ParallelCommandGroup(new TurnToAngle(m_driveTrain, 201).withTimeout(4), new ClearShooter(m_indexer)),//turn around
       //new TurnToAngle(m_drive_train, 30), //angle to be perpendicular to the hub fender
       new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_LEDsubsystem, ShotDistance.TarmacLine), //Shoot grabbed ball and preload ball
       new ParallelCommandGroup(new TurnToAngle(m_driveTrain, -85)
                                .andThen(new DriveMM(m_driveTrain, 90)), 
-                               new ExtendIntakeBangBang(m_intake, Intake.INTAKE_ARM_EXTEND, true)
+                               new ExtendIntakeBangBang(m_intake, Intake.INTAKE_ARM_EXTEND)
                                .andThen(new CollectBalls(m_intake, m_indexer).withTimeout(3.5))
                                ),
       new ParallelCommandGroup(new ResetArmLimitAndEncoder(m_intake), 
                                new TurnToAngle(m_driveTrain, 118), 
-                               new StartShooterWheel(m_shooter)
+                               new StartShooterWheel(m_shooter, m_LEDsubsystem)
                                ),
       new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_LEDsubsystem, ShotDistance.TarmacLine)
     );

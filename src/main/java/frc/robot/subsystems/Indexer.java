@@ -208,4 +208,10 @@ public class Indexer extends SubsystemBase {
   public boolean isEmpty(){
     return m_ball_count == 0;
   }
+
+  public void clearShooter() {
+    m_intakeIndex.set(ControlMode.PercentOutput, 0);
+    m_midIndex.set(ControlMode.PercentOutput, 0);
+    m_shooterIndex.set(ControlMode.PercentOutput, -INTAKE_SHOOT_SPEED);  
+  }
 }

@@ -283,7 +283,7 @@ public class LEDsubsystem extends SubsystemBase {
   // for only lighting up half of the strip use " m_loopcount == 46"
   public void rainbowchase(){
 
-    if(m_loopcount == 41  ){  /* Only lighting up the sides and not the top 13 */   
+    if(m_loopcount == TOTAL_LED_COUNT  ){  /* Only lighting up the sides and not the top 13 */   
       for (var i = 0; i < m_ledBuffer.getLength(); i++) {
         // Set the value
         m_ledBuffer.setHSV(i, 0, 100, 0);

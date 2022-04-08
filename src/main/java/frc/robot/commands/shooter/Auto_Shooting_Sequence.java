@@ -30,10 +30,10 @@ public class Auto_Shooting_Sequence extends SequentialCommandGroup {
 
     addCommands(
       new SetShooterDistance(shooter, distance),
-      new StartShooterWheel(shooter),
+      new StartShooterWheel(shooter, ledsubsystem),
       new WaitUntilCommand(shooter::isUpToSpeed),
       new ShootBallsTilEmptyOrThreeSeconds(indexer, shooter, m_LEDsubsystem),
-      new StopShooterAndIndexerMotors(shooter, indexer)  
+      new StopShooterAndIndexerMotors(shooter, indexer, m_LEDsubsystem)  
     );
   }
 }

@@ -59,7 +59,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 
 public class DriveTrain extends SubsystemBase {
-	private final double MAX_TELEOP_DRIVE_SPEED = .81;
+	private final double MAX_TELEOP_DRIVE_SPEED = .85;
 	// private final double arbFF = 0.2;
 	// TalonFX's for the drivetrain
 	// Right side is inverted here to drive forward

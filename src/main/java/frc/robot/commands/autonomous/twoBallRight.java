@@ -6,6 +6,7 @@ package frc.robot.commands.autonomous;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.Indexer.ClearShooter;
 import frc.robot.commands.Intake.ArmMM;
 import frc.robot.commands.Intake.CollectBalls;
 import frc.robot.commands.Intake.ExtendIntakeBangBang;
@@ -46,8 +47,9 @@ public class twoBallRight extends SequentialCommandGroup {
       new ExtendIntakeBangBang(m_intake, Intake.INTAKE_ARM_EXTEND, true),
       new ParallelCommandGroup(new CollectBalls(m_intake, m_indexer).withTimeout(3), new DriveMM(m_drive_train, 62)),
       new ResetArmLimitAndEncoder(m_intake),
+      new ClearShooter(m_indexer),
       new ParallelCommandGroup(new TurnToAngle(m_drive_train, 180), new SetShooterDistance(m_shooter, ShotDistance.ClosestShot)), //turn around
-      new ParallelCommandGroup(new DriveMM(m_drive_train, 40.44), new StartShooterWheel(shooter)),
+      new ParallelCommandGroup(new DriveMM(m_drive_train, 40.44), new StartShooterWheel(shooter, m_LEDsubsystem)),
       new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_LEDsubsystem, ShotDistance.MidTarmac)
     );
   }

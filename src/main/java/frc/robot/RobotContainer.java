@@ -189,14 +189,14 @@ public class RobotContainer {
     m_p_a.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_ledsubsystem, ShotDistance.ClosestShot));
     m_p_b.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_ledsubsystem, ShotDistance.MidTarmac));
     m_p_y.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_ledsubsystem, ShotDistance.TarmacLine));
-    m_p_x.whenPressed(new CancelShooter(m_shooter));
+    m_p_x.whenPressed(new CancelShooter(m_shooter, m_ledsubsystem));
     m_p_sel.whenPressed(new DriveClimbertoReverseHardLimit(m_climber));
 
     // Partner POV Bindings
-    m_p_down.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.ClosestShot).andThen(new StartShooterWheel(m_shooter)));
-    m_p_right.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.MidTarmac).andThen(new StartShooterWheel(m_shooter)));
-    m_p_up.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.TarmacLine).andThen(new StartShooterWheel(m_shooter)));
-    m_p_left.whenPressed(new CancelShooter(m_shooter));
+    m_p_down.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.ClosestShot).andThen(new StartShooterWheel(m_shooter, m_ledsubsystem)));
+    m_p_right.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.MidTarmac).andThen(new StartShooterWheel(m_shooter, m_ledsubsystem)));
+    m_p_up.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.TarmacLine).andThen(new StartShooterWheel(m_shooter, m_ledsubsystem)));
+    m_p_left.whenPressed(new CancelShooter(m_shooter, m_ledsubsystem));
 
   }
 
@@ -248,11 +248,11 @@ public class RobotContainer {
                                   .withProperties(Map.of("Min", -1, "Max", 1));
 
     // Add vision cues below the camera stream block
-    driveTab.add("HighTarget", false).withSize(1, 1).withPosition(0, 4).withWidget(BuiltInWidgets.kBooleanBox);
-    driveTab.add("BallTarget", false).withSize(1, 1).withPosition(1, 4).withWidget(BuiltInWidgets.kBooleanBox);
-    driveTab.add("Pipeline",0).withSize(1, 1).withPosition(2, 4).withWidget(BuiltInWidgets.kDial)
+    driveTab.add("HighTarget", false).withSize(1, 1).withPosition(0, 2).withWidget(BuiltInWidgets.kBooleanBox);
+    driveTab.add("BallTarget", false).withSize(1, 1).withPosition(1, 2).withWidget(BuiltInWidgets.kBooleanBox);
+    driveTab.add("Pipeline",0).withSize(1, 1).withPosition(2, 2).withWidget(BuiltInWidgets.kDial)
                               .withProperties(Map.of("Min", 0, "Max", 2));
-    driveTab.add("Distance", 0).withSize(1, 1).withPosition(3, 4);
+    driveTab.add("Distance", 0).withSize(1, 1).withPosition(3, 2);
 
     // Add Intake Sensors and Ball Count
     driveTab.add("Ball Count",0).withSize(1, 1).withPosition(6, 0).withWidget(BuiltInWidgets.kDial)
@@ -281,7 +281,7 @@ public class RobotContainer {
     m_auto_chooser.addOption("Right Tarmac, 2 ball", new twoBallRight(m_driveTrain, m_shooter, m_intake, m_indexer, m_ledsubsystem));
     m_auto_chooser.setDefaultOption("Left Tarmac, 2 ball", new twoBallLeft(m_driveTrain, m_shooter, m_intake, m_indexer, m_ledsubsystem));
     m_auto_chooser.addOption("Right Tarmac, 3 ball", new ThreeBall(m_driveTrain, m_shooter, m_intake, m_indexer, m_ledsubsystem));
-    driveTab.add("Autonomous Chooser", m_auto_chooser).withWidget(BuiltInWidgets.kComboBoxChooser).withPosition(4, 4).withSize(2, 1);
+    driveTab.add("Autonomous Chooser", m_auto_chooser).withWidget(BuiltInWidgets.kComboBoxChooser).withPosition(0, 0).withSize(2, 1);
   }
 
   public void buildDriverTestTab(){
@@ -324,10 +324,10 @@ public class RobotContainer {
   public void buildShooterTab(){
     ShuffleboardTab driveTab = Shuffleboard.getTab("Shooter");
     driveTab.add("SetShotDistanceCloseShot", new SetShooterDistance(m_shooter, ShotDistance.ClosestShot)).withPosition(0, 0).withSize(2, 1);
-    driveTab.add("StarShooterWheel", new StartShooterWheel(m_shooter)).withPosition(2, 0).withSize(2, 1);
+    driveTab.add("StarShooterWheel", new StartShooterWheel(m_shooter, m_ledsubsystem)).withPosition(2, 0).withSize(2, 1);
     driveTab.add("WaitUntilCommand", new WaitUntilCommand(m_shooter::isUpToSpeed)).withPosition(4, 0).withSize(2, 1);
     driveTab.add("ShootBallsUntilEmpty", new ShootBallsTilEmptyOrThreeSeconds(m_indexer, m_shooter, m_ledsubsystem)).withPosition(6, 0).withSize(2, 1);
-    driveTab.add("StopShooter", new StopShooterAndIndexerMotors(m_shooter, m_indexer)).withPosition(8, 0).withSize(2, 1);
+    driveTab.add("StopShooter", new StopShooterAndIndexerMotors(m_shooter, m_indexer, m_ledsubsystem)).withPosition(8, 0).withSize(2, 1);
 
     driveTab.addBoolean("Is Up To Speed", m_shooter::isUpToSpeed).withPosition(0, 2).withSize(1, 1);
     driveTab.addNumber("Closed Loop Error", m_shooter::getClosedLoopError).withPosition(1, 2).withSize(1, 1);
