@@ -37,7 +37,7 @@ public class ThreeBall extends SequentialCommandGroup {
     m_LEDsubsystem = ledsubsystem;
 
     addCommands(
-      new ParallelCommandGroup(new ExtendIntakeBangBang(m_intake, Intake.INTAKE_ARM_EXTEND).withTimeout(2)
+      new ParallelCommandGroup(new ExtendIntakeBangBang(m_intake, Intake.INTAKE_ARM_EXTEND, true).withTimeout(2)
                                .andThen(new CollectBalls(m_intake, m_indexer).withTimeout(3)),
                                new WaitCommand(.75).andThen(new DriveMM(m_driveTrain, 45.44))
                                ),
@@ -50,7 +50,7 @@ public class ThreeBall extends SequentialCommandGroup {
       new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_LEDsubsystem, ShotDistance.TarmacLine), //Shoot grabbed ball and preload ball
       new ParallelCommandGroup(new TurnToAngle(m_driveTrain, -85)
                                .andThen(new DriveMM(m_driveTrain, 90)), 
-                               new ExtendIntakeBangBang(m_intake, 1700)
+                               new ExtendIntakeBangBang(m_intake, Intake.INTAKE_ARM_EXTEND, true)
                                .andThen(new CollectBalls(m_intake, m_indexer).withTimeout(3.5))
                                ),
       new ParallelCommandGroup(new ResetArmLimitAndEncoder(m_intake), 

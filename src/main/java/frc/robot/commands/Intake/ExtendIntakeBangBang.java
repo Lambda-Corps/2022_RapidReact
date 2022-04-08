@@ -12,10 +12,20 @@ public class ExtendIntakeBangBang extends CommandBase {
   Intake m_intake;
   boolean m_finished;
   int m_targetPos;
+  boolean m_hold;
   public ExtendIntakeBangBang(Intake intake, int targetPosition) { //drops arm to given position without holding it
     // Use addRequirements() here to declare subsystem dependencies.\       ^ then gravity will do the rest (strap holds position)
     m_intake = intake;
     m_targetPos = targetPosition;
+    m_hold = false;
+    addRequirements(m_intake);
+  }
+
+  public ExtendIntakeBangBang(Intake intake, int targetPosition, boolean hold) { //drops arm to given position without holding it
+    // Use addRequirements() here to declare subsystem dependencies.\       ^ then gravity will do the rest (strap holds position)
+    m_intake = intake;
+    m_targetPos = targetPosition;
+    m_hold = hold;
     addRequirements(m_intake);
   }
 
@@ -35,8 +45,11 @@ public class ExtendIntakeBangBang extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    // m_intake.turnOffArmMotor();
-    m_intake.holdMotorPosition(m_targetPos);
+    if (!m_hold) {
+      m_intake.turnOffArmMotor();
+    } else {
+      m_intake.holdMotorPosition(m_targetPos);
+    }
   }
 
   // Returns true when the command should end.

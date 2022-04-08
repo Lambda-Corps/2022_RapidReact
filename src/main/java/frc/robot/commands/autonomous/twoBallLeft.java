@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.Intake.ArmMM;
 import frc.robot.commands.Intake.CollectBalls;
+import frc.robot.commands.Intake.ExtendIntakeBangBang;
 import frc.robot.commands.Intake.ResetArmLimitAndEncoder;
 import frc.robot.commands.drivetrain.DriveMM;
 import frc.robot.commands.drivetrain.TurnToAngle;
@@ -43,7 +44,7 @@ public class twoBallLeft extends SequentialCommandGroup {
     //STARTING CONDITIONS: 1 ball in robot, front of the robot at edge of tarmac, directly in front of the ball
     //                       on the left side of the tarmac
     addCommands(
-      new ArmMM(m_intake, Intake.INTAKE_ARM_EXTEND),
+      new ExtendIntakeBangBang(m_intake, Intake.INTAKE_ARM_EXTEND, true),
       new ParallelCommandGroup(new CollectBalls(m_intake, m_indexer).withTimeout(5), new WaitCommand(.75).andThen(new DriveMM(m_drive_train, 45.44))),
       new ResetArmLimitAndEncoder(m_intake).andThen(new WaitCommand(.75)), // Wait 3/4 of a second to try and fix if ball squeezes forward
       new ParallelCommandGroup(new TurnToAngle(m_drive_train, 192), new SetShooterDistance(m_shooter, ShotDistance.ClosestShot)), //turn around
