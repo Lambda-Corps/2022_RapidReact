@@ -31,6 +31,7 @@ import frc.robot.commands.Intake.ExtendIntakeBangBang;
 import frc.robot.commands.Intake.ResetArmLimitAndEncoder;
 import frc.robot.commands.Intake.SetExtendLimit;
 import frc.robot.commands.Intake.TurnOffIntakeArm;
+import frc.robot.commands.Intake.setIntakeEncoderToZero;
 import frc.robot.commands.autonomous.ThreeBall;
 import frc.robot.commands.autonomous.oneBall;
 import frc.robot.commands.autonomous.twoBallLeft;
@@ -173,6 +174,7 @@ public class RobotContainer {
     m_d_lt.whenPressed(new CancelIndexer(m_indexer, m_intake));
     m_d_rt.whenHeld(new PrintCommand("Driving Inverted"));
     m_d_lb.whenPressed(new DropIntakeAndCollectBalls(m_intake, m_indexer));
+    m_d_strt.whenPressed(new setIntakeEncoderToZero(m_intake));
     //m_d_rs.whenPressed(new HighBarClimb(m_climber, m_ledsubsystem, m_driver_controller));
     //m_d_ls.whenPressed(new LowBarClimb(m_climber, m_ledsubsystem, m_driver_controller));
 

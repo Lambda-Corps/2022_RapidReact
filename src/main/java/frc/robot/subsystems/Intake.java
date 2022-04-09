@@ -349,6 +349,11 @@ public class Intake extends SubsystemBase {
     m_armMotor.configReverseSoftLimitEnable(true);
   }
 
+  public void resetEncoderAndHold(){
+    m_armMotor.setSelectedSensorPosition(0,0,10);
+    holdMotorPosition(0);
+  }
+
   public void turnOffArmMotor(){
     m_armMotor.set(ControlMode.PercentOutput, 0);
   }
