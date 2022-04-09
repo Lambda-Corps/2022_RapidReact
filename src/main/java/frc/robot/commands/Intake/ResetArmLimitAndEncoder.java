@@ -30,13 +30,15 @@ public class ResetArmLimitAndEncoder extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_isDone = m_intake.driveMotorToLimitSwitch();
+    m_isDone = m_intake.driveMotorToZero();
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_intake.holdMotorPosition(0);
+    // m_intake.holdMotorPosition(0);
+    m_intake.turnOffArmMotor();
+    m_intake.resetEncoderAndEnableLimit();
   }
 
   // Returns true when the command should end.

@@ -6,21 +6,25 @@ package frc.robot.commands.Indexer;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.Indexer;
+import frc.robot.subsystems.Intake;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class CancelIndexer extends InstantCommand {
   Indexer m_indexer;
-  public CancelIndexer(Indexer indexer) {
+  Intake m_intake;
+  public CancelIndexer(Indexer indexer, Intake intake) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_indexer = indexer;
-    addRequirements(m_indexer);
+    m_intake = intake;
+    addRequirements(m_indexer, m_intake);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     m_indexer.stopMotors();
+    m_intake.stopIntakeMotor();
   }
 }

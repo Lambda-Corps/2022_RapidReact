@@ -169,11 +169,10 @@ public class RobotContainer {
     m_d_b.whileHeld(new LEDon(m_vision).andThen(new DriveWithVision(m_driveTrain, m_vision, TARGET_DISTANCE_FAR)));
     m_d_a.whenReleased(new LEDoff(m_vision));
     m_d_b.whenReleased(new LEDoff(m_vision));
-    m_d_rt.whileHeld(new AimAtCargo(m_vision, m_driveTrain, m_driver_controller));
-    m_d_lt.whenPressed(new CancelIndexer(m_indexer));
-    m_d_rb.whenHeld(new PrintCommand("Driving Inverted"));
-    m_d_lb.whenPressed(new DropIntakeAndCollectBalls(m_intake, m_indexer));
     m_d_lb.whenReleased(new ResetArmLimitAndEncoder(m_intake));
+    m_d_lt.whenPressed(new CancelIndexer(m_indexer, m_intake));
+    m_d_rt.whenHeld(new PrintCommand("Driving Inverted"));
+    m_d_lb.whenPressed(new DropIntakeAndCollectBalls(m_intake, m_indexer));
     //m_d_rs.whenPressed(new HighBarClimb(m_climber, m_ledsubsystem, m_driver_controller));
     //m_d_ls.whenPressed(new LowBarClimb(m_climber, m_ledsubsystem, m_driver_controller));
 

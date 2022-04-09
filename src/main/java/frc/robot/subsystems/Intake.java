@@ -37,7 +37,7 @@ public class Intake extends SubsystemBase {
 
   //positions
   public static final int INTAKE_ARM_RETRACT = 0; //intake fully vertical/up
-  public static int INTAKE_ARM_EXTEND = 1620; //intake down to grab ball (currently has temporary value)
+  public static int INTAKE_ARM_EXTEND = 1630; //intake down to grab ball (currently has temporary value)
   // public static final int INTAKE_ARM_EXTEND = 1475; //intake down to grab ball (currently has temporary value)
 
   final double DOWN_FEEDFORWARD = 0.3;
@@ -115,8 +115,8 @@ public class Intake extends SubsystemBase {
     m_armMotor.configMotionAcceleration(300, 0);
 
     //current limits?
-    //m_armMotor.configPeakCurrentLimit(0);
-    //m_armMotor.configContinuousCurrentLimit(amps);
+    m_armMotor.configPeakCurrentLimit(20);
+    m_armMotor.configContinuousCurrentLimit(10);
     
     //limit switches
    //m_armMotor.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled, 0);
@@ -157,7 +157,7 @@ public class Intake extends SubsystemBase {
     // armMMTab.addBoolean("Soft Forward", this::getArmSoftForwardLimit).withPosition(4, 1);
     // armMMTab.addBoolean("Soft Reverse", this::getArmSoftReverseLimit).withPosition(5,1);
     m_armMotor.setSelectedSensorPosition(0);
-    //holdMotorPosition(0);
+    holdMotorPosition(0);
 
     NetworkTable intakeTab = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Intake");
     m_rev_limit_entry = intakeTab.getEntry("Intake Rev Limit");
@@ -320,28 +320,31 @@ public class Intake extends SubsystemBase {
     m_armMotor.configReverseSoftLimitEnable(false);
   }
 
-  public boolean driveMotorToLimitSwitch(){
+  public boolean driveMotorToZero(){
     double motorspeed = 0;
 
     // True represents the limit being hit, so
     // !reverse_limit.get() means false, such that the limit
     // has not been hit yet.
-    boolean reverse_limit_hit = isReverseLimitSwitchHit();
-    if(!reverse_limit_hit){
+
+    // turn off motors at encoder 600 or timeout at 0.5 seconds
+    boolean encoderReached = true;
+    if(m_armMotor.getSelectedSensorPosition() > 500) {
       
       // Limit not hit, adjust the speed to go backward at half speed
       motorspeed = -.6;
+      encoderReached = false;
     }
 
     m_armMotor.set(ControlMode.PercentOutput, motorspeed);
 
     // Return to the caller whether or not they should end the command,
     // not whether or not they should keep driving
-    return reverse_limit_hit;
+    return encoderReached;
   }
 
   public void resetEncoderAndEnableLimit(){
-    m_armMotor.setSelectedSensorPosition(0);
+    //m_armMotor.setSelectedSensorPosition(0);
     m_armMotor.configReverseSoftLimitThreshold(0);
     m_armMotor.configReverseSoftLimitEnable(true);
   }

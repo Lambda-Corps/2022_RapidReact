@@ -29,6 +29,7 @@ public class StopShooterAndIndexerMotors extends InstantCommand {
   public void initialize() {
     m_shooter.stopMotor();
     m_indexer.stopMotors();
+    m_LEDsubsystem.blackout();
     m_LEDsubsystem.shooterActive(0);
   }
 }

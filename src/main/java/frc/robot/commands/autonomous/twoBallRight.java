@@ -45,12 +45,12 @@ public class twoBallRight extends SequentialCommandGroup {
     //                       on the right side of the tarmac
     addCommands(
       new ExtendIntakeBangBang(m_intake, Intake.INTAKE_ARM_EXTEND, true),
-      new ParallelCommandGroup(new CollectBalls(m_intake, m_indexer).withTimeout(3), new DriveMM(m_drive_train, 62)),
+      new ParallelCommandGroup(new CollectBalls(m_intake, m_indexer).withTimeout(4), new DriveMM(m_drive_train, 67)),
       new ResetArmLimitAndEncoder(m_intake),
       new ClearShooter(m_indexer),
-      new ParallelCommandGroup(new TurnToAngle(m_drive_train, 180), new SetShooterDistance(m_shooter, ShotDistance.ClosestShot)), //turn around
-      new ParallelCommandGroup(new DriveMM(m_drive_train, 40.44), new StartShooterWheel(shooter, m_LEDsubsystem)),
-      new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_LEDsubsystem, ShotDistance.MidTarmac)
+      new ParallelCommandGroup(new TurnToAngle(m_drive_train, 180), new SetShooterDistance(m_shooter, ShotDistance.TarmacLine)), //turn around
+      // new ParallelCommandGroup(new DriveMM(m_drive_train, 40.44), new StartShooterWheel(shooter, m_LEDsubsystem)),
+      new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_LEDsubsystem, ShotDistance.TarmacLine)
     );
   }
 }

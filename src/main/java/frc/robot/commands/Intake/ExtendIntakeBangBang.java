@@ -4,6 +4,7 @@
 
 package frc.robot.commands.Intake;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Intake;
 
@@ -13,11 +14,14 @@ public class ExtendIntakeBangBang extends CommandBase {
   boolean m_finished;
   int m_targetPos;
   boolean m_hold;
+  Timer m_timer;
   public ExtendIntakeBangBang(Intake intake, int targetPosition) { //drops arm to given position without holding it
     // Use addRequirements() here to declare subsystem dependencies.\       ^ then gravity will do the rest (strap holds position)
     m_intake = intake;
     m_targetPos = targetPosition;
-    m_hold = false;
+    m_hold = true;
+    m_timer = new Timer();
+    m_timer.start();
     addRequirements(m_intake);
   }
 
@@ -26,6 +30,9 @@ public class ExtendIntakeBangBang extends CommandBase {
     m_intake = intake;
     m_targetPos = targetPosition;
     m_hold = hold;
+    m_timer = new Timer();
+    m_timer.reset();
+    m_timer.start();
     addRequirements(m_intake);
   }
 
@@ -34,6 +41,7 @@ public class ExtendIntakeBangBang extends CommandBase {
   public void initialize() {
     m_finished = false;
     m_intake.turnOnArmMotor(0.45);
+    m_timer.reset();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -55,6 +63,12 @@ public class ExtendIntakeBangBang extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    // return m_finished;
+  //   if (m_hold) {
+  //     return m_finished;
+  //   } else {
+  //     return m_timer.hasElapsed(0.75);
+  //   }
     return m_finished;
   }
 }
