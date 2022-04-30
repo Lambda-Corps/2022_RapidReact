@@ -37,7 +37,7 @@ public class Intake extends SubsystemBase {
 
   //positions
   public static final int INTAKE_ARM_RETRACT = 0; //intake fully vertical/up
-  public static int INTAKE_ARM_EXTEND = 1485; //intake down to grab ball (currently has temporary value)
+  public static int INTAKE_ARM_EXTEND = 1630; //intake down to grab ball (currently has temporary value)
   // public static final int INTAKE_ARM_EXTEND = 1475; //intake down to grab ball (currently has temporary value)
 
   final double DOWN_FEEDFORWARD = 0.3;
@@ -82,7 +82,7 @@ public class Intake extends SubsystemBase {
 
   private final NetworkTableEntry m_rev_limit_entry, m_fwd_limit_entry;
 
-  private boolean m_arm_is_moving;
+  // private boolean m_arm_is_moving;
 
   public Intake() {
     m_faults = new Faults();
@@ -94,8 +94,10 @@ public class Intake extends SubsystemBase {
     m_intakeMotor.configFactoryDefault();
     m_intakeMotor.setInverted(false);
     m_armMotor.configFactoryDefault();
-    m_armMotor.setInverted(true);
-    m_armMotor.setSensorPhase(false);
+    // m_armMotor.setInverted(true);
+    m_armMotor.setInverted(false);
+    // m_armMotor.setSensorPhase(false);
+    m_armMotor.setSensorPhase(true);
 
     // TEsting limits
     //m_armMotor.configPeakOutputForward(.2);
@@ -113,8 +115,8 @@ public class Intake extends SubsystemBase {
     m_armMotor.configMotionAcceleration(300, 0);
 
     //current limits?
-    //m_armMotor.configPeakCurrentLimit(0);
-    //m_armMotor.configContinuousCurrentLimit(amps);
+    m_armMotor.configPeakCurrentLimit(20);
+    m_armMotor.configContinuousCurrentLimit(10);
     
     //limit switches
    //m_armMotor.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector, LimitSwitchNormal.Disabled, 0);
@@ -212,11 +214,11 @@ public class Intake extends SubsystemBase {
   }
 
   public boolean moveMM(int targetPosition){
-    int kMeasuredPosHorizontal = 570; //Position measured when arm is horizontal
-    double kTicksPerDegree = 4096 / 360; //Sensor is 1:1 with arm rotation
+    // int kMeasuredPosHorizontal = 570; //Position measured when arm is horizontal
+    // double kTicksPerDegree = 4096 / 360; //Sensor is 1:1 with arm rotation
     double currentPos = m_armMotor.getSelectedSensorPosition();
-    double degrees = (currentPos - kMeasuredPosHorizontal) / kTicksPerDegree;
-    double radians = java.lang.Math.toRadians(degrees);
+    // double degrees = (currentPos - kMeasuredPosHorizontal) / kTicksPerDegree;
+    // double radians = java.lang.Math.toRadians(degrees);
     //double cosineScalar = java.lang.Math.cos(radians);
     m_armMotor.set(ControlMode.MotionMagic, targetPosition, DemandType.ArbitraryFeedForward, MM_FEEDFORWARD); // * -cosineScalar);
     m_is_on_target = Math.abs(currentPos - targetPosition) < MM_DONE_TOLERANCE;
@@ -318,33 +320,45 @@ public class Intake extends SubsystemBase {
     m_armMotor.configReverseSoftLimitEnable(false);
   }
 
-  public boolean driveMotorToLimitSwitch(){
+  public boolean driveMotorToZero(){
     double motorspeed = 0;
 
     // True represents the limit being hit, so
     // !reverse_limit.get() means false, such that the limit
     // has not been hit yet.
-    boolean reverse_limit_hit = isReverseLimitSwitchHit();
-    if(!reverse_limit_hit){
+
+    // turn off motors at encoder 600 or timeout at 0.5 seconds
+    boolean encoderReached = true;
+    if(m_armMotor.getSelectedSensorPosition() > 500) {
       
       // Limit not hit, adjust the speed to go backward at half speed
       motorspeed = -.6;
+      encoderReached = false;
     }
 
     m_armMotor.set(ControlMode.PercentOutput, motorspeed);
 
     // Return to the caller whether or not they should end the command,
     // not whether or not they should keep driving
-    return reverse_limit_hit;
+    return encoderReached;
   }
 
   public void resetEncoderAndEnableLimit(){
-    m_armMotor.setSelectedSensorPosition(0);
+    //m_armMotor.setSelectedSensorPosition(0);
     m_armMotor.configReverseSoftLimitThreshold(0);
     m_armMotor.configReverseSoftLimitEnable(true);
   }
 
+  public void resetEncoderAndHold(){
+    m_armMotor.setSelectedSensorPosition(0,0,10);
+    holdMotorPosition(0);
+  }
+
   public void turnOffArmMotor(){
     m_armMotor.set(ControlMode.PercentOutput, 0);
+  }
+
+  public void turnOnArmMotor(double speed){
+    m_armMotor.set(ControlMode.PercentOutput, speed);
   }
 }

@@ -61,17 +61,17 @@ public class pathFollowing extends SequentialCommandGroup {
 
     Trajectory trajectory = new Trajectory();
     //Trajectory trajectory2 = new Trajectory();
-    //String path = "pathplanner/generatedJSON/testpath.json";
+    String path = "pathplanner/generatedJSON/Example.wpilib.json";
     // String path = "paths/11First.wpilib.json";
     // //String path2 = "paths/11Second.wpilib.json";
-    // try{
-    //   Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(path);
-    //   trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-    //   //Path trajectoryPath2 = Filesystem.getDeployDirectory().toPath().resolve(path2);
+    try{
+       Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(path);
+       trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+       // Path trajectoryPath2 = Filesystem.getDeployDirectory().toPath().resolve(path2);
     //   //trajectory2 = TrajectoryUtil.fromPathweaverJson(trajectoryPath2);
-    // }
+    }
     // // A default trajectory to follow.  All units in meters.
-    // catch(IOException ex){
+    catch(IOException ex){
       //DriverStation.reportError("Unable to open trajectory: " + path, ex.getStackTrace());
       trajectory =
         TrajectoryGenerator.generateTrajectory(
@@ -84,7 +84,7 @@ public class pathFollowing extends SequentialCommandGroup {
             new Pose2d(3, 3, new Rotation2d(0)),
             // Pass config
             config);
-    //}
+    }
 
     addCommands(
       new RamseteCommand(

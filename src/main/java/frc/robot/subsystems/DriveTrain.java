@@ -61,7 +61,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 
 public class DriveTrain extends SubsystemBase {
-	private final double MAX_TELEOP_DRIVE_SPEED = .70;
+	private final double MAX_TELEOP_DRIVE_SPEED = .85;
 	// private final double arbFF = 0.2;
 	// TalonFX's for the drivetrain
 	// Right side is inverted here to drive forward
@@ -100,7 +100,7 @@ public class DriveTrain extends SubsystemBase {
 
 	// Motion Magic Setpoints for each side of the motor
 	private double m_left_setpoint, m_right_setpoint;
-	private boolean m_isCCWTurn;
+	// private boolean m_isCCWTurn;
 
 	private final DifferentialDrive m_safety_drive;
 
@@ -440,9 +440,9 @@ public class DriveTrain extends SubsystemBase {
 		m_right_setpoint = m_right_leader.getSelectedSensorPosition() + lengthInTicks;
 
 		m_left_leader.configMotionCruiseVelocity(16636,kTimeoutMs);
-		m_left_leader.configMotionAcceleration(8318, kTimeoutMs); //cruise velocity / 2, so will take 2 seconds
+		m_left_leader.configMotionAcceleration(8318/1.25, kTimeoutMs); //cruise velocity / 2, so will take 2 seconds
 		m_right_leader.configMotionCruiseVelocity(16636,kTimeoutMs);
-		m_right_leader.configMotionAcceleration(8318, kTimeoutMs);
+		m_right_leader.configMotionAcceleration(8318/1.25, kTimeoutMs);
 		
 		//set up talon to use DriveMM slots
 		m_left_leader.selectProfileSlot(kSlot_DriveMM, PID_PRIMARY);
@@ -797,5 +797,10 @@ public class DriveTrain extends SubsystemBase {
 	public void resetOdometry(Pose2d pose) {
 		resetEncoders();
 		m_odometry.resetPosition(pose, m_gyro.getRotation2d());
+	}
+	
+	public void setNeutralMode(NeutralMode mode) {
+		m_left_leader.setNeutralMode(mode);
+		m_left_leader.setNeutralMode(mode);
 	}
 }

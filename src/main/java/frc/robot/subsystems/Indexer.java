@@ -23,8 +23,8 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Indexer extends SubsystemBase {
-  private final double INTAKE_SHOOT_SPEED = .27; // measured testing
-  private final double INTAKE_INTAKE_SPEED = .4;
+  private final double INTAKE_SHOOT_SPEED = .3; // measured testing
+  private final double INTAKE_INTAKE_SPEED = .55;
 
   public enum StorageState {
     EMPTY, 
@@ -35,6 +35,7 @@ public class Indexer extends SubsystemBase {
     TOPTWO,
     TOPANDBOTTOM,
     FULL,
+    TOO_FAR,
     PURGE // This is if the state machine cannot decide what state the indexer is in. If applied it will eject all cargo.
   }
 
@@ -108,22 +109,19 @@ public class Indexer extends SubsystemBase {
     m_midBeamState = m_midbeam.get();
     m_topBeamState = m_topBeam.get();
   
-    if (!m_bottomBeamState && !m_topBeamState && !m_midBeamState) {
-      m_storageStatus = StorageState.EMPTY;
-    }else if (!m_bottomBeamState && m_topBeamState && m_midBeamState) {
+    if(!m_topBeamState){
+      m_storageStatus = StorageState.TOO_FAR;
+    } else if( !m_midBeamState && !m_bottomBeamState ) {
+      m_storageStatus = StorageState.FULL;
+    } else if( !m_bottomBeamState && m_midBeamState ){
       m_storageStatus = StorageState.BOTTOMONLY;
-    }else if (!m_bottomBeamState && m_topBeamState && !m_midBeamState) { 
-      m_storageStatus = StorageState.BOTTOMTWO;
-    }else if (!m_bottomBeamState && !m_topBeamState && m_midBeamState) {
-      m_storageStatus = StorageState.TOPANDBOTTOM;
-    }else if (m_bottomBeamState && !m_topBeamState && !m_midBeamState) {
-      m_storageStatus = StorageState.TOPTWO; 
-    }else if (!m_bottomBeamState && m_topBeamState && m_midBeamState) {
-      m_storageStatus = StorageState.BOTTOMONLY;
-    }else if (m_bottomBeamState && m_topBeamState && !m_midBeamState) {
-      m_storageStatus = StorageState.MIDDLEONLY;
-    }else if (m_bottomBeamState && !m_topBeamState && m_midBeamState) {
+    } else if( !m_midBeamState && m_bottomBeamState ){
       m_storageStatus = StorageState.TOPONLY;
+    } else if (m_midBeamState && m_bottomBeamState){
+      m_storageStatus = StorageState.EMPTY;
+    } else {
+      // who knows what happened, try and purge
+      m_storageStatus = StorageState.PURGE;
     }
   }
 
@@ -133,23 +131,25 @@ public class Indexer extends SubsystemBase {
     intake_speed = mid_speed = shooter_speed = 0;
 
     switch(m_storageStatus) {
-      case BOTTOMONLY:
-      case BOTTOMTWO:
-        intake_speed = INDEXER_SPEED;
-        mid_speed = INDEXER_SPEED;
-        break;
-      case MIDDLEONLY:
-        mid_speed = INDEXER_SPEED;
-        break;
-      case EMPTY:
-      case TOPTWO:
-      case TOPONLY:
-      case TOPANDBOTTOM:
       case FULL:
+      case EMPTY:
+      case TOPONLY:
+        break;
+      case BOTTOMONLY:
+        intake_speed = 2*INDEXER_SPEED;
+        mid_speed = 2*INDEXER_SPEED;
+        break;
+      case TOO_FAR:
+        mid_speed = -3*INTAKE_SHOOT_SPEED;
+        shooter_speed = -3*INTAKE_SHOOT_SPEED;
+        intake_speed = -INDEXER_SPEED;
+        break;
+      case PURGE:
+        intake_speed = -INTAKE_SHOOT_SPEED;
+        mid_speed = -INTAKE_SHOOT_SPEED;
+        shooter_speed = -INTAKE_SHOOT_SPEED;
+        break;
       default:
-      intake_speed = 0;
-      mid_speed = 0;
-      shooter_speed = 0;
         break;
     }
 
@@ -207,5 +207,11 @@ public class Indexer extends SubsystemBase {
 
   public boolean isEmpty(){
     return m_ball_count == 0;
+  }
+
+  public void clearShooter() {
+    m_intakeIndex.set(ControlMode.PercentOutput, 0);
+    m_midIndex.set(ControlMode.PercentOutput, 0);
+    m_shooterIndex.set(ControlMode.PercentOutput, -INTAKE_SHOOT_SPEED);  
   }
 }

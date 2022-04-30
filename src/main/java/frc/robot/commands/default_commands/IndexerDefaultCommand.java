@@ -24,8 +24,8 @@ public class IndexerDefaultCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //m_indexer.checkIndexState();
-    //m_indexer.resolveIndexer();
+    m_indexer.checkIndexState();
+    m_indexer.resolveIndexer();
   }
 
   // Called once the command ends or is interrupted.

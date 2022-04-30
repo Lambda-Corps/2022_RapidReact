@@ -21,7 +21,7 @@ public class Vision extends SubsystemBase {
   int LIMELIGHTPIPELINE = 0;
   int HD3000PIPELINE = 0;
 
-  PhotonCamera m_HD3000 = new PhotonCamera("lifecam");
+  // PhotonCamera m_HD3000 = new PhotonCamera("lifecam");
   PhotonCamera m_limelight = new PhotonCamera("eagletron");
  
   ShuffleboardTab m_visionTab;
@@ -32,7 +32,7 @@ public class Vision extends SubsystemBase {
 
   public Vision() {
       m_limelight.setPipelineIndex(LIMELIGHTPIPELINE);
-      m_HD3000.setPipelineIndex(HD3000PIPELINE);
+      // m_HD3000.setPipelineIndex(HD3000PIPELINE);
 
       // double ballcamDiagFOV = 75.0; // degrees
       // double shootercamDiagFOV = 75.0; // degrees
@@ -71,10 +71,11 @@ public class Vision extends SubsystemBase {
   }
 
   private boolean getCargoTargetStatus() {
-    var result = m_HD3000.getLatestResult();
-     boolean hasTargets = result.hasTargets();
-     cargoTarget.setBoolean(hasTargets);
-    return hasTargets;
+    // var result = m_HD3000.getLatestResult();
+    //  boolean hasTargets = result.hasTargets();
+    //  cargoTarget.setBoolean(hasTargets);
+    // return hasTargets;
+    return false;
   }
 
   public double[] getHubTargetRange() {
@@ -107,10 +108,10 @@ public class Vision extends SubsystemBase {
     int pipelineIndex;
     if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
       pipelineIndex = 1;
-      m_HD3000.setPipelineIndex(pipelineIndex);
+      // m_HD3000.setPipelineIndex(pipelineIndex);
     }else if (DriverStation.getAlliance() == DriverStation.Alliance.Red) {
       pipelineIndex = 0;
-      m_HD3000.setPipelineIndex(pipelineIndex);
+      // m_HD3000.setPipelineIndex(pipelineIndex);
     }
   }
 

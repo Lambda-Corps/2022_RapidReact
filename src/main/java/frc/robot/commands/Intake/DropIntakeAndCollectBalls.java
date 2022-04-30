@@ -16,7 +16,8 @@ public class DropIntakeAndCollectBalls extends SequentialCommandGroup {
   public DropIntakeAndCollectBalls(Intake intake, Indexer indexer) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands(new ArmMM(intake, Intake.INTAKE_ARM_EXTEND),
+    // addCommands(new ArmMM(intake, Intake.INTAKE_ARM_EXTEND),
+    addCommands(new ExtendIntakeBangBang(intake, Intake.INTAKE_ARM_EXTEND),
                 new CollectBalls(intake, indexer)
     );
   }

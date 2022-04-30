@@ -9,6 +9,8 @@ import static frc.robot.Constants.TARGET_DISTANCE_FAR;
 
 import java.util.Map;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -25,9 +27,11 @@ import frc.robot.commands.Indexer.EjectBalls;
 import frc.robot.commands.Indexer.ShootBallsTilEmptyOrThreeSeconds;
 import frc.robot.commands.Intake.ArmMM;
 import frc.robot.commands.Intake.DropIntakeAndCollectBalls;
+import frc.robot.commands.Intake.ExtendIntakeBangBang;
 import frc.robot.commands.Intake.ResetArmLimitAndEncoder;
 import frc.robot.commands.Intake.SetExtendLimit;
 import frc.robot.commands.Intake.TurnOffIntakeArm;
+import frc.robot.commands.Intake.setIntakeEncoderToZero;
 import frc.robot.commands.autonomous.ThreeBall;
 import frc.robot.commands.autonomous.oneBall;
 import frc.robot.commands.autonomous.twoBallLeft;
@@ -167,11 +171,11 @@ public class RobotContainer {
     m_d_b.whileHeld(new LEDon(m_vision).andThen(new DriveWithVision(m_driveTrain, m_vision, TARGET_DISTANCE_FAR)));
     m_d_a.whenReleased(new LEDoff(m_vision));
     m_d_b.whenReleased(new LEDoff(m_vision));
-    m_d_rt.whileHeld(new AimAtCargo(m_vision, m_driveTrain, m_driver_controller));
-    m_d_lt.whenPressed(new CancelIndexer(m_indexer));
-    m_d_rb.whenHeld(new PrintCommand("Driving Inverted"));
-    m_d_lb.whenPressed(new DropIntakeAndCollectBalls(m_intake, m_indexer));
     m_d_lb.whenReleased(new ResetArmLimitAndEncoder(m_intake));
+    m_d_lt.whenPressed(new CancelIndexer(m_indexer, m_intake));
+    m_d_rt.whenHeld(new PrintCommand("Driving Inverted"));
+    m_d_lb.whenPressed(new DropIntakeAndCollectBalls(m_intake, m_indexer));
+    m_d_strt.whenPressed(new setIntakeEncoderToZero(m_intake));
     //m_d_rs.whenPressed(new HighBarClimb(m_climber, m_ledsubsystem, m_driver_controller));
     //m_d_ls.whenPressed(new LowBarClimb(m_climber, m_ledsubsystem, m_driver_controller));
 
@@ -184,17 +188,17 @@ public class RobotContainer {
     // Partner Bindings
     m_p_rb.whileHeld(new EjectBalls(m_indexer, m_shooter));
     m_p_start.whenPressed(new TurnOffIntakeArm(m_intake));
-    m_p_a.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.ClosestShot));
-    m_p_b.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.MidTarmac));
-    m_p_y.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, ShotDistance.TarmacLine));
-    m_p_x.whenPressed(new CancelShooter(m_shooter));
+    m_p_a.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_ledsubsystem, ShotDistance.ClosestShot));
+    m_p_b.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_ledsubsystem, ShotDistance.MidTarmac));
+    m_p_y.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_ledsubsystem, ShotDistance.TarmacLine));
+    m_p_x.whenPressed(new CancelShooter(m_shooter, m_ledsubsystem));
     m_p_sel.whenPressed(new DriveClimbertoReverseHardLimit(m_climber));
 
     // Partner POV Bindings
-    m_p_down.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.ClosestShot).andThen(new StartShooterWheel(m_shooter)));
-    m_p_right.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.MidTarmac).andThen(new StartShooterWheel(m_shooter)));
-    m_p_up.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.TarmacLine).andThen(new StartShooterWheel(m_shooter)));
-    m_p_left.whenPressed(new CancelShooter(m_shooter));
+    m_p_down.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.ClosestShot).andThen(new StartShooterWheel(m_shooter, m_ledsubsystem)));
+    m_p_right.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.MidTarmac).andThen(new StartShooterWheel(m_shooter, m_ledsubsystem)));
+    m_p_up.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.TarmacLine).andThen(new StartShooterWheel(m_shooter, m_ledsubsystem)));
+    m_p_left.whenPressed(new CancelShooter(m_shooter, m_ledsubsystem));
 
   }
 
@@ -246,11 +250,11 @@ public class RobotContainer {
                                   .withProperties(Map.of("Min", -1, "Max", 1));
 
     // Add vision cues below the camera stream block
-    driveTab.add("HighTarget", false).withSize(1, 1).withPosition(0, 4).withWidget(BuiltInWidgets.kBooleanBox);
-    driveTab.add("BallTarget", false).withSize(1, 1).withPosition(1, 4).withWidget(BuiltInWidgets.kBooleanBox);
-    driveTab.add("Pipeline",0).withSize(1, 1).withPosition(2, 4).withWidget(BuiltInWidgets.kDial)
+    driveTab.add("HighTarget", false).withSize(1, 1).withPosition(0, 2).withWidget(BuiltInWidgets.kBooleanBox);
+    driveTab.add("BallTarget", false).withSize(1, 1).withPosition(1, 2).withWidget(BuiltInWidgets.kBooleanBox);
+    driveTab.add("Pipeline",0).withSize(1, 1).withPosition(2, 2).withWidget(BuiltInWidgets.kDial)
                               .withProperties(Map.of("Min", 0, "Max", 2));
-    driveTab.add("Distance", 0).withSize(1, 1).withPosition(3, 4);
+    driveTab.add("Distance", 0).withSize(1, 1).withPosition(3, 2);
 
     // Add Intake Sensors and Ball Count
     driveTab.add("Ball Count",0).withSize(1, 1).withPosition(6, 0).withWidget(BuiltInWidgets.kDial)
@@ -274,14 +278,13 @@ public class RobotContainer {
 
     // //auto chooser
     m_auto_chooser = new SendableChooser<Command>();
-    m_auto_chooser.addOption("1 ball", new oneBall(m_driveTrain, m_shooter, m_intake, m_indexer));
+    m_auto_chooser.addOption("1 ball", new oneBall(m_driveTrain, m_shooter, m_intake, m_indexer, m_ledsubsystem));
     // m_auto_chooser.addOption("Left Tarmac, 2 ball", new twoBallLeft(m_driveTrain, m_shooter, m_intake, m_indexer));
-    m_auto_chooser.addOption("Right Tarmac, 2 ball", new twoBallRight(m_driveTrain, m_shooter, m_intake, m_indexer));
-    m_auto_chooser.setDefaultOption("Left Tarmac, 2 ball", new twoBallLeft(m_driveTrain, m_shooter, m_intake, m_indexer));
+    m_auto_chooser.addOption("Right Tarmac, 2 ball", new twoBallRight(m_driveTrain, m_shooter, m_intake, m_indexer, m_ledsubsystem));
+    m_auto_chooser.setDefaultOption("Left Tarmac, 2 ball", new twoBallLeft(m_driveTrain, m_shooter, m_intake, m_indexer, m_ledsubsystem));
+    m_auto_chooser.addOption("Right Tarmac, 3 ball", new ThreeBall(m_driveTrain, m_shooter, m_intake, m_indexer, m_ledsubsystem));
     m_auto_chooser.addOption("Test PathWeaver", new pathFollowing(m_driveTrain));
-    //m_auto_chooser.addOption("Bottom Left Tarmac, 4 ball", new fourBall(m_driveTrain, m_shooter, m_intake, m_indexer));
-    m_auto_chooser.addOption("Right Tarmac, 3 ball", new ThreeBall(m_driveTrain, m_shooter, m_intake, m_indexer));
-    driveTab.add("Autonomous Chooser", m_auto_chooser).withWidget(BuiltInWidgets.kComboBoxChooser).withPosition(4, 4).withSize(2, 1);
+    driveTab.add("Autonomous Chooser", m_auto_chooser).withWidget(BuiltInWidgets.kComboBoxChooser).withPosition(0, 0).withSize(2, 1);
   }
 
   public void buildDriverTestTab(){
@@ -324,17 +327,17 @@ public class RobotContainer {
   public void buildShooterTab(){
     ShuffleboardTab driveTab = Shuffleboard.getTab("Shooter");
     driveTab.add("SetShotDistanceCloseShot", new SetShooterDistance(m_shooter, ShotDistance.ClosestShot)).withPosition(0, 0).withSize(2, 1);
-    driveTab.add("StarShooterWheel", new StartShooterWheel(m_shooter)).withPosition(2, 0).withSize(2, 1);
+    driveTab.add("StarShooterWheel", new StartShooterWheel(m_shooter, m_ledsubsystem)).withPosition(2, 0).withSize(2, 1);
     driveTab.add("WaitUntilCommand", new WaitUntilCommand(m_shooter::isUpToSpeed)).withPosition(4, 0).withSize(2, 1);
-    driveTab.add("ShootBallsUntilEmpty", new ShootBallsTilEmptyOrThreeSeconds(m_indexer, m_shooter)).withPosition(6, 0).withSize(2, 1);
-    driveTab.add("StopShooter", new StopShooterAndIndexerMotors(m_shooter, m_indexer)).withPosition(8, 0).withSize(2, 1);
+    driveTab.add("ShootBallsUntilEmpty", new ShootBallsTilEmptyOrThreeSeconds(m_indexer, m_shooter, m_ledsubsystem)).withPosition(6, 0).withSize(2, 1);
+    driveTab.add("StopShooter", new StopShooterAndIndexerMotors(m_shooter, m_indexer, m_ledsubsystem)).withPosition(8, 0).withSize(2, 1);
 
     driveTab.addBoolean("Is Up To Speed", m_shooter::isUpToSpeed).withPosition(0, 2).withSize(1, 1);
     driveTab.addNumber("Closed Loop Error", m_shooter::getClosedLoopError).withPosition(1, 2).withSize(1, 1);
     driveTab.add("At Speed", false).withPosition(2, 2).withSize(1, 1).withWidget(BuiltInWidgets.kBooleanBox);
     driveTab.addNumber("Shooter Loop Count", m_shooter::getLoopCount).withPosition(3, 2).withSize(1, 1);
   }
-
+  @SuppressWarnings("unused")
   private void buildIntakeTestTab(){
     ShuffleboardTab intakeTab = Shuffleboard.getTab("Intake");
     intakeTab.add("ResetDriveSpeed", -.5)                  .withPosition(0, 0).withSize(1, 1);
@@ -351,8 +354,10 @@ public class RobotContainer {
     intakeTab.add("ResetArmLimitAndEncoder", new ResetArmLimitAndEncoder(m_intake)).withPosition(0, 3).withSize(2, 1);
     intakeTab.add("TurnOffIntakeArm", new TurnOffIntakeArm(m_intake))              .withPosition(2, 3).withSize(2, 1);
 
+    intakeTab.add("Move Arm no MM (900)", new ExtendIntakeBangBang(m_intake, 1700)).withPosition(5, 0);
   }
 
+  @SuppressWarnings("unused")
   private void buildClimberTestTab(){
     ShuffleboardTab climberTab = Shuffleboard.getTab("Climber");
     // Testing Information
@@ -376,6 +381,7 @@ public class RobotContainer {
     climberTab.add("Reset to LowerLimit", new DriveClimbertoReverseHardLimit(m_climber)).withPosition(4, 3).withSize(2, 1);
   }
 
+  @SuppressWarnings("unused")
   private void buildVisionTab() {
     ShuffleboardTab visionTab = Shuffleboard.getTab("Vision");
 
@@ -401,5 +407,13 @@ public class RobotContainer {
     visionTab.add("Turn kI", 0);
     visionTab.add("Turn kF", 0);
     visionTab.add("Cargo kP,", 0.011);
+  }
+
+  public void setBrakeModeOff() {
+    m_driveTrain.setNeutralMode(NeutralMode.Coast);
+  }
+
+  public void setBrakeModeOn() {
+    m_driveTrain.setNeutralMode(NeutralMode.Brake);
   }
 }
