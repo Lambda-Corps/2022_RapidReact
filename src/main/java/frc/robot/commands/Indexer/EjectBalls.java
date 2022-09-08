@@ -7,14 +7,17 @@ package frc.robot.commands.Indexer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Indexer;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Intake;
 
 public class EjectBalls extends CommandBase {
   Indexer m_Indexer;
   Shooter m_shooter;
+  Intake m_intake;
   /** Creates a new EjectBalls. */
-  public EjectBalls(Indexer indexer, Shooter shooter) {
+  public EjectBalls(Indexer indexer, Shooter shooter, Intake intake) {
     m_Indexer = indexer;
     m_shooter = shooter;
+    m_intake = intake;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_Indexer, m_shooter);
   }
@@ -29,6 +32,7 @@ public class EjectBalls extends CommandBase {
     
     m_Indexer.ejectBallsBackward();
     m_shooter.ejectBallsBackward();
+    m_intake.ejectBalls();
   }
 
   // Called once the command ends or is interrupted.
@@ -36,6 +40,7 @@ public class EjectBalls extends CommandBase {
   public void end(boolean interrupted) {
     m_Indexer.stopMotors();
     m_shooter.stopMotor();
+    m_intake.stopIntakeMotor();
   }
 
   // Returns true when the command should end.

@@ -186,7 +186,7 @@ public class RobotContainer {
     m_d_down.whileHeld(new LowerClimber(m_climber, m_ledsubsystem));
 
     // Partner Bindings
-    m_p_rb.whileHeld(new EjectBalls(m_indexer, m_shooter));
+    m_p_rb.whileHeld(new EjectBalls(m_indexer, m_shooter, m_intake));
     m_p_start.whenPressed(new TurnOffIntakeArm(m_intake));
     m_p_a.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_ledsubsystem, ShotDistance.ClosestShot));
     m_p_b.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_ledsubsystem, ShotDistance.MidTarmac));

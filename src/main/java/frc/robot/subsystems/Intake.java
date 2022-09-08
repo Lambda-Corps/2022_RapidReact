@@ -37,7 +37,7 @@ public class Intake extends SubsystemBase {
 
   //positions
   public static final int INTAKE_ARM_RETRACT = 0; //intake fully vertical/up
-  public static int INTAKE_ARM_EXTEND = 1630; //intake down to grab ball (currently has temporary value)
+  public static int INTAKE_ARM_EXTEND = 0; // 1630 //intake down to grab ball (currently has temporary value)
   // public static final int INTAKE_ARM_EXTEND = 1475; //intake down to grab ball (currently has temporary value)
 
   final double DOWN_FEEDFORWARD = 0.3;
@@ -64,7 +64,7 @@ public class Intake extends SubsystemBase {
   
   //soft limits
   private final int ARM_REVERSE_SOFT_LIMIT = 0;
-  private final int ARM_FORWARD_SOFT_LIMIT = 1750;
+  private final int ARM_FORWARD_SOFT_LIMIT = 1750; // 1750
 
   ShuffleboardTab m_intakeTab;
   NetworkTableEntry m_armMaxSpeed, m_armStandardSpeed, m_maxFF, m_minFF, m_forwardSoftLimit, m_armEncoder;
@@ -252,6 +252,11 @@ public class Intake extends SubsystemBase {
 
     public void collectBalls(){
       m_intakeMotor.set(ControlMode.PercentOutput, INTAKE_WHEEL_SPEEDS);
+    }
+
+    // Added 9/8/2022 as temporary bypass for no up/down functionality
+    public void ejectBalls(){
+      m_intakeMotor.set(ControlMode.PercentOutput, -INTAKE_WHEEL_SPEEDS);
     }
 
   public void stopIntakeMotor(){

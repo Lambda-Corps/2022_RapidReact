@@ -129,8 +129,8 @@ public class DriveTrain extends SubsystemBase {
 		m_right_follower.setInverted(InvertType.FollowMaster);
 
     		/* Set Neutral Mode */
-		m_left_leader.setNeutralMode(NeutralMode.Brake);
-		m_right_leader.setNeutralMode(NeutralMode.Brake);
+		m_left_leader.setNeutralMode(NeutralMode.Brake); //Brake
+		m_right_leader.setNeutralMode(NeutralMode.Brake); //Brake
 
 		/* Configure output */
 		m_left_leader.setInverted(m_left_invert);

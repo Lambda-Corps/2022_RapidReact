@@ -20,7 +20,7 @@ public class EjectBallsSequence extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
       new ArmMM(intake, Intake.INTAKE_ARM_RETRACT),
-      new EjectBalls(indexer,shooter)
+      new EjectBalls(indexer,shooter,intake)
     );
   }
 }
