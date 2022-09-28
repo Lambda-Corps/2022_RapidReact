@@ -38,7 +38,7 @@ public class LEDsubsystem extends SubsystemBase {
   private int m_loopcount;
   private int m_LEDPoint = 0;
   
-  private final int LEFT_SIDE_COUNT = 32, MIDDLE_COUNT = 13 + 1 , RIGHT_SIDE_COUNT = 36; //81 also added one to keep the code from breaking
+  private final int LEFT_SIDE_COUNT = 32, MIDDLE_COUNT = 12 , RIGHT_SIDE_COUNT = 36; //80 also if another LED needs to be cut off make sure its still and even number of LEDs
   private final int TOTAL_LED_COUNT = LEFT_SIDE_COUNT + RIGHT_SIDE_COUNT + MIDDLE_COUNT;
 
   private boolean climberLEDHighBar = false; // Actually the mid bar
