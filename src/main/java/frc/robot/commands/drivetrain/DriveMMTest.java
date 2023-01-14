@@ -52,7 +52,7 @@ public class DriveMMTest extends CommandBase {
     m_kD = m_kDEntry.getDouble(0.0);
     STABLE_ITERATIONS_BEFORE_FINISHED = (int) m_iterationEntry.getDouble(5.0);
     m_targetTicks = m_targetPosEntry.getDouble(0) * kEncoderTicksPerInch;
-    m_targetTicksEntry.forceSetDouble((int) m_targetTicks);
+    m_targetTicksEntry.setDouble((int) m_targetTicks);
     count = 0;
     m_driveTrain.reset_drive_PID_values(m_drive_kP, m_kI, m_kD);
     m_driveTrain.motion_magic_start_config_drive(m_targetTicks >= 0, m_targetTicks);

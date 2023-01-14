@@ -166,8 +166,8 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    m_rev_limit_entry.forceSetBoolean(isReverseLimitSwitchHit());
-    m_fwd_limit_entry.forceSetBoolean(isForwardLimitSwitchHit());
+    m_rev_limit_entry.setBoolean(isReverseLimitSwitchHit());
+    m_fwd_limit_entry.setBoolean(isForwardLimitSwitchHit());
     // This method will be called once per scheduler run
     if(isReverseLimitSwitchHit()){
       m_armMotor.setSelectedSensorPosition(0);

@@ -4,7 +4,7 @@
 
 package frc.robot.commands.shooter;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -19,7 +19,7 @@ public class ShooterPIDTuning extends CommandBase {
   private final Shooter m_shooter;
   private final Indexer m_indexer;
   private final ShuffleboardTab m_myTab;
-  private final NetworkTableEntry m_kpEntry, m_kiEntry, m_kdEntry, m_kfEntry, m_spEntry,m_indexerSpeedEntry, m_indexderDelayEntry, m_runTimeEntry;
+  private final GenericEntry m_kpEntry, m_kiEntry, m_kdEntry, m_kfEntry, m_spEntry,m_indexerSpeedEntry, m_indexderDelayEntry, m_runTimeEntry;
   /**
    * Creates a new PIDTuningCommand.
    */

@@ -29,6 +29,7 @@ public class Vision extends SubsystemBase {
   PhotonTrackedTarget m_target;
 
   double pitch, yaw, area;
+  int pipelineIndex;
 
   public Vision() {
       m_limelight.setPipelineIndex(LIMELIGHTPIPELINE);
@@ -105,7 +106,6 @@ public class Vision extends SubsystemBase {
   }
 
   public void setTeamPipeline() {
-    int pipelineIndex;
     if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) {
       pipelineIndex = 1;
       // m_HD3000.setPipelineIndex(pipelineIndex);

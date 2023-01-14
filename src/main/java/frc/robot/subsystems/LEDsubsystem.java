@@ -5,7 +5,7 @@
 package frc.robot.subsystems;
 
 
-import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -50,12 +50,12 @@ public class LEDsubsystem extends SubsystemBase {
   private boolean driverSignalActive = false;
 
   // Intake State Collector
-  private NetworkTableEntry m_LEDSNetworkTableEntry;
+  private GenericEntry m_LEDSNetworkTableEntry;
   /** Creates a new LEDsubsystem. */
-  public LEDsubsystem() { // LEDs normaly use PWM port 9
-    // Must be a PWM header, not MXP or DIO
+  public LEDsubsystem() { 
     m_LEDSNetworkTableEntry = Shuffleboard.getTab("LED").add("TestNumber", 0).getEntry();
-
+    // LEDs normaly use PWM port 9
+    // Must be a PWM header, not MXP or DIO
     m_led = new AddressableLED(9);
     // Reuse buffer
     // Default to a length of 60, start empty output

@@ -116,7 +116,7 @@ public class DriveTrain extends SubsystemBase {
     	TalonFXConfiguration _leftConfig = new TalonFXConfiguration();
     	TalonFXConfiguration _rightConfig = new TalonFXConfiguration();
 
-		// Set follower talons to default configs, and then follow their leaders
+		// Set follower talons to default configs, and then follo–w their leaders
 		m_left_follower.configAllSettings(_leftConfig);
 		m_right_follower.configAllSettings(_rightConfig);
 		m_left_follower.follow(m_left_leader);
@@ -239,7 +239,7 @@ public class DriveTrain extends SubsystemBase {
 		/// Odometry Tracker objects
 		m_2dField = new Field2d();
 		SmartDashboard.putData(m_2dField);
-		m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
+		m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d(), 0, 0);
 
 		// Code for simulation within the DriveTrain Constructor
 		if (Robot.isSimulation()) { // If our robot is simulated
@@ -363,8 +363,8 @@ public class DriveTrain extends SubsystemBase {
 			// Just set the motors
 			m_right_leader.set(ControlMode.PercentOutput, speeds.right);
 			m_left_leader.set(ControlMode.PercentOutput, speeds.left);
-			m_right_output.forceSetDouble(speeds.right);
-			m_left_output.forceSetDouble(speeds.left);
+			m_right_output.setDouble(speeds.right);
+			m_left_output.setDouble(speeds.left);
 			return;
 		}
 
@@ -394,8 +394,8 @@ public class DriveTrain extends SubsystemBase {
 			// Just set the motors
 			m_right_leader.set(ControlMode.PercentOutput, speeds.right);
 			m_left_leader.set(ControlMode.PercentOutput, speeds.left);
-			m_right_output.forceSetDouble(speeds.right);
-			m_left_output.forceSetDouble(speeds.left);
+			m_right_output.setDouble(speeds.right);
+			m_left_output.setDouble(speeds.left);
 		// }
   	}
 
@@ -730,8 +730,8 @@ public class DriveTrain extends SubsystemBase {
 			turnspeed = -m_turnPidController.calculate(yaw, 0);
 
 			NetworkTable visionTable = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Vision");
-			visionTable.getEntry("forward drive speed").forceSetDouble(forwardspeed);
-			visionTable.getEntry("Turn speed").forceSetDouble(turnspeed);
+			visionTable.getEntry("forward drive speed").setDouble(forwardspeed);
+			visionTable.getEntry("Turn speed").setDouble(turnspeed);
 		}
 
 		teleop_drive(forwardspeed, turnspeed);
@@ -748,9 +748,9 @@ public class DriveTrain extends SubsystemBase {
 		}
 
 		NetworkTable visionTable = NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Vision");
-		visionTable.getEntry("forward drive speed").forceSetDouble(forwardspeed);
-		visionTable.getEntry("Turn speed").forceSetDouble(turnspeed);
-		visionTable.getEntry("Cargo Yaw").forceSetDouble(yaw);
+		visionTable.getEntry("forward drive speed").setDouble(forwardspeed);
+		visionTable.getEntry("Turn speed").setDouble(turnspeed);
+		visionTable.getEntry("Cargo Yaw").setDouble(yaw);
 		teleop_drive(forwardspeed, turnspeed);
 	}
 

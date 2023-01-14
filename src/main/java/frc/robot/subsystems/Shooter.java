@@ -175,7 +175,7 @@ public class Shooter extends SubsystemBase {
     double currentLoopError = Math.abs(m_Shooter.getClosedLoopError());
 
     boolean atspeed = currentLoopError < (m_shooter_set_point * SHOOTER_TOLERANCE);
-    m_at_speed_entry.forceSetBoolean(atspeed);
+    m_at_speed_entry.setBoolean(atspeed);
     // The command was ending right as it started because the closed loop error
     // hadn't gotten far enough away from the inertia start.
     // Only return true if we've been spinning for at least half a second AND we

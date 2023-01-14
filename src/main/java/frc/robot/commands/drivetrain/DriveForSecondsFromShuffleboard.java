@@ -4,7 +4,7 @@
 
 package frc.robot.commands.drivetrain;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -17,7 +17,7 @@ public class DriveForSecondsFromShuffleboard extends CommandBase {
   Timer m_timer;
   DriveTrain m_driveTrain;
   ShuffleboardTab m_dTab = Shuffleboard.getTab("Default Drive Tab");
-  NetworkTableEntry m_elapsed_entry, m_speed_entry, m_right_distance, m_inches_off;
+  GenericEntry m_elapsed_entry, m_speed_entry, m_right_distance, m_inches_off;
   private double m_elapsed, m_speed;
   /** Creates a new DriveFiveSeconds. */
   public DriveForSecondsFromShuffleboard(DriveTrain dt) {
@@ -57,9 +57,9 @@ public class DriveForSecondsFromShuffleboard extends CommandBase {
     double rightenc = m_driveTrain.getRightEncoderValue();
     double leftenc = m_driveTrain.getLeftEncoderValue();
 
-    m_right_distance.forceSetDouble(rightenc / kEncoderTicksPerInch);
+    m_right_distance.setDouble(rightenc / kEncoderTicksPerInch);
     double off = Math.abs(Math.abs(rightenc) - Math.abs(leftenc));
-    m_inches_off.forceSetDouble(off/kEncoderTicksPerInch);
+    m_inches_off.setDouble(off/kEncoderTicksPerInch);
     }
 
   // Returns true when the command should end.

@@ -11,17 +11,16 @@ package frc.robot.utils;
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-import edu.wpi.first.wpilibj2.command.button.Button;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj.GenericHID;
 
 /**
  * A {@link Button} that gets its state from a {@link GenericHID}.
  */
-public class GamepadAxisButton extends Button {
-	private final GenericHID m_joystick;
-	private final int m_axisNumber;
-	private final double m_threshold;
-
+public class GamepadAxisButton extends Trigger {
 	/**
 	 * Create a gamepad axis for triggering commands as if it were a button.
 	 *
@@ -31,33 +30,8 @@ public class GamepadAxisButton extends Button {
 	 * 
 	 * @param threshold The threshold above which the axis shall trigger a command
 	 */
-	public GamepadAxisButton(GenericHID joystick, int axisNumber, double threshold) {
-		m_joystick = joystick;
-		m_axisNumber = axisNumber;
-		m_threshold = threshold;
-	}
-
-	/**
-	 * Create a GamepadAxisButton with a default threshold of 0.5 to trigger
-	 *
-	 * @param joystick     The GenericHID object that has the axis (e.g. Joystick, KinectStick,
-	 *                     etc)
-	 * @param axisNumber The axis number (see {@link GenericHID#getRawAxis(int) }
-	 */
-	public GamepadAxisButton(GenericHID joystick, int axisNumber) {
-		this(joystick,axisNumber,0.5);
-	}
-
-	/**
-	 * Gets the value of the gamepad axis.
-	 *
-	 * @return The value of the gamepad axis
-	 */
-	@Override
-	public boolean get() {
-		double rawAxis = m_joystick.getRawAxis(m_axisNumber);
-
-		return Math.abs(rawAxis) > m_threshold;
+	public GamepadAxisButton(BooleanSupplier bs) {
+		super(bs);
 	}
 }
 

@@ -4,7 +4,7 @@
 
 package frc.robot.commands.Indexer;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -18,7 +18,7 @@ public class TestIntakeIndexerAndShooter extends CommandBase {
   private final Intake m_intake;
   private final Shooter m_shooter;
 
-  NetworkTableEntry m_in_speed_entry, m_mid_speed_entry, m_shoot_speed_entry, m_duration_entry, m_beamIndex_entry, m_beamShoot_entry, m_intakeWheels_entry, m_shotPower;
+  GenericEntry m_in_speed_entry, m_mid_speed_entry, m_shoot_speed_entry, m_duration_entry, m_beamIndex_entry, m_beamShoot_entry, m_intakeWheels_entry, m_shotPower;
 
   double m_in_speed, m_mid_speed, m_shoot_speed, m_duration, m_intakeWheelSpeed, m_flywheelSpeed;
 

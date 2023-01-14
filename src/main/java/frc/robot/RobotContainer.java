@@ -54,7 +54,6 @@ import frc.robot.commands.shooter.CancelShooter;
 import frc.robot.commands.shooter.SetShooterDistance;
 import frc.robot.commands.shooter.Shooting_Sequence;
 import frc.robot.commands.shooter.StartShooterWheel;
-import frc.robot.commands.vision.AimAtCargo;
 import frc.robot.commands.vision.DriveWithVision;
 import frc.robot.commands.vision.LEDoff;
 import frc.robot.commands.vision.LEDon;
@@ -118,8 +117,8 @@ public class RobotContainer {
     m_d_lb = new JoystickButton(m_driver_controller, XboxController.Button.kLeftBumper.value);
     m_d_ls = new JoystickButton(m_driver_controller, XboxController.Button.kLeftStick.value);
     m_d_rs = new JoystickButton(m_driver_controller, XboxController.Button.kRightStick.value);
-    m_d_rt = new GamepadAxisButton(m_driver_controller, 3);
-    m_d_lt = new GamepadAxisButton(m_driver_controller, 2);
+    m_d_rt = new GamepadAxisButton(this::axis3ThresholdGreatererThanPoint5);
+    m_d_lt = new GamepadAxisButton(this::axis2ThresholdGreatererThanPoint5);
     m_d_sel = new JoystickButton(m_driver_controller, XboxController.Button.kBack.value);
     m_d_strt = new JoystickButton(m_driver_controller, XboxController.Button.kStart.value);
 
@@ -165,37 +164,37 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Driver Bindings
 
-    m_d_a.whileHeld(new LEDon(m_vision).andThen(new DriveWithVision(m_driveTrain, m_vision, TARGET_DISTANCE_CLOSE)));
-    m_d_b.whileHeld(new LEDon(m_vision).andThen(new DriveWithVision(m_driveTrain, m_vision, TARGET_DISTANCE_FAR)));
-    m_d_a.whenReleased(new LEDoff(m_vision));
-    m_d_b.whenReleased(new LEDoff(m_vision));
-    m_d_lb.whenReleased(new ResetArmLimitAndEncoder(m_intake));
-    m_d_lt.whenPressed(new CancelIndexer(m_indexer, m_intake));
-    m_d_rt.whenHeld(new PrintCommand("Driving Inverted"));
-    m_d_lb.whenPressed(new DropIntakeAndCollectBalls(m_intake, m_indexer));
+    m_d_a.whileTrue(new LEDon(m_vision).andThen(new DriveWithVision(m_driveTrain, m_vision, TARGET_DISTANCE_CLOSE)));
+    m_d_b.whileTrue(new LEDon(m_vision).andThen(new DriveWithVision(m_driveTrain, m_vision, TARGET_DISTANCE_FAR)));
+    m_d_a.onFalse(new LEDoff(m_vision));
+    m_d_b.onFalse(new LEDoff(m_vision));
+    m_d_lb.onFalse(new ResetArmLimitAndEncoder(m_intake));
+    m_d_lt.onTrue(new CancelIndexer(m_indexer, m_intake));
+    m_d_rt.onTrue(new PrintCommand("Driving Inverted"));
+    m_d_lb.onTrue(new DropIntakeAndCollectBalls(m_intake, m_indexer));
     //m_d_rs.whenPressed(new HighBarClimb(m_climber, m_ledsubsystem, m_driver_controller));
     //m_d_ls.whenPressed(new LowBarClimb(m_climber, m_ledsubsystem, m_driver_controller));
 
     // Driver POV Bindings
-    m_d_up.whenPressed(new CancelClimber(m_climber, m_ledsubsystem));
-    m_d_right.whenPressed(new HighBarRaise(m_climber, m_ledsubsystem, m_driver_controller));
-    m_d_left.whenPressed(new LowBarRaise(m_climber, m_ledsubsystem, m_driver_controller));
-    m_d_down.whileHeld(new LowerClimber(m_climber, m_ledsubsystem));
+    m_d_up.onTrue(new CancelClimber(m_climber, m_ledsubsystem));
+    m_d_right.onTrue(new HighBarRaise(m_climber, m_ledsubsystem, m_driver_controller));
+    m_d_left.onTrue(new LowBarRaise(m_climber, m_ledsubsystem, m_driver_controller));
+    m_d_down.onTrue(new LowerClimber(m_climber, m_ledsubsystem));
 
     // Partner Bindings
-    m_p_rb.whileHeld(new EjectBalls(m_indexer, m_shooter));
-    m_p_start.whenPressed(new TurnOffIntakeArm(m_intake));
-    m_p_a.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_ledsubsystem, ShotDistance.ClosestShot));
-    m_p_b.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_ledsubsystem, ShotDistance.MidTarmac));
-    m_p_y.whenPressed(new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_ledsubsystem, ShotDistance.TarmacLine));
-    m_p_x.whenPressed(new CancelShooter(m_shooter, m_ledsubsystem));
-    m_p_sel.whenPressed(new DriveClimbertoReverseHardLimit(m_climber));
+    m_p_rb.onTrue(new EjectBalls(m_indexer, m_shooter));
+    m_p_start.onTrue(new TurnOffIntakeArm(m_intake));
+    m_p_a.onTrue(new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_ledsubsystem, ShotDistance.ClosestShot));
+    m_p_b.onTrue(new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_ledsubsystem, ShotDistance.MidTarmac));
+    m_p_y.onTrue(new Shooting_Sequence(m_shooter, m_intake, m_indexer, m_ledsubsystem, ShotDistance.TarmacLine));
+    m_p_x.onTrue(new CancelShooter(m_shooter, m_ledsubsystem));
+    m_p_sel.onTrue(new DriveClimbertoReverseHardLimit(m_climber));
 
     // Partner POV Bindings
-    m_p_down.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.ClosestShot).andThen(new StartShooterWheel(m_shooter, m_ledsubsystem)));
-    m_p_right.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.MidTarmac).andThen(new StartShooterWheel(m_shooter, m_ledsubsystem)));
-    m_p_up.whenPressed(new SetShooterDistance(m_shooter, ShotDistance.TarmacLine).andThen(new StartShooterWheel(m_shooter, m_ledsubsystem)));
-    m_p_left.whenPressed(new CancelShooter(m_shooter, m_ledsubsystem));
+    m_p_down.onTrue(new SetShooterDistance(m_shooter, ShotDistance.ClosestShot).andThen(new StartShooterWheel(m_shooter, m_ledsubsystem)));
+    m_p_right.onTrue(new SetShooterDistance(m_shooter, ShotDistance.MidTarmac).andThen(new StartShooterWheel(m_shooter, m_ledsubsystem)));
+    m_p_up.onTrue(new SetShooterDistance(m_shooter, ShotDistance.TarmacLine).andThen(new StartShooterWheel(m_shooter, m_ledsubsystem)));
+    m_p_left.onTrue(new CancelShooter(m_shooter, m_ledsubsystem));
 
   }
 
@@ -411,5 +410,13 @@ public class RobotContainer {
 
   public void setBrakeModeOn() {
     m_driveTrain.setNeutralMode(NeutralMode.Brake);
+  }
+
+  public boolean axis3ThresholdGreatererThanPoint5(){
+    return Math.abs(m_driver_controller.getRawAxis(3)) > .5;
+  }
+
+  public boolean axis2ThresholdGreatererThanPoint5(){
+    return Math.abs(m_driver_controller.getRawAxis(2)) > .5;
   }
 }
