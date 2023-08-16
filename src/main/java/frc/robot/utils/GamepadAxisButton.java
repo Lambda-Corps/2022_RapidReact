@@ -30,8 +30,7 @@ public class GamepadAxisButton extends Trigger {
 	 * 
 	 * @param threshold The threshold above which the axis shall trigger a command
 	 */
-	public GamepadAxisButton(BooleanSupplier bs) {
-		super(bs);
+	public GamepadAxisButton(GenericHID joystick, int axisNumber, double threshold) {
+		super(() -> joystick.getRawAxis(0) > threshold);
 	}
 }
-
