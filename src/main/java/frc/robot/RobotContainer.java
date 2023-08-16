@@ -117,8 +117,8 @@ public class RobotContainer {
     m_d_lb = new JoystickButton(m_driver_controller, XboxController.Button.kLeftBumper.value);
     m_d_ls = new JoystickButton(m_driver_controller, XboxController.Button.kLeftStick.value);
     m_d_rs = new JoystickButton(m_driver_controller, XboxController.Button.kRightStick.value);
-    m_d_rt = new GamepadAxisButton(this::axis3ThresholdGreatererThanPoint5);
-    m_d_lt = new GamepadAxisButton(this::axis2ThresholdGreatererThanPoint5);
+    m_d_rt = new GamepadAxisButton(m_driver_controller, 3, 0.5);
+    m_d_lt = new GamepadAxisButton(m_driver_controller, 3, 0.5);
     m_d_sel = new JoystickButton(m_driver_controller, XboxController.Button.kBack.value);
     m_d_strt = new JoystickButton(m_driver_controller, XboxController.Button.kStart.value);
 
